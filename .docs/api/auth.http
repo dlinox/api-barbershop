@@ -1,0 +1,59 @@
+### Variables
+@baseUrl = http://localhost:8000/api
+@token = {{signIn.response.body.data.accessToken}}
+@profileToken = {{selectProfile.response.body.data.accessToken}}
+
+### Health Check
+GET {{baseUrl}}
+
+###############################################
+# SIGN IN
+###############################################
+
+### Sign In (1 perfil → hasProfile: true)
+# @name signIn
+POST {{baseUrl}}/auth/sign-in
+Content-Type: application/json
+
+{
+    "identifier": "linox",
+    "password": "password"
+}
+
+###############################################
+# PROFILES (solo si hasProfile: false)
+###############################################
+
+### Get Profiles
+GET {{baseUrl}}/auth/profiles
+Authorization: Bearer {{token}}
+
+### Select Profile
+# @name selectProfile
+POST {{baseUrl}}/auth/select-profile
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "profileId": 1
+}
+
+###############################################
+# USER DATA
+###############################################
+
+### Get Current User (usa token con profileId)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+###############################################
+# TOKEN MANAGEMENT
+###############################################
+
+### Refresh Token
+POST {{baseUrl}}/auth/refresh
+Authorization: Bearer {{token}}
+
+### Sign Out
+POST {{baseUrl}}/auth/sign-out
+Authorization: Bearer {{token}}

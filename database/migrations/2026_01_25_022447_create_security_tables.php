@@ -1,0 +1,130 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+
+    public function up(): void
+    {
+        Schema::create('auth_users', function (Blueprint $table) {
+            $table->id();
+            $table->string('username', 50)->unique();
+            $table->string('email', 100)->unique();
+            $table->string('password', 255);
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('last_sign_in_at')->nullable();
+            $table->timestamps();
+
+            $table->index('username');
+            $table->index('email');
+            $table->index('is_active');
+        });
+
+        Schema::create('auth_password_resets', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('auth_user_id');
+            $table->string('reset_token', 255);
+            $table->timestamp('expires_at');
+            $table->timestamps();
+
+            $table->foreign('auth_user_id')->references('id')->on('auth_users')->onDelete('cascade');
+            $table->index('auth_user_id');
+            $table->index('expires_at');
+        });
+
+        Schema::create('auth_sessions', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('auth_user_id');
+            $table->unsignedBigInteger('behavior_profile_id')->nullable();
+            $table->text('session_token');
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->timestamp('last_used_at')->nullable();
+            $table->timestamp('expires_at');
+            $table->timestamps();
+
+            $table->foreign('auth_user_id')->references('id')->on('auth_users')->onDelete('cascade');
+            $table->index('auth_user_id');
+            $table->index('behavior_profile_id');
+            $table->index('expires_at');
+        });
+
+        Schema::create('behavior_roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 50)->unique();
+            $table->string('display_name', 100)->unique();
+            $table->string('redirect_to', 255)->nullable();
+            $table->enum('level', ['0', '1', '2', '3'])->default('1');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+
+            $table->index('name');
+            $table->index('level');
+            $table->index('is_active');
+        });
+
+        Schema::create('behavior_permissions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 50)->unique();
+            $table->string('display_name', 100);
+            $table->enum('type', ['module', 'menu', 'view', 'action', 'feature'])->default('action');
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->enum('level', ['0', '1', '2', '3'])->default('1');
+            $table->timestamps();
+
+            $table->foreign('parent_id')->references('id')->on('behavior_permissions')->onDelete('cascade');
+            $table->index('name');
+            $table->index('type');
+            $table->index('parent_id');
+            $table->index('level');
+        });
+
+        Schema::create('behavior_role_permissions', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('behavior_role_id');
+            $table->unsignedBigInteger('behavior_permission_id');
+            $table->timestamps();
+
+            $table->foreign('behavior_role_id')->references('id')->on('behavior_roles')->onDelete('cascade');
+            $table->foreign('behavior_permission_id')->references('id')->on('behavior_permissions')->onDelete('cascade');
+            $table->index('behavior_role_id');
+            $table->index('behavior_permission_id');
+            $table->unique(['behavior_role_id', 'behavior_permission_id'], 'role_perm_unique');
+        });
+
+        Schema::create('behavior_profiles', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('auth_user_id');
+            $table->string('profileable_type', 50);
+            $table->unsignedBigInteger('profileable_id');
+            $table->unsignedBigInteger('behavior_role_id');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+
+            $table->foreign('auth_user_id')->references('id')->on('auth_users')->onDelete('cascade');
+            $table->foreign('behavior_role_id')->references('id')->on('behavior_roles')->onDelete('cascade');
+
+            $table->index('auth_user_id');
+            $table->index(['profileable_type', 'profileable_id']);
+            $table->index('behavior_role_id');
+            $table->index('is_active');
+            $table->unique(['profileable_type', 'profileable_id'], 'profile_morph_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('behavior_profiles');
+        Schema::dropIfExists('behavior_role_permissions');
+        Schema::dropIfExists('behavior_permissions');
+        Schema::dropIfExists('behavior_roles');
+
+        Schema::dropIfExists('auth_sessions');
+        Schema::dropIfExists('auth_password_resets');
+        Schema::dropIfExists('auth_users');
+    }
+};

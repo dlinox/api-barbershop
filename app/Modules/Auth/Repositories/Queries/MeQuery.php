@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Modules\Auth\Repositories\Queries;
+
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+
+use App\Models\Auth\User;
+use App\Common\Exceptions\ApiException;
+
+use App\Modules\Auth\Repositories\ProfileRepository;
+
+class MeQuery
+{
+
+    public function __construct(
+        private ProfileRepository $profileRepository,
+    ) {}
+
+    public function __invoke(User $user, ?int $profileId): array
+    {
+
+        if ($profileId) {
+            $profile = $this->profileRepository->findById($profileId);
+        } else {
+            $profile = $this->profileRepository->firstActiveByUserId($user->id);
+        }
+
+        if (!$profile) {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            throw new ApiException("Perfil no encontrado", 404);
+        }
+
+        return  [
+            'name' => collect([$profile->person->name, $profile->person->paternal_surname, $profile->person->maternal_surname])->filter()->implode(' '),
+            'username' => $user->username,
+            'email' => $user->email,
+            'profile' => [
+                'id' => $profile->id,
+                'role' => $profile->role->display_name,
+                'redirectTo' => $profile->role->redirect_to,
+                'permissions' => $profile->role->permissions,
+            ],
+        ];
+    }
+}
