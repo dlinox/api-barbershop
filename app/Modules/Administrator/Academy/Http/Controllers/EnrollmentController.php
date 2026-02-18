@@ -25,6 +25,6 @@ class EnrollmentController
     {
         $data = $request->validated();
         $this->enrollmentService->save($data);
-        return ApiResponse::success('Registro guardado correctamente');
+        return ApiResponse::success(null, 'Registro guardado correctamente');
     }
 }
