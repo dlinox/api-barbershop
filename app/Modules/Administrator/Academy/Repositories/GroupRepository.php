@@ -5,8 +5,6 @@ namespace App\Modules\Administrator\Academy\Repositories;
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\Group;
 
-use function Laravel\Prompts\select;
-
 class GroupRepository
 {
     public function dataTable($request)
@@ -22,9 +20,28 @@ class GroupRepository
     public function createOrUpdate(array $data)
     {
         $group = Group::updateOrCreate(['id' => $data['id'] ?? null], $data);
-        $group->paymentPlans()->delete();
+
+        $newPaymentPlanIds = [];
+        foreach ($data['payment_plans'] as $paymentPlan) {
+            if (!empty($paymentPlan['id'])) {
+                $newPaymentPlanIds[] = $paymentPlan['id'];
+            }
+        }
+
+        $plansToDelete = $group->paymentPlans()->whereNotIn('id', $newPaymentPlanIds)->get();
+
+        $plansWithPayments = $plansToDelete->filter(function ($plan) {
+            return $plan->enrollmentPayments()->exists();
+        });
+
+        if ($plansWithPayments->isNotEmpty()) {
+            throw new \Exception('No se pueden eliminar los planes de pago porque tienen pagos asociados');
+        }
+
+        $group->paymentPlans()->whereNotIn('id', $newPaymentPlanIds)->delete();
 
         if ($group->enrollment_price > 0) {
+
             $group->paymentPlans()->updateOrCreate(
                 [
                     'type' => 'enrollment',
@@ -58,6 +75,7 @@ class GroupRepository
                 ]);
             }
         }
+
         return $group;
     }
 
@@ -103,7 +121,9 @@ class GroupRepository
             'academy_groups.days_of_week',
             'academy_groups.enrollment_price',
             'academy_groups.monthly_price',
+            'academy_groups.attendance_tolerance_minutes',
             'academy_groups.is_active',
+
 
             'academy_groups.branch_id',
             'academy_branches.name as branch_name',

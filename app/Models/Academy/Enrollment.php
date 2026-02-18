@@ -26,4 +26,9 @@ class Enrollment extends Model
     {
         return $this->hasMany(EnrollmentPayment::class);
     }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
 }

@@ -9,7 +9,7 @@ class AttendanceRepository
 {
     public function dataTable($request)
     {
-        return Attendance::select(
+        $query = Attendance::select(
             'academy_attendances.id',
             'academy_attendances.check_in',
             'academy_attendances.check_out',
@@ -40,8 +40,14 @@ class AttendanceRepository
             ->join('academy_attendance_deadlines', 'academy_attendances.attendance_deadline_id', '=', 'academy_attendance_deadlines.id')
             ->join('academy_groups', 'academy_attendance_deadlines.group_id', '=', 'academy_groups.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
-            ->join('academy_schedules', 'academy_groups.schedule_id', '=', 'academy_schedules.id')
-            ->dataTable($request);
+            ->join('academy_schedules', 'academy_groups.schedule_id', '=', 'academy_schedules.id');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('academy_attendances.id', 'desc');
+        }
+
+        $items = $query->dataTable($request);
+        return $items;
     }
 
     public function update(array $data)

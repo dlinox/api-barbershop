@@ -26,6 +26,14 @@ class Attendance extends Model
         'attendance_deadline_id' => 'integer',
     ];
 
+    public static $searchColumns = [
+        'core_persons.name',
+        'core_persons.paternal_surname',
+        'core_persons.maternal_surname',
+        'academy_groups.name',
+        'academy_levels.name',
+    ];
+
     public function enrollment(): BelongsTo
     {
         return $this->belongsTo(Enrollment::class, 'enrollment_id');

@@ -5,6 +5,7 @@ namespace App\Modules\Administrator\Academy\Services;
 use App\Models\Academy\Branch;
 use App\Modules\Administrator\Academy\Repositories\GroupRepository;
 use Illuminate\Http\Request;
+use Pest\Plugin\Commands\DumpCommand;
 
 class GroupService
 {
@@ -19,9 +20,12 @@ class GroupService
 
     public function save(array $data)
     {
-        $branch = Branch::join('academy_rooms', 'academy_rooms.branch_id', '=', 'academy_branches.id')
+        $branch = Branch::select(
+            'academy_branches.id',
+        )->join('academy_rooms', 'academy_rooms.branch_id', '=', 'academy_branches.id')
             ->where('academy_rooms.id', $data['room_id'])
             ->first();
+
         $data['branch_id'] = $branch->id;
         $data['days_of_week'] = implode(',', $data['days_of_week']);
         return $this->groupRepository->createOrUpdate($data);

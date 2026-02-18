@@ -62,10 +62,31 @@ class AttendanceService
     {
         $group = $this->groupRepository->find($data['group_id']);
         $deadline = $group->attendanceDeadlines()->where('date', date('Y-m-d'))->first();
-        if (!$deadline) {
+        if ($deadline)  return;
+
+        try {
+            DB::beginTransaction();
+
+            $students = $group->enrollments()->where('status', 'active')->get();
+
+            $enrollmentsIds = $students->pluck('id')->toArray();
+
             $deadline = $group->attendanceDeadlines()->create([
                 'date' => date('Y-m-d'),
             ]);
+
+            foreach ($enrollmentsIds as $enrollmentId) {
+                Attendance::create([
+                    'attendance_deadline_id' => $deadline->id,
+                    'enrollment_id' => $enrollmentId,
+                    'status' => 'absent'
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new ApiException($e->getMessage(), 500);
         }
     }
 

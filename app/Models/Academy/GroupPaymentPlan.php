@@ -21,13 +21,16 @@ class GroupPaymentPlan extends Model
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
         'amount' => 'decimal:2',
     ];
 
     public function group(): BelongsTo
     {
         return $this->belongsTo(Group::class, 'group_id');
+    }
+
+    public function enrollmentPayments()
+    {
+        return $this->hasMany(EnrollmentPayment::class, 'group_payment_plan_id');
     }
 }

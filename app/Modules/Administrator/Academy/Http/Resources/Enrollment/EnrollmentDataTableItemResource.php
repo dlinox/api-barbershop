@@ -5,6 +5,7 @@ namespace App\Modules\Administrator\Academy\Http\Resources\Enrollment;
 use App\Models\Academy\EnrollmentPayment;
 use App\Models\Academy\Group;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class EnrollmentDataTableItemResource extends JsonResource
 {
@@ -21,8 +22,8 @@ class EnrollmentDataTableItemResource extends JsonResource
                 'planId' => $paymentPlan->id,
                 'type' => $paymentPlan->type,
                 'status' => $payment ? 'Pagado' : 'Pendiente',
-                'startDate' => $paymentPlan->start_date->format('d-m-Y'),
-                'endDate' => $paymentPlan->end_date->format('d-m-Y'),
+                'startDate' => Carbon::parse($paymentPlan->start_date)->locale('es')->isoFormat('D \d\e MMM'), // 12 de Ene.
+                'endDate' => Carbon::parse($paymentPlan->end_date)->locale('es')->isoFormat('D \d\e MMM'),
                 'subtotal' => (float)$paymentPlan->amount,
                 'discount' => $payment ? (float)$payment->discount : 0,
                 'total' => $payment ? (float)$payment->total : (float)$paymentPlan->amount,
@@ -33,7 +34,10 @@ class EnrollmentDataTableItemResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'status' => $this->status,
+            /*
+            'active', 'cancelled', 'completed
+            */
+            'status' => $this->status == 'active' ? 'Activa' : ($this->status == 'cancelled' ? 'Cancelada' : 'Completada'),
             'createdAt' =>  $this->created_at->format('d \d\e M Y'),
             'student' => [
                 'id' => $this->student_id,

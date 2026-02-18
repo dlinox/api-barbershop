@@ -13,10 +13,10 @@ class GroupDataTableItemResource extends JsonResource
             'name' => $this->name,
             'startDate' => $this->start_date,
             'endDate' => $this->end_date,
-            'enrollmentPrice' => $this->enrollment_price,
-            'monthlyPrice' => $this->monthly_price,
+            'enrollmentPrice' => (float) $this->enrollment_price,
+            'monthlyPrice' => (float) $this->monthly_price,
             'daysOfWeek' => $this->days_of_week ? explode(',', $this->days_of_week) : [],
-            'attendanceToleranceMinutes' => $this->attendance_tolerance_minutes,
+            'attendanceToleranceMinutes' => (int) $this->attendance_tolerance_minutes,
             'isActive' => $this->is_active,
             'branch' => [
                 'id' => $this->branch_id,
@@ -37,6 +37,14 @@ class GroupDataTableItemResource extends JsonResource
                 'number' => $this->room_number,
                 'floor' => $this->room_floor,
             ],
+            'paymentPlans' => $this->paymentPlans()->where('type', '!=', 'enrollment')->get()->map(function ($paymentPlan) {
+                return [
+                    'id' => $paymentPlan->id,
+                    'startDate' => $paymentPlan->start_date,
+                    'endDate' => $paymentPlan->end_date,
+                    'amount' => (float) $paymentPlan->amount,
+                ];
+            }),
         ];
     }
 }
