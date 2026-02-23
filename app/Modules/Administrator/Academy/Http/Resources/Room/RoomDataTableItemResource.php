@@ -15,6 +15,7 @@ class RoomDataTableItemResource extends JsonResource
                 'name' => $this->branch_name,
             ],
             'number' => $this->number,
+            'description' => $this->description,
             'capacity' => $this->capacity,
             'floor' => $this->floor,
             'isActive' => (bool) $this->is_active,

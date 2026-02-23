@@ -30,6 +30,7 @@ class StudentRepository
         )
             ->join('core_persons', 'profile_students.core_person_id', '=', 'core_persons.id')
             ->join('auth_users', 'core_persons.id', '=', 'auth_users.id')
+            ->withCount('enrollments')
             ->dataTable($request);
         return $items;
     }
@@ -57,16 +58,16 @@ class StudentRepository
         )
             ->join('core_persons', 'profile_students.core_person_id', '=', 'core_persons.id');
 
-        if ($search) {
-            $items->where('core_persons.name', 'like', "%{$search}%")
-                ->orWhere('core_persons.paternal_surname', 'like', "%{$search}%")
-                ->orWhere('core_persons.maternal_surname', 'like', "%{$search}%")
-                ->orWhere('core_persons.document_number', 'like', "%{$search}%")
-                ->orWhere(DB::raw('CONCAT(core_persons.name, " ", core_persons.paternal_surname, " ", core_persons.maternal_surname)'), 'like', "%{$search}%");
+        if (!empty($search)) {
+            $items->where(function ($query) use ($search) {
+                $query->where('core_persons.name', 'like', "%{$search}%")
+                    ->orWhere('core_persons.paternal_surname', 'like', "%{$search}%")
+                    ->orWhere('core_persons.maternal_surname', 'like', "%{$search}%")
+                    ->orWhere('core_persons.document_number', 'like', "%{$search}%")
+                    ->orWhere(DB::raw('CONCAT(core_persons.name, " ", core_persons.paternal_surname, " ", core_persons.maternal_surname)'), 'like', "%{$search}%");
+            });
         }
 
-        $items->limit(20)->get();
-
-        return $items;
+        return $items->limit(20)->get();
     }
 }

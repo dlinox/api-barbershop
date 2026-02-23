@@ -29,8 +29,11 @@ class EnrollmentPayment extends Model
         'total' => 'decimal:2',
     ];
 
-    public function enrollment(): BelongsTo
-    {
-        return $this->belongsTo(Enrollment::class);
-    }
+    protected static $searchColumns = [
+        'core_persons.name',
+        'core_persons.paternal_surname',
+        'core_persons.maternal_surname',
+        'core_persons.document_number',
+        'academy_groups.name'
+    ];
 }

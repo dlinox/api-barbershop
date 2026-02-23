@@ -22,5 +22,15 @@ class DataInitSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        Role::firstOrCreate(
+            ['name' => 'docente'],
+            [
+                'display_name' => 'Docente',
+                'redirect_to' => '/admin',
+                'level' => '3',
+                'is_active' => true,
+            ]
+        );
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models\Academy;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Common\Traits\HasDataTable;
+use App\Models\Profile\Student;
 
 class Enrollment extends Model
 {
@@ -15,6 +16,7 @@ class Enrollment extends Model
         'profile_student_id',
         'group_id',
         'status',
+        'date',
     ];
 
     protected $casts = [
@@ -30,5 +32,15 @@ class Enrollment extends Model
     public function group()
     {
         return $this->belongsTo(Group::class);
+    }
+
+    public function materials()
+    {
+        return $this->belongsToMany(Material::class, 'academy_enrollment_materials');
+    }
+
+    public function student()
+    {
+        return $this->belongsTo(Student::class, 'profile_student_id');
     }
 }

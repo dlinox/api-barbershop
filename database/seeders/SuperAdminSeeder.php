@@ -122,7 +122,7 @@ class SuperAdminSeeder extends Seeder
             ['username' => 'linox'],
             [
                 'email' => 'super@admin.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('linox'),
                 'is_active' => true,
                 'email_verified_at' => now(),
             ]

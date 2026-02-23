@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use App\Models\Profile\Admin;
+use App\Models\Academy\Branch;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
             'profile_admins' => Admin::class,
             // 'profile_students' => Student::class,
             // 'profile_teachers' => Teacher::class,
+            'academy_branches' => Branch::class,
         ]);
     }
 }

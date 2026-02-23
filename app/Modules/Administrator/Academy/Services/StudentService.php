@@ -24,6 +24,6 @@ class StudentService
 
     public function selectAsyncItems($request)
     {
-        return $this->studentRepository->selectAsyncItems($request);
+        return $this->studentRepository->selectAsyncItems($request->search);
     }
 }

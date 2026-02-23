@@ -35,10 +35,14 @@ class CreateOrUpdatePersonAction
             ->exists();
         if ($documentExists) throw new ApiException('El documento, ya fue registardo.');
 
-        $emailExists = Person::where('email', $data['email'])->where('id', '!=', $id)->exists();
-        if ($emailExists) throw new ApiException('El correo personal, ya fue registardo.');
+        if (!empty($data['email'])) {
+            $emailExists = Person::where('email', $data['email'])->where('id', '!=', $id)->exists();
+            if ($emailExists) throw new ApiException('El correo personal, ya fue registardo.');
+        }
 
-        $phoneExists = Person::where('phone', $data['phone'])->where('id', '!=', $id)->exists();
-        if ($phoneExists) throw new ApiException('El número de celular, ya fue registardo.');
+        if (!empty($data['phone'])) {
+            $phoneExists = Person::where('phone', $data['phone'])->where('id', '!=', $id)->exists();
+            if ($phoneExists) throw new ApiException('El número de celular, ya fue registardo.');
+        }
     }
 }

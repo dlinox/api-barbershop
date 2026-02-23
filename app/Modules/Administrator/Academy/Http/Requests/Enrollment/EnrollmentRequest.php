@@ -12,6 +12,9 @@ class EnrollmentRequest extends ApiFormRequest
         return [
             'id' => 'nullable|exists:academy_enrollments,id',
             'student_id' => 'required|exists:profile_students,core_person_id',
+            'materials' => $id ? 'nullable|array' : 'nullable|array',
+            'materials.*' => 'integer|exists:academy_materials,id',
+            'date' => 'required|date',
             'group_id' => 'required|exists:academy_groups,id',
             'payments' => 'required|array',
             'payments.*.id' => 'nullable|exists:academy_enrollment_payments,id',
@@ -31,6 +34,12 @@ class EnrollmentRequest extends ApiFormRequest
             'id.exists' => 'No se encontro la matricula',
             'student_id.required' => 'El estudiante es requerido',
             'student_id.exists' => 'El estudiante no existe',
+            'materials.required' => 'Los materiales son requeridos',
+            'materials.array' => 'Los materiales deben ser un array',
+            'materials.*.integer' => 'El material debe ser un entero',
+            'materials.*.exists' => 'El material no existe',
+            'date.required' => 'La fecha es requerida',
+            'date.date' => 'La fecha debe ser una fecha',
             'group_id.required' => 'El grupo es requerido',
             'group_id.exists' => 'El grupo no existe',
             'payments.required' => 'Los pagos son requeridos',
@@ -57,7 +66,9 @@ class EnrollmentRequest extends ApiFormRequest
     {
         return [
             'student_id' => 'Estudiante',
+            'date' => 'Fecha',
             'group_id' => 'Grupo',
+            'materials' => 'Materiales',
             'payments' => 'Pagos',
             'payments.*.id' => 'ID',
             'payments.*.planId' => 'Plan',

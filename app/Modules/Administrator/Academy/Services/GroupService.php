@@ -36,13 +36,13 @@ class GroupService
         return $this->groupRepository->delete($id);
     }
 
-    public function getActiveAndUpcomingGroups()
+    public function getAvailableEnrollmentGroups(int $studentId)
     {
-        return $this->groupRepository->getActiveAndUpcomingGroups();
+        return $this->groupRepository->getAvailableEnrollmentGroups($studentId);
     }
 
-    public function getActiveGroups()
+    public function assignTeacher(array $data)
     {
-        return $this->groupRepository->getActiveGroups();
+        return $this->groupRepository->assignTeacher($data['group_id'], $data['teacher_id'] ?? null);
     }
 }

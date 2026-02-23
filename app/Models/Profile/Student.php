@@ -34,6 +34,6 @@ class Student extends Model
 
     public function enrollments()
     {
-        return $this->hasMany(Enrollment::class, 'profile_student_id');
+        return $this->hasMany(Enrollment::class, 'profile_student_id', 'core_person_id');
     }
 }

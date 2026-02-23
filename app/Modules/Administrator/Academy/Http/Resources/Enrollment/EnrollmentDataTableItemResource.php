@@ -34,9 +34,6 @@ class EnrollmentDataTableItemResource extends JsonResource
 
         return [
             'id' => $this->id,
-            /*
-            'active', 'cancelled', 'completed
-            */
             'status' => $this->status == 'active' ? 'Activa' : ($this->status == 'cancelled' ? 'Cancelada' : 'Completada'),
             'createdAt' =>  $this->created_at->format('d \d\e M Y'),
             'student' => [

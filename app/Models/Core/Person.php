@@ -3,6 +3,7 @@
 namespace App\Models\Core;
 
 use App\Models\Profile\Student;
+use App\Models\Profile\Teacher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -58,5 +59,11 @@ class Person extends Model
     public function studentRelation(): BelongsTo
     {
         return $this->belongsTo(Student::class, 'id', 'core_person_id');
+    }
+
+    //teacher
+    public function teacherRelation(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class, 'id', 'core_person_id');
     }
 }

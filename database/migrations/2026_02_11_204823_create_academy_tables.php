@@ -26,15 +26,14 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('branch_id');
             $table->integer('number');
+            $table->string('description')->nullable();
             $table->integer('capacity');
             $table->integer('floor');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
             $table->foreign('branch_id')->references('id')->on('academy_branches')->cascadeOnDelete();
-
-            $table->unique(['branch_id', 'number', 'floor']);
-
+            // $table->unique(['branch_id', 'number', 'floor']);
             $table->index('is_active');
             $table->index('number');
             $table->index('floor');
@@ -77,6 +76,7 @@ return new class extends Migration
             $table->unsignedBigInteger('level_id');
             $table->unsignedBigInteger('schedule_id');
             $table->unsignedBigInteger('room_id');
+            $table->unsignedBigInteger('teacher_id')->nullable();
 
             $table->string('name');
 
@@ -98,6 +98,7 @@ return new class extends Migration
             $table->foreign('level_id')->references('id')->on('academy_levels')->restrictOnDelete();
             $table->foreign('schedule_id')->references('id')->on('academy_schedules')->restrictOnDelete();
             $table->foreign('room_id')->references('id')->on('academy_rooms')->restrictOnDelete();
+            $table->foreign('teacher_id')->references('core_person_id')->on('profile_teachers')->nullOnDelete();
 
             $table->index('is_active');
             $table->index('name');
@@ -119,6 +120,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('profile_student_id');
             $table->unsignedBigInteger('group_id');
+            $table->date('date');
             $table->enum('status', ['active', 'cancelled', 'completed'])->default('active');
             $table->timestamps();
 
@@ -171,19 +173,49 @@ return new class extends Migration
             $table->index('attendance_deadline_id');
             $table->index('status');
         });
+
+        // ─── MATERIALES ───
+        Schema::create('academy_materials', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('product_id');
+            $table->integer('quantity')->default(1);
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+            $table->foreign('product_id')->references('id')->on('inventory_products')->restrictOnDelete();
+            $table->index('product_id');
+            $table->index('is_active');
+        });
+
+        // ─── MATERIALES POR MATRÍCULA ───
+        Schema::create('academy_enrollment_materials', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('enrollment_id');
+            $table->unsignedBigInteger('material_id');
+            $table->integer('quantity')->default(1);
+            $table->timestamps();
+
+            $table->foreign('enrollment_id')->references('id')->on('academy_enrollments')->restrictOnDelete();
+            $table->foreign('material_id')->references('id')->on('academy_materials')->restrictOnDelete();
+
+            $table->unique(['enrollment_id', 'material_id']);
+            $table->index('enrollment_id');
+            $table->index('material_id');
+        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('academy_branches');
-        Schema::dropIfExists('academy_levels');
-        Schema::dropIfExists('academy_rooms');
-        Schema::dropIfExists('academy_schedules');
-
-        Schema::dropIfExists('academy_enrollments');
-        Schema::dropIfExists('academy_enrollment_payments');
-
-        Schema::dropIfExists('academy_attendance_deadlines');
+        Schema::dropIfExists('academy_enrollment_materials');
+        Schema::dropIfExists('academy_materials');
         Schema::dropIfExists('academy_attendances');
+        Schema::dropIfExists('academy_attendance_deadlines');
+        Schema::dropIfExists('academy_enrollment_payments');
+        Schema::dropIfExists('academy_enrollments');
+        Schema::dropIfExists('academy_group_payment_plans');
+        Schema::dropIfExists('academy_groups');
+        Schema::dropIfExists('academy_schedules');
+        Schema::dropIfExists('academy_rooms');
+        Schema::dropIfExists('academy_levels');
+        Schema::dropIfExists('academy_branches');
     }
 };

@@ -3,6 +3,7 @@
 namespace App\Models\Academy;
 
 use App\Common\Traits\HasDataTable;
+use App\Models\Profile\Teacher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -17,6 +18,7 @@ class Group extends Model
         'level_id',
         'schedule_id',
         'room_id',
+        'teacher_id',
         'name',
         'start_date',
         'end_date',
@@ -65,6 +67,11 @@ class Group extends Model
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class, 'room_id');
+    }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(Teacher::class, 'teacher_id', 'core_person_id');
     }
 
     public function paymentPlans()

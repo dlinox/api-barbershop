@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Behavior\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Academy\Branch;
 use App\Models\Academy\Room;
@@ -12,7 +11,6 @@ use App\Models\Academy\Schedule;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
 
     /**
      * Seed the application's database.
@@ -21,8 +19,8 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
-            DataInitSeeder::class,
-            DataDemoSeeder::class,
+            // DataInitSeeder::class,
+            DataBUSeeder::class,
         ]);
     }
 }

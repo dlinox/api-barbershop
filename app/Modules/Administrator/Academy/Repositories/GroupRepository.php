@@ -4,12 +4,22 @@ namespace App\Modules\Administrator\Academy\Repositories;
 
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\Group;
+use Illuminate\Support\Facades\DB;
 
 class GroupRepository
 {
     public function dataTable($request)
     {
-        return $this->getGroupsQuery()->dataTable($request);
+        return $this->getGroupsQuery()
+            ->addSelect(
+                'academy_groups.teacher_id',
+                'core_persons.name as teacher_person_name',
+                'core_persons.paternal_surname as teacher_person_paternal_surname',
+                'core_persons.maternal_surname as teacher_person_maternal_surname'
+            )
+            ->leftJoin('profile_teachers', 'academy_groups.teacher_id', '=', 'profile_teachers.core_person_id')
+            ->leftJoin('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id')
+            ->dataTable($request);
     }
 
     public function find(int $id): ?Group
@@ -92,24 +102,27 @@ class GroupRepository
         return $group->delete();
     }
 
-    public function getActiveAndUpcomingGroups()
+    public function getAvailableEnrollmentGroups(int $studentId)
     {
+
         return $this->getGroupsQuery()
+            ->leftJoin('academy_enrollments', function ($join) use ($studentId) {
+                $join->on('academy_groups.id', '=', 'academy_enrollments.group_id')
+                    ->where('academy_enrollments.profile_student_id', '!=',  $studentId);
+            })
+            ->distinct()
             ->where('academy_groups.end_date', '>', now()) // fecha de fin mayor a la fecha actual
             ->where('academy_groups.is_active', true)
             ->get();
     }
 
 
-    public function getActiveGroups()
+    public function assignTeacher(int $groupId, ?int $teacherId): Group
     {
-        return $this->getGroupsQuery()
-            ->where('academy_groups.start_date', '<=', now()) // fecha de inicio menor o igual a la fecha actual
-            ->where('academy_groups.end_date', '>=', now()) // fecha de fin mayor o igual a la fecha actual
-            ->where('academy_groups.is_active', true)
-            ->get();
+        $group = Group::findOrFail($groupId);
+        $group->update(['teacher_id' => $teacherId]);
+        return $group;
     }
-
 
     private function getGroupsQuery()
     {
@@ -138,7 +151,7 @@ class GroupRepository
 
             'academy_groups.room_id',
             'academy_rooms.number as room_number',
-            'academy_rooms.floor as room_floor'
+            'academy_rooms.floor as room_floor',
         )
             ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')

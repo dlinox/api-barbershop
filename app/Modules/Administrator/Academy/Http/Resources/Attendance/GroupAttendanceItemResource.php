@@ -2,23 +2,20 @@
 
 namespace App\Modules\Administrator\Academy\Http\Resources\Attendance;
 
+use App\Common\Helpers\DateHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Carbon\Carbon;
 
 class GroupAttendanceItemResource extends JsonResource
 {
     public function toArray($request)
     {
-        $daysNumber = explode(',', $this->days_of_week);
-        $daysOfWeek = collect($daysNumber)->map(function ($day) {
-            return Carbon::now()->startOfWeek(Carbon::SUNDAY)->addDays((int)$day)->locale('es')->shortDayName;
-        });
+        $daysOfWeek = DateHelper::getDayNamesFromCsv($this->days_of_week);
 
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'startDate' => Carbon::parse($this->start_date)->format('d-m-Y'),
-            'endDate' => Carbon::parse($this->end_date)->format('d-m-Y'),
+            'startDate' => DateHelper::formatDate($this->start_date),
+            'endDate' => DateHelper::formatDate($this->end_date),
             'daysOfWeek' =>  $daysOfWeek,
             'enrollmentPrice' => $this->enrollment_price,
             'monthlyPrice' => $this->monthly_price,
@@ -33,8 +30,8 @@ class GroupAttendanceItemResource extends JsonResource
             ],
             'schedule' => [
                 'shift' => $this->schedule_shift,
-                'startTime' => Carbon::parse($this->schedule_start_time)->format('g:i A'), //08:00 am
-                'endTime' => Carbon::parse($this->schedule_end_time)->format('g:i A'), //05:00 pm
+                'startTime' => DateHelper::formatTime($this->schedule_start_time),
+                'endTime' => DateHelper::formatTime($this->schedule_end_time),
             ],
             'attendanceDeadlineStatus' => $this->attendance_deadline_status,
         ];

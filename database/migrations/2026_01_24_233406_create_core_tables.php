@@ -79,14 +79,26 @@ return new class extends Migration
             $table->index('email');
             $table->index(['name', 'paternal_surname', 'maternal_surname']);
         });
+
+        // ─── INFRAESTRUCTURAS (polimórfica: sedes de academia, barbería, oficina, etc.) ───
+        Schema::create('core_infrastructures', function (Blueprint $table) {
+            $table->id();
+            $table->string('infrastructurable_type'); // 'academy_branches', 'barbershop_branches', etc.
+            $table->unsignedBigInteger('infrastructurable_id');
+            $table->timestamps();
+
+            $table->unique(['infrastructurable_type', 'infrastructurable_id'], 'core_infra_type_id_unique');
+            $table->index('infrastructurable_type');
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('core_infrastructures');
+        Schema::dropIfExists('core_persons');
         Schema::dropIfExists('core_cities');
         Schema::dropIfExists('core_genders');
         Schema::dropIfExists('core_document_types');
         Schema::dropIfExists('core_countries');
-        Schema::dropIfExists('core_persons');
     }
 };

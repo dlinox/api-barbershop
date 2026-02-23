@@ -29,7 +29,9 @@ class CreateOrUpdateUserAction
             ->exists();
         if ($usernameExists) throw new ApiException('El nombre de usuario ya existe');
 
-        $emailExists = User::where('email', $data['email'])->where('id', '!=', $id)->exists();
-        if ($emailExists) throw new ApiException('El correo del usuario ya existe');
+        if (!empty($data['email'])) {
+            $emailExists = User::where('email', $data['email'])->where('id', '!=', $id)->exists();
+            if ($emailExists) throw new ApiException('El correo del usuario ya existe');
+        }
     }
 }

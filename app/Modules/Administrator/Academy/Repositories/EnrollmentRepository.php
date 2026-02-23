@@ -6,9 +6,10 @@ use App\Models\Academy\Enrollment;
 
 class EnrollmentRepository
 {
-    public function dataTable($request)
+
+    protected function query()
     {
-        $items =  Enrollment::select(
+        return Enrollment::select(
             'academy_enrollments.id',
             'academy_enrollments.status',
             'academy_enrollments.created_at',
@@ -29,13 +30,23 @@ class EnrollmentRepository
             'academy_groups.level_id as group_level_id',
             'academy_levels.name as group_level_name',
 
-        )
-            ->join('core_persons', 'academy_enrollments.profile_student_id', '=', 'core_persons.id')
+        )->join('core_persons', 'academy_enrollments.profile_student_id', '=', 'core_persons.id')
             ->join('academy_groups', 'academy_enrollments.group_id', '=', 'academy_groups.id')
-            ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
-            ->dataTable($request);
+            ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id');
+    }
+
+    public function dataTable($request)
+    {
+        $query = $this->query();
+
+        $items = $query->dataTable($request);
 
         return $items;
+    }
+
+    public function getEnrollment($id)
+    {
+        return $this->query()->where('academy_enrollments.id', $id)->first();
     }
 
     public function save($data)

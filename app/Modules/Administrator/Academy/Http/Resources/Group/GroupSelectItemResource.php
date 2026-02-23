@@ -4,21 +4,21 @@ namespace App\Modules\Administrator\Academy\Http\Resources\Group;
 
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\EnrollmentPayment;
+use App\Models\Academy\EnrollmentMaterial;
+use App\Models\Academy\Material;
+use App\Common\Helpers\DateHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Carbon\Carbon;
 
 class GroupSelectItemResource extends JsonResource
 {
     public function toArray($request)
     {
-        $daysNumber = explode(',', $this->days_of_week);
-        $daysOfWeek = collect($daysNumber)->map(function ($day) {
-            return Carbon::now()->startOfWeek(Carbon::SUNDAY)->addDays((int)$day)->locale('es')->shortDayName;
-        });
+        $daysOfWeek = DateHelper::getDayNamesFromCsv($this->days_of_week);
 
         $paymentPlans = $this->paymentPlans;
 
         $payments = [];
+        $materials = [];
 
         if ($request->studentId) {
 
@@ -33,8 +33,8 @@ class GroupSelectItemResource extends JsonResource
                         'planId' => $paymentPlan->id,
                         'type' => $paymentPlan->type,
                         'status' => $payment ? 'Pagado' : 'Pendiente',
-                        'startDate' => Carbon::parse($paymentPlan->start_date)->format('d-m-Y'),
-                        'endDate' => Carbon::parse($paymentPlan->end_date)->format('d-m-Y'),
+                        'startDate' => DateHelper::formatDate($paymentPlan->start_date),
+                        'endDate' => DateHelper::formatDate($paymentPlan->end_date),
                         'subtotal' => (float)$paymentPlan->amount,
                         'discount' => $payment ? (float)$payment->discount : 0,
                         'total' => $payment ? (float)$payment->total : (float)$paymentPlan->amount,
@@ -48,8 +48,8 @@ class GroupSelectItemResource extends JsonResource
                         'planId' => $paymentPlan->id,
                         'type' => $paymentPlan->type,
                         'status' => 'Pendiente',
-                        'startDate' => Carbon::parse($paymentPlan->start_date)->format('d-m-Y'),
-                        'endDate' => Carbon::parse($paymentPlan->end_date)->format('d-m-Y'),
+                        'startDate' => DateHelper::formatDate($paymentPlan->start_date),
+                        'endDate' => DateHelper::formatDate($paymentPlan->end_date),
                         'subtotal' => (float)$paymentPlan->amount,
                         'discount' => 0,
                         'total' => (float)$paymentPlan->amount,
@@ -58,6 +58,7 @@ class GroupSelectItemResource extends JsonResource
             }
 
             $payments = $payments->sortBy('type')->sortBy('startDate')->values();
+            $materials = Material::select('id', 'name')->where('is_active', true)->get();
         }
 
 
@@ -66,8 +67,8 @@ class GroupSelectItemResource extends JsonResource
             'title' => $this->name,
             'meta' => [
                 'name' => $this->name,
-                'startDate' => Carbon::parse($this->start_date)->format('d-m-Y'),
-                'endDate' => Carbon::parse($this->end_date)->format('d-m-Y'),
+                'startDate' => DateHelper::formatDate($this->start_date),
+                'endDate' => DateHelper::formatDate($this->end_date),
                 'daysOfWeek' =>  $daysOfWeek,
                 'enrollmentPrice' => $this->enrollment_price,
                 'monthlyPrice' => $this->monthly_price,
@@ -82,19 +83,11 @@ class GroupSelectItemResource extends JsonResource
                 ],
                 'schedule' => [
                     'shift' => $this->schedule_shift,
-                    'startTime' => Carbon::parse($this->schedule_start_time)->format('g:i A'), //08:00 am
-                    'endTime' => Carbon::parse($this->schedule_end_time)->format('g:i A'), //05:00 pm
+                    'startTime' => DateHelper::formatTime($this->schedule_start_time),
+                    'endTime' => DateHelper::formatTime($this->schedule_end_time),
                 ],
-                // 'paymentPlans' => $this->paymentPlans->map(function ($paymentPlan) {
-                //     return [
-                //         'id' => $paymentPlan->id,
-                //         'startDate' => Carbon::parse($paymentPlan->start_date)->format('d-m-Y'),
-                //         'endDate' => Carbon::parse($paymentPlan->end_date)->format('d-m-Y'),
-                //         'amount' => $paymentPlan->amount,
-                //     ];
-                // }),
                 'payments' => $payments,
-                'enrollment' => $enrollment ?? null,
+                'materials' => $materials
             ],
         ];
     }

@@ -28,8 +28,9 @@ class CreateOrUpdateStudentAction
         $role = Role::where('name', 'estudiante')->where('is_active', true)->where('level', '3')->first();
         if (!$role) throw new ApiException('El rol estudiante no existe, comuníquese con el administrador');
 
-        DB::beginTransaction();
         try {
+            DB::beginTransaction();
+
             $person = $this->createOrUpdatePersonAction->execute($data['person'], $data['id']);
 
             $profile = $this->profileRepository->findByProfileableId($person->id);

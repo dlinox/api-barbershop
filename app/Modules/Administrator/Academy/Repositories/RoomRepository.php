@@ -11,6 +11,7 @@ class RoomRepository
         return Room::select(
             'academy_rooms.id',
             'academy_rooms.number',
+            'academy_rooms.description',
             'academy_rooms.capacity',
             'academy_rooms.floor',
             'academy_rooms.is_active',

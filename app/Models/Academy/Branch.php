@@ -3,12 +3,13 @@
 namespace App\Models\Academy;
 
 use App\Common\Traits\HasDataTable;
+use App\Common\Traits\HasInfrastructure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Branch extends Model
 {
-    use HasDataTable;
+    use HasDataTable, HasInfrastructure;
 
     protected $table = 'academy_branches';
 

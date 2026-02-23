@@ -14,6 +14,7 @@ class Room extends Model
     protected $fillable = [
         'branch_id',
         'number',
+        'description',
         'capacity',
         'floor',
         'is_active',
