@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('name');
-            $table->enum('type', ['product']);
+            $table->enum('type', ['product'])->default('product');
             $table->string('icon')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
@@ -58,13 +58,10 @@ return new class extends Migration
         // ─── PRODUCTOS ───
         Schema::create('inventory_products', function (Blueprint $table) {
             $table->id();
-            $table->string('sku', 50)->unique();
             $table->string('name');
             $table->text('description')->nullable();
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('brand_id')->nullable();
-            $table->integer('min_stock')->default(0);
-            $table->integer('max_stock')->default(0);
             $table->boolean('is_for_sale')->default(false);       // se vende al cliente
             $table->boolean('is_for_internal')->default(true);    // uso interno en servicios
             $table->string('image_url')->nullable();
@@ -75,7 +72,6 @@ return new class extends Migration
             $table->foreign('brand_id')->references('id')->on('inventory_brands')->nullOnDelete();
 
             $table->index('name');
-            $table->index('sku');
             $table->index('category_id');
             $table->index('brand_id');
             $table->index('is_for_sale');
@@ -87,7 +83,8 @@ return new class extends Migration
         Schema::create('inventory_product_presentations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
-            $table->string('name');                                  // "Unidad", "Caja x12", "Pack x6"
+            $table->string('sku', 50)->unique();                     // SKU por presentación
+            $table->string('name');                                  // "20 ml", "50 ml", "Caja x12"
             $table->enum('unit_type', [
                 'unit',    // unidad individual
                 'box',     // caja
@@ -101,6 +98,8 @@ return new class extends Migration
             ])->default('unit');
             $table->integer('quantity')->default(1);                 // unidades base por presentación (caja x12 = 12)
             $table->string('barcode', 100)->nullable()->unique();
+            $table->integer('min_stock')->default(0);                // stock mínimo por presentación
+            $table->integer('max_stock')->default(0);                // stock máximo por presentación
             $table->decimal('cost_price', 10, 2)->default(0);        // precio de compra por esta presentación
             $table->decimal('sale_price', 10, 2)->default(0);        // precio de venta por esta presentación
             $table->boolean('is_default')->default(false);           // presentación predeterminada
@@ -111,6 +110,7 @@ return new class extends Migration
 
             $table->unique(['product_id', 'name']);
             $table->index('product_id');
+            $table->index('sku');
             $table->index('unit_type');
             $table->index('is_default');
             $table->index('is_active');
@@ -120,16 +120,19 @@ return new class extends Migration
         Schema::create('inventory_stocks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('presentation_id');
             $table->unsignedBigInteger('infrastructure_id');
             $table->integer('current_stock')->default(0);
             $table->timestamp('last_movement_at')->nullable();
             $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on('inventory_products')->restrictOnDelete();
+            $table->foreign('presentation_id')->references('id')->on('inventory_product_presentations')->restrictOnDelete();
             $table->foreign('infrastructure_id')->references('id')->on('core_infrastructures')->restrictOnDelete();
 
-            $table->unique(['product_id', 'infrastructure_id']);
+            $table->unique(['presentation_id', 'infrastructure_id']);
             $table->index('product_id');
+            $table->index('presentation_id');
             $table->index('infrastructure_id');
             $table->index('current_stock');
         });
@@ -138,7 +141,7 @@ return new class extends Migration
         Schema::create('inventory_kardex', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('presentation_id')->nullable(); // presentación usada en el movimiento
+            $table->unsignedBigInteger('presentation_id'); // presentación usada en el movimiento
             $table->unsignedBigInteger('infrastructure_id');
 
             $table->enum('movement_type', ['in', 'out', 'adjustment']);
@@ -173,7 +176,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on('inventory_products')->restrictOnDelete();
-            $table->foreign('presentation_id')->references('id')->on('inventory_product_presentations')->nullOnDelete();
+            $table->foreign('presentation_id')->references('id')->on('inventory_product_presentations')->restrictOnDelete();
             $table->foreign('infrastructure_id')->references('id')->on('core_infrastructures')->restrictOnDelete();
             $table->foreign('created_by')->references('id')->on('auth_users')->nullOnDelete();
 
@@ -184,7 +187,7 @@ return new class extends Migration
             $table->index('reason');
             $table->index('created_by');
             $table->index('created_at');
-            $table->index(['product_id', 'infrastructure_id']);
+            $table->index(['presentation_id', 'infrastructure_id']);
             $table->index(['reference_id', 'reference_type']);
         });
 

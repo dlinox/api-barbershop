@@ -23,7 +23,7 @@ class KardexController
         //
     }
 
-    public function getByProduct(int $productId, int $branchId)
+    public function getByPresentation(int $presentationId, int $branchId)
     {
         //
     }

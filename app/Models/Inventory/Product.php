@@ -14,31 +14,11 @@ class Product extends Model
 
     protected $table = 'inventory_products';
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function (Product $product) {
-            $product->sku = self::generateSku();
-        });
-    }
-
-    public static function generateSku(): string
-    {
-        $last = self::orderBy('id', 'desc')->first();
-        $nextNumber = $last ? $last->id + 1 : 1;
-
-        return 'PROD-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
-    }
-
     protected $fillable = [
-        'sku',
         'name',
         'description',
         'category_id',
         'brand_id',
-        'min_stock',
-        'max_stock',
         'is_for_sale',
         'is_for_internal',
         'image_url',
@@ -51,16 +31,13 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'min_stock' => 'integer',
-        'max_stock' => 'integer',
         'is_for_sale' => 'boolean',
         'is_for_internal' => 'boolean',
         'is_active' => 'boolean',
     ];
 
     public static $searchColumns = [
-        'name',
-        'sku',
+        'inventory_products.name',
     ];
 
     public function category(): BelongsTo

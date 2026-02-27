@@ -11,11 +11,19 @@ class MaterialRepository
         $query = Material::select(
             'academy_materials.id',
             'academy_materials.quantity',
-            'academy_materials.product_id',
+
+            'inventory_products.id as product_id',
             'inventory_products.name as product_name',
+
+            'inventory_product_presentations.id as product_presentation_id',
+            'inventory_product_presentations.name as product_presentation_name',
+            'inventory_product_presentations.unit_type as product_presentation_unit_type',
+            'inventory_product_presentations.quantity as product_presentation_quantity',
+            
             'academy_materials.is_active',
         )
-            ->join('inventory_products', 'academy_materials.product_id', '=', 'inventory_products.id');
+            ->join('inventory_product_presentations', 'academy_materials.presentation_id', '=', 'inventory_product_presentations.id')
+            ->join('inventory_products', 'inventory_product_presentations.product_id', '=', 'inventory_products.id');
 
         $items = $query->dataTable($request);
         return $items;
@@ -43,10 +51,12 @@ class MaterialRepository
         return Material::select(
             'academy_materials.id',
             'academy_materials.quantity',
-            'academy_materials.product_id',
+            'academy_materials.presentation_id',
+            'inventory_product_presentations.name as presentation_name',
             'inventory_products.name as product_name',
         )
-            ->join('inventory_products', 'academy_materials.product_id', '=', 'inventory_products.id')
-            ->where('is_active', true)->get();
+            ->join('inventory_product_presentations', 'academy_materials.presentation_id', '=', 'inventory_product_presentations.id')
+            ->join('inventory_products', 'inventory_product_presentations.product_id', '=', 'inventory_products.id')
+            ->where('academy_materials.is_active', true)->get();
     }
 }

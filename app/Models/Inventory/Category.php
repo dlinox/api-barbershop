@@ -48,9 +48,4 @@ class Category extends Model
     {
         return $this->hasMany(Product::class, 'category_id');
     }
-
-    public function services(): HasMany
-    {
-        return $this->hasMany(Service::class, 'category_id');
-    }
 }

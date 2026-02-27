@@ -16,15 +16,15 @@ class KardexRepository
         return Kardex::create($data);
     }
 
-    public function getLastBalance(int $productId, int $infrastructureId): ?Kardex
+    public function getLastBalance(int $presentationId, int $infrastructureId): ?Kardex
     {
-        return Kardex::where('product_id', $productId)
+        return Kardex::where('presentation_id', $presentationId)
             ->where('infrastructure_id', $infrastructureId)
             ->orderByDesc('id')
             ->first();
     }
 
-    public function getByProduct(int $productId, int $branchId)
+    public function getByPresentation(int $presentationId, int $branchId)
     {
         //
     }

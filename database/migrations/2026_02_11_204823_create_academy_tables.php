@@ -133,15 +133,37 @@ return new class extends Migration
         Schema::create('academy_enrollment_payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('enrollment_id');
+            $table->timestamps();
+            $table->foreign('enrollment_id')->references('id')->on('academy_enrollments')->restrictOnDelete();
+        });
+
+        Schema::create('academy_enrollment_payment_details', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('enrollment_payment_id');
             $table->unsignedBigInteger('group_payment_plan_id');
             $table->enum('type', ['enrollment', 'monthly']);
             $table->decimal('subtotal', 10, 2); // 100
             $table->decimal('discount', 10, 2)->default(0); // 10
             $table->decimal('total', 10, 2); // 90
             $table->timestamps();
-
-            $table->foreign('enrollment_id')->references('id')->on('academy_enrollments')->restrictOnDelete();
+            $table->foreign('enrollment_payment_id')->references('id')->on('academy_enrollment_payments')->restrictOnDelete();
             $table->foreign('group_payment_plan_id')->references('id')->on('academy_group_payment_plans')->restrictOnDelete();
+            $table->index('enrollment_payment_id');
+            $table->index('type');
+        });
+
+
+        Schema::create('academy_enrollment_payment_advances', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('student_id');
+            $table->unsignedBigInteger('enrollment_payment_id')->nullable();
+            $table->decimal('amount', 10, 2);
+            $table->text('observation')->nullable();
+            $table->date('payment_date');
+            $table->date('used_at')->nullable();
+            $table->timestamps();
+            $table->foreign('student_id')->references('core_person_id')->on('profile_students')->restrictOnDelete();
+            $table->foreign('enrollment_payment_id', 'adv_enrollment_payment_id_foreign')->references('id')->on('academy_enrollment_payments')->nullOnDelete();
         });
 
         Schema::create('academy_attendance_deadlines', function (Blueprint $table) {
@@ -177,12 +199,12 @@ return new class extends Migration
         // ─── MATERIALES ───
         Schema::create('academy_materials', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('presentation_id');
             $table->integer('quantity')->default(1);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->foreign('product_id')->references('id')->on('inventory_products')->restrictOnDelete();
-            $table->index('product_id');
+            $table->foreign('presentation_id')->references('id')->on('inventory_product_presentations')->restrictOnDelete();
+            $table->index('presentation_id');
             $table->index('is_active');
         });
 
@@ -209,6 +231,7 @@ return new class extends Migration
         Schema::dropIfExists('academy_materials');
         Schema::dropIfExists('academy_attendances');
         Schema::dropIfExists('academy_attendance_deadlines');
+        Schema::dropIfExists('academy_enrollment_payment_advances');
         Schema::dropIfExists('academy_enrollment_payments');
         Schema::dropIfExists('academy_enrollments');
         Schema::dropIfExists('academy_group_payment_plans');

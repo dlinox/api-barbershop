@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Behavior\Role;
+use App\Models\Treasury\PaymentMethod;
+use App\Models\Treasury\TransactionCategory;
 
 class DataInitSeeder extends Seeder
 {
@@ -13,6 +15,8 @@ class DataInitSeeder extends Seeder
         $this->call([
             SuperAdminSeeder::class,
         ]);
+
+
         Role::firstOrCreate(
             ['name' => 'estudiante'],
             [
@@ -32,5 +36,9 @@ class DataInitSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+    }
+    private function seedCoreData(): void
+    {
+        
     }
 }

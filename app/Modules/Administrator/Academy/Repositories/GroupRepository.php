@@ -105,14 +105,14 @@ class GroupRepository
     public function getAvailableEnrollmentGroups(int $studentId)
     {
 
+        $enrollments = Enrollment::where('profile_student_id', $studentId)->get();
+        $groupIds = $enrollments->pluck('group_id')->toArray();
+
         return $this->getGroupsQuery()
-            ->leftJoin('academy_enrollments', function ($join) use ($studentId) {
-                $join->on('academy_groups.id', '=', 'academy_enrollments.group_id')
-                    ->where('academy_enrollments.profile_student_id', '!=',  $studentId);
-            })
             ->distinct()
             ->where('academy_groups.end_date', '>', now()) // fecha de fin mayor a la fecha actual
             ->where('academy_groups.is_active', true)
+            ->whereNotIn('academy_groups.id', $groupIds)
             ->get();
     }
 

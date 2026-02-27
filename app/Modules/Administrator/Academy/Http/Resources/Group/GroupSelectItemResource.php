@@ -3,7 +3,7 @@
 namespace App\Modules\Administrator\Academy\Http\Resources\Group;
 
 use App\Models\Academy\Enrollment;
-use App\Models\Academy\EnrollmentPayment;
+use App\Models\Academy\EnrollmentPaymentDetail;
 use App\Models\Academy\EnrollmentMaterial;
 use App\Models\Academy\Material;
 use App\Common\Helpers\DateHelper;
@@ -26,18 +26,22 @@ class GroupSelectItemResource extends JsonResource
 
             if ($enrollment) {
                 $payments = $paymentPlans->map(function ($paymentPlan) use ($enrollment) {
-                    $payment = EnrollmentPayment::where('group_payment_plan_id', $paymentPlan->id)->where('enrollment_id', $enrollment->id)->first();
+                    $detail = EnrollmentPaymentDetail::select('academy_enrollment_payment_details.*')
+                        ->join('academy_enrollment_payments', 'academy_enrollment_payment_details.enrollment_payment_id', 'academy_enrollment_payments.id')
+                        ->where('academy_enrollment_payment_details.group_payment_plan_id', $paymentPlan->id)
+                        ->where('academy_enrollment_payments.enrollment_id', $enrollment->id)
+                        ->first();
 
                     return [
-                        'id' => $payment ? $payment->id : null,
+                        'id' => $detail ? $detail->id : null,
                         'planId' => $paymentPlan->id,
                         'type' => $paymentPlan->type,
-                        'status' => $payment ? 'Pagado' : 'Pendiente',
+                        'status' => $detail ? 'Pagado' : 'Pendiente',
                         'startDate' => DateHelper::formatDate($paymentPlan->start_date),
                         'endDate' => DateHelper::formatDate($paymentPlan->end_date),
                         'subtotal' => (float)$paymentPlan->amount,
-                        'discount' => $payment ? (float)$payment->discount : 0,
-                        'total' => $payment ? (float)$payment->total : (float)$paymentPlan->amount,
+                        'discount' => $detail ? (float)$detail->discount : 0,
+                        'total' => $detail ? (float)$detail->total : (float)$paymentPlan->amount,
                     ];
                 });
             } else {

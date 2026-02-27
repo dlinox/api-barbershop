@@ -21,12 +21,12 @@ class KardexService
         //
     }
 
-    public function getLastBalance(int $productId, int $branchId)
+    public function getLastBalance(int $presentationId, int $branchId)
     {
         //
     }
 
-    public function getByProduct(int $productId, int $branchId)
+    public function getByPresentation(int $presentationId, int $branchId)
     {
         //
     }

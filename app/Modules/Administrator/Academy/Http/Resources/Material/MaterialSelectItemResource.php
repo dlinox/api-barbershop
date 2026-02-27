@@ -10,7 +10,7 @@ class MaterialSelectItemResource extends JsonResource
     {
         return [
             'value' => $this->id,
-            'title' => $this->product_name . ' (Cantidad: ' . $this->quantity . ')',
+            'title' => $this->product_name . ' - ' . $this->presentation_name . ' (Cantidad: ' . $this->quantity . ')',
         ];
     }
 }

@@ -13,7 +13,7 @@ class Material extends Model
     protected $table = 'academy_materials';
 
     protected $fillable = [
-        'product_id',
+        'presentation_id',
         'quantity',
         'is_active',
     ];
@@ -25,12 +25,12 @@ class Material extends Model
 
     protected $casts = [
         'quantity' => 'integer',
-        'product_id' => 'integer',
+        'presentation_id' => 'integer',
         'is_active' => 'boolean',
     ];
 
     protected static $searchColumns = [
-        'academy_materials.product_id',
+        'academy_materials.presentation_id',
     ];
 
     public function enrollments(): BelongsToMany
@@ -38,8 +38,8 @@ class Material extends Model
         return $this->belongsToMany(Enrollment::class, 'academy_enrollment_materials', 'material_id', 'enrollment_id');
     }
 
-    public function product()
+    public function presentation()
     {
-        return $this->belongsTo(\App\Models\Inventory\Product::class, 'product_id');
+        return $this->belongsTo(\App\Models\Inventory\ProductPresentation::class, 'presentation_id');
     }
 }

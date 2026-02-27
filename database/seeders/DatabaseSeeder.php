@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
-            // DataInitSeeder::class,
+            CoreSeeder::class,
             DataBUSeeder::class,
         ]);
     }

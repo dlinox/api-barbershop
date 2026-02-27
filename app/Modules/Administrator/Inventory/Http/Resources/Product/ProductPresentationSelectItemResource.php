@@ -10,7 +10,7 @@ class ProductPresentationSelectItemResource extends JsonResource
     {
         return [
             'value' => $this->id,
-            'title' => $this->name . ' (x' . $this->quantity . ')',
+            'title' => $this->sku . ' - ' . $this->name . ' (x' . $this->quantity . ')',
         ];
     }
 }

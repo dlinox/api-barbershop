@@ -24,8 +24,8 @@ class StockService
 
     public function initializeStock(array $data): void
     {
-        $lastBalance = $this->kardexRepository->getLastBalance($data['product_id'], $data['infrastructure_id']);
-        if ($lastBalance) throw new ApiException('El producto ya tiene stock inicializado en esta sucursal');
+        $lastBalance = $this->kardexRepository->getLastBalance($data['presentation_id'], $data['infrastructure_id']);
+        if ($lastBalance) throw new ApiException('La presentación ya tiene stock inicializado en esta sucursal');
 
         DB::beginTransaction();
         try {
@@ -49,8 +49,8 @@ class StockService
     {
 
         if (!isset($data['unit_cost'])) {
-            $lastBalance = $this->kardexRepository->getLastBalance($data['product_id'], $data['infrastructure_id']);
-            if (!$lastBalance) throw new ApiException('El producto no tiene stock en esta sucursal, debe inicializarlo primero');
+            $lastBalance = $this->kardexRepository->getLastBalance($data['presentation_id'], $data['infrastructure_id']);
+            if (!$lastBalance) throw new ApiException('La presentación no tiene stock en esta sucursal, debe inicializarlo primero');
             $data['unit_cost'] = $lastBalance->balance_unit_cost;
         }
 

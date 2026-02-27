@@ -3,6 +3,7 @@
 namespace App\Modules\Administrator\Academy\Http\Resources\Enrollment;
 
 use App\Models\Academy\EnrollmentPayment;
+use App\Models\Academy\EnrollmentPaymentDetail;
 use App\Models\Academy\Group;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
@@ -12,10 +13,16 @@ class EnrollmentDataTableItemResource extends JsonResource
     public function toArray($request)
     {
 
+        $id = $this->id;
         $group = Group::find($this->group_id);
 
-        $payments = $group->paymentPlans->map(function ($paymentPlan) {
-            $payment = EnrollmentPayment::where('group_payment_plan_id', $paymentPlan->id)->where('enrollment_id', $this->id)->first();
+        $payments = $group->paymentPlans->map(function ($paymentPlan) use ($id) {
+
+            $payment = EnrollmentPaymentDetail::select('academy_enrollment_payment_details.*')
+                ->join('academy_enrollment_payments', 'academy_enrollment_payment_details.enrollment_payment_id', 'academy_enrollment_payments.id')
+                ->where('academy_enrollment_payment_details.group_payment_plan_id', $paymentPlan->id)
+                ->where('academy_enrollment_payments.enrollment_id', $id)
+                ->first();
 
             return [
                 'id' => $payment ? $payment->id : null,
@@ -30,7 +37,7 @@ class EnrollmentDataTableItemResource extends JsonResource
             ];
         });
 
-        $payments = $payments->sortBy('type')->sortBy('startDate')->values();
+        $payments = $payments->sortBy('type')->values();
 
         return [
             'id' => $this->id,

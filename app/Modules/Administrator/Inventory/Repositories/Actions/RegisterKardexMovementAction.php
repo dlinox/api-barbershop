@@ -14,7 +14,7 @@ class RegisterKardexMovementAction
 
     public function execute(array $data): Kardex
     {
-        $lastBalance = $this->kardexRepository->getLastBalance($data['product_id'], $data['infrastructure_id']);
+        $lastBalance = $this->kardexRepository->getLastBalance($data['presentation_id'], $data['infrastructure_id']);
 
         $prevQuantity  = $lastBalance?->balance_quantity ?? 0;
         $prevUnitCost  = (float) ($lastBalance?->balance_unit_cost ?? 0);
@@ -56,7 +56,7 @@ class RegisterKardexMovementAction
         // ─── Registrar movimiento en kardex ───
         $kardex = $this->kardexRepository->create([
             'product_id'         => $data['product_id'],
-            'presentation_id'    => $data['presentation_id'] ?? null,
+            'presentation_id'    => $data['presentation_id'],
             'infrastructure_id'  => $data['infrastructure_id'],
             'movement_type'      => $data['movement_type'],
             'reason'             => $data['reason'],
@@ -75,6 +75,7 @@ class RegisterKardexMovementAction
         Stock::updateOrCreate(
             [
                 'product_id'        => $data['product_id'],
+                'presentation_id'   => $data['presentation_id'],
                 'infrastructure_id' => $data['infrastructure_id'],
             ],
             [

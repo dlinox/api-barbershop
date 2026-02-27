@@ -29,8 +29,8 @@ class GroupPaymentPlan extends Model
         return $this->belongsTo(Group::class, 'group_id');
     }
 
-    public function enrollmentPayments()
+    public function enrollmentPaymentDetails()
     {
-        return $this->hasMany(EnrollmentPayment::class, 'group_payment_plan_id');
+        return $this->hasMany(EnrollmentPaymentDetail::class, 'group_payment_plan_id');
     }
 }

@@ -80,6 +80,19 @@ return new class extends Migration
             $table->index(['name', 'paternal_surname', 'maternal_surname']);
         });
 
+        Schema::create('core_payment_methods', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->enum('type', ['cash', 'bank'])->default('cash');
+            $table->boolean('is_default')->default(false);
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+
+            $table->index('is_active');
+            $table->index('name');
+        });
+
+
         // ─── INFRAESTRUCTURAS (polimórfica: sedes de academia, barbería, oficina, etc.) ───
         Schema::create('core_infrastructures', function (Blueprint $table) {
             $table->id();
@@ -94,6 +107,8 @@ return new class extends Migration
 
     public function down(): void
     {
+
+        Schema::dropIfExists('core_payment_methods');
         Schema::dropIfExists('core_infrastructures');
         Schema::dropIfExists('core_persons');
         Schema::dropIfExists('core_cities');

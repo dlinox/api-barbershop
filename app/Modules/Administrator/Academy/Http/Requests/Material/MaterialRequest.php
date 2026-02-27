@@ -11,7 +11,7 @@ class MaterialRequest extends ApiFormRequest
         $id = $this->id ?? null;
         return [
             'id' => $id ? 'exists:academy_materials,id' : 'nullable',
-            'product_id' => 'required|integer|exists:inventory_products,id',
+            'presentation_id' => 'required|integer|exists:inventory_product_presentations,id',
             'quantity' => 'required|integer|min:1',
             'is_active' => 'required|boolean',
         ];
@@ -21,9 +21,9 @@ class MaterialRequest extends ApiFormRequest
     {
         return [
             'id.exists' => 'El material no existe',
-            'product_id.required' => 'El producto es requerido',
-            'product_id.integer' => 'El producto debe ser un entero',
-            'product_id.exists' => 'El producto no existe',
+            'presentation_id.required' => 'La presentación es requerida',
+            'presentation_id.integer' => 'La presentación debe ser un entero',
+            'presentation_id.exists' => 'La presentación no existe',
             'quantity.required' => 'La cantidad es requerida',
             'quantity.integer' => 'La cantidad debe ser un entero',
             'quantity.min' => 'La cantidad debe ser mayor o igual a 1',
@@ -36,7 +36,7 @@ class MaterialRequest extends ApiFormRequest
     {
         return [
             'id' => 'ID',
-            'product_id' => 'Producto',
+            'presentation_id' => 'Presentación',
             'quantity' => 'Cantidad',
             'is_active' => 'Estado',
         ];

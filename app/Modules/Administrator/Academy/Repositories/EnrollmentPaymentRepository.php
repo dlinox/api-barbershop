@@ -11,11 +11,11 @@ class EnrollmentPaymentRepository
         $query = EnrollmentPayment::select(
             'academy_enrollment_payments.id',
             'academy_enrollment_payments.enrollment_id',
-            'academy_enrollment_payments.group_payment_plan_id',
-            'academy_enrollment_payments.type',
-            'academy_enrollment_payments.subtotal',
-            'academy_enrollment_payments.discount',
-            'academy_enrollment_payments.total',
+            'academy_enrollment_payment_details.group_payment_plan_id',
+            'academy_enrollment_payment_details.type',
+            'academy_enrollment_payment_details.subtotal',
+            'academy_enrollment_payment_details.discount',
+            'academy_enrollment_payment_details.total',
             'academy_enrollment_payments.created_at',
 
             // student
@@ -38,11 +38,12 @@ class EnrollmentPaymentRepository
             'academy_group_payment_plans.start_date as plan_start_date',
             'academy_group_payment_plans.end_date as plan_end_date',
         )
+            ->join('academy_enrollment_payment_details', 'academy_enrollment_payments.id', '=', 'academy_enrollment_payment_details.enrollment_payment_id')
             ->join('academy_enrollments', 'academy_enrollment_payments.enrollment_id', '=', 'academy_enrollments.id')
             ->join('core_persons', 'academy_enrollments.profile_student_id', '=', 'core_persons.id')
             ->join('academy_groups', 'academy_enrollments.group_id', '=', 'academy_groups.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
-            ->join('academy_group_payment_plans', 'academy_enrollment_payments.group_payment_plan_id', '=', 'academy_group_payment_plans.id');
+            ->join('academy_group_payment_plans', 'academy_enrollment_payment_details.group_payment_plan_id', '=', 'academy_group_payment_plans.id');
 
         return $query->dataTable($request);
     }
@@ -54,7 +55,10 @@ class EnrollmentPaymentRepository
 
     public function save($data)
     {
-        return EnrollmentPayment::updateOrCreate(['id' => $data['id'] ?? null], $data);
+        return EnrollmentPayment::updateOrCreate(
+            ['id' => $data['id'] ?? null],
+            ['enrollment_id' => $data['enrollment_id']]
+        );
     }
 
     public function delete(int $id)

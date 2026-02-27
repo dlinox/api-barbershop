@@ -2,7 +2,7 @@
 
 namespace App\Modules\Administrator\Academy\Http\Resources\Enrollment;
 
-use App\Models\Academy\EnrollmentPayment;
+use App\Models\Academy\EnrollmentPaymentDetail;
 use App\Models\Academy\Group;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
@@ -15,18 +15,22 @@ class EnrollmentItemResource extends JsonResource
         $group = Group::find($this->group_id);
 
         $payments = $group->paymentPlans->map(function ($paymentPlan) {
-            $payment = EnrollmentPayment::where('group_payment_plan_id', $paymentPlan->id)->where('enrollment_id', $this->id)->first();
+            $detail = EnrollmentPaymentDetail::select('academy_enrollment_payment_details.*')
+                ->join('academy_enrollment_payments', 'academy_enrollment_payment_details.enrollment_payment_id', 'academy_enrollment_payments.id')
+                ->where('academy_enrollment_payment_details.group_payment_plan_id', $paymentPlan->id)
+                ->where('academy_enrollment_payments.enrollment_id', $this->id)
+                ->first();
 
             return [
-                'id' => $payment ? $payment->id : null,
+                'id' => $detail ? $detail->id : null,
                 'planId' => $paymentPlan->id,
                 'type' => $paymentPlan->type,
-                'status' => $payment ? 'Pagado' : 'Pendiente',
+                'status' => $detail ? 'Pagado' : 'Pendiente',
                 'startDate' => Carbon::parse($paymentPlan->start_date)->locale('es')->isoFormat('D \d\e MMM'), // 12 de Ene.
                 'endDate' => Carbon::parse($paymentPlan->end_date)->locale('es')->isoFormat('D \d\e MMM'),
                 'subtotal' => (float)$paymentPlan->amount,
-                'discount' => $payment ? (float)$payment->discount : 0,
-                'total' => $payment ? (float)$payment->total : (float)$paymentPlan->amount,
+                'discount' => $detail ? (float)$detail->discount : 0,
+                'total' => $detail ? (float)$detail->total : (float)$paymentPlan->amount,
             ];
         });
 

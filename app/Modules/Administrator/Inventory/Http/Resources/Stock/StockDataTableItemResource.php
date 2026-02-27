@@ -2,23 +2,57 @@
 
 namespace App\Modules\Administrator\Inventory\Http\Resources\Stock;
 
+use App\Common\Helpers\DateHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class StockDataTableItemResource extends JsonResource
 {
     public function toArray($request)
     {
+
+        $presentations = $this->presentations->map(function ($presentation) use ($request) {
+            $stock = $presentation->stock()->where('infrastructure_id', $request->infrastructureId)->first();
+            return [
+                'id' => $presentation->id,
+                'productId' => $presentation->product_id,
+                'sku' => $presentation->sku,
+                'name' => $presentation->name,
+                'unitType' => $presentation->unit_type,
+                'quantity' => (int)$presentation->quantity,
+                // 'barcode' => $presentation->barcode,
+                'minStock' => $presentation->min_stock,
+                'maxStock' => $presentation->max_stock,
+                'costPrice' => (float) $presentation->cost_price,
+                'salePrice' => (float) $presentation->sale_price,
+                'isDefault' => (bool) $presentation->is_default,
+                'isActive' => (bool) $presentation->is_active,
+                'stock' => $stock ? [
+                    'id' => $stock->id,
+                    'presentationId' => $stock->presentation_id,
+                    'infrastructureId' => $stock->infrastructure_id,
+                    'currentStock' => (int) $stock->current_stock,
+                    'lastMovementAt' => DateHelper::formatDate($stock->last_movement_at)
+                ] : null,
+            ];
+        });
+
         return [
             'id' => $this->id,
-            'currentStock' => $this->current_stock,
-            'lastMovementAt' => $this->last_movement_at,
-            'product' => [
-                'id' => $this->product_id,
-                'name' => $this->product_name,
-                'sku' => $this->product_sku,
-                'minStock' => $this->product_min_stock,
-                'maxStock' => $this->product_max_stock,
+            'name' => $this->name,
+            'description' => $this->description,
+            'category' => [
+                'id' => $this->category_id,
+                'name' => $this->category?->name,
             ],
+            'brand' => [
+                'id' => $this->brand_id,
+                'name' => $this->brand?->name,
+            ],
+            'isForSale' => $this->is_for_sale,
+            'isForInternal' => $this->is_for_internal,
+            'imageUrl' => $this->image_url,
+            'presentations' => $presentations,
+            'isActive' => $this->is_active,
         ];
     }
 }

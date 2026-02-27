@@ -30,13 +30,21 @@ class EnrollmentGroupItemResource extends JsonResource
 
         $payments = $payments->sortBy('type')->sortBy('startDate')->values();
 
-        $materials = Material::select('academy_materials.id', 'inventory_products.name', 'academy_materials.quantity')
-            ->join('inventory_products', 'academy_materials.product_id', '=', 'inventory_products.id')
+        $materials = Material::select(
+            'academy_materials.id',
+            'inventory_products.name',
+            'inventory_product_presentations.name as presentation_name',
+            'inventory_product_presentations.unit_type as presentation_unit_type',
+            'inventory_product_presentations.quantity as presentation_quantity',
+            'academy_materials.quantity as material_quantity'
+        )
+            ->join('inventory_product_presentations', 'academy_materials.presentation_id', '=', 'inventory_product_presentations.id')
+            ->join('inventory_products', 'inventory_product_presentations.product_id', '=', 'inventory_products.id')
             ->where('academy_materials.is_active', true)
             ->get()->map(function ($material) {
                 return [
                     'value' => $material->id,
-                    'title' => $material->name . ' (Cantidad: ' . $material->quantity . ')',
+                    'title' => '[' . $material->material_quantity . '] ' . $material->name . ' ' . $material->presentation_name  . ' (' . $material->presentation_unit_type . 'x' . $material->presentation_quantity . ')',
                 ];
             });
 

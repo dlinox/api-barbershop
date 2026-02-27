@@ -55,7 +55,7 @@ Route::middleware(['auth:api'])->prefix('/inventory-stocks')->group(function () 
 Route::middleware(['auth:api'])->prefix('/inventory-kardex')->group(function () {
     Route::post('/data-table', [KardexController::class, 'dataTable'])->name('inventory-kardex.dataTable');
     Route::post('/register-movement', [KardexController::class, 'registerMovement'])->name('inventory-kardex.registerMovement');
-    Route::get('/by-product/{productId}/{branchId}', [KardexController::class, 'getByProduct'])->name('inventory-kardex.getByProduct');
+    Route::get('/by-presentation/{presentationId}/{branchId}', [KardexController::class, 'getByPresentation'])->name('inventory-kardex.getByPresentation');
 });
 
 Route::middleware(['auth:api'])->prefix('/inventory-purchase-orders')->group(function () {

@@ -30,6 +30,21 @@ class ProductRepository
 
     public function getActiveProducts()
     {
-        return Product::where('is_active', true)->get();
+        return Product::select(
+            'inventory_products.id',
+            'inventory_products.name',
+
+            'inventory_product_presentations.id as presentation_id',
+            'inventory_product_presentations.name as presentation_name',
+            'inventory_product_presentations.unit_type as presentation_unit_type',
+            'inventory_product_presentations.quantity as presentation_quantity',
+
+            'inventory_stocks.current_stock as stock_current_stock',
+        )
+            ->join('inventory_product_presentations', 'inventory_products.id', '=', 'inventory_product_presentations.product_id')
+            ->join('inventory_stocks', 'inventory_product_presentations.id', '=', 'inventory_stocks.presentation_id')
+            ->where('inventory_products.is_active', true)
+            ->distinct()
+            ->get();
     }
 }

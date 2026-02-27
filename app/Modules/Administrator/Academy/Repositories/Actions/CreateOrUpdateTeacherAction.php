@@ -25,7 +25,7 @@ class CreateOrUpdateTeacherAction
     public function execute(array $data): void
     {
 
-        $role = Role::where('name', 'docente')->where('is_active', true)->where('level', '3')->first();
+        $role = Role::where('name', 'docente')->where('is_active', true)->where('level', '2')->first();
         if (!$role) throw new ApiException('El rol docente no existe, comuníquese con el administrador');
 
         try {
