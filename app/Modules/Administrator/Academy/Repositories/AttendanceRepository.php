@@ -25,7 +25,7 @@ class AttendanceRepository
             'academy_attendances.attendance_deadline_id',
             'academy_attendance_deadlines.date as attendance_deadline_date',
 
-            'academy_attendance_deadlines.group_id',
+            'academy_groups.id as group_id',
             'academy_groups.name as group_name',
 
             'academy_groups.level_id as group_level_id',

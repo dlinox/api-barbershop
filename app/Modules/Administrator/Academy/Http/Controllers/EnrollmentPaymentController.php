@@ -10,6 +10,7 @@ use App\Modules\Administrator\Academy\Services\EnrollmentPaymentService;
 
 use App\Modules\Administrator\Academy\Http\Requests\EnrollmentPayment\EnrollmentPaymentRequest;
 use App\Modules\Administrator\Academy\Http\Resources\EnrollmentPayment\EnrollmentPaymentDataTableItemResource;
+use App\Modules\Administrator\Academy\Http\Resources\EnrollmentPayment\EnrollmentPaymentHistoryResource;
 
 class EnrollmentPaymentController
 {
@@ -35,5 +36,12 @@ class EnrollmentPaymentController
     {
         $this->enrollmentPaymentService->delete($id);
         return ApiResponse::success(null, 'Pago eliminado correctamente');
+    }
+
+    public function historyByEnrollmentId(int $enrollmentId)
+    {
+        $items = $this->enrollmentPaymentService->historyByEnrollmentId($enrollmentId);
+        $items = EnrollmentPaymentHistoryResource::collection($items);
+        return ApiResponse::success($items);
     }
 }

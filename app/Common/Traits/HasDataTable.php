@@ -45,6 +45,26 @@ trait HasDataTable
         return $query;
     }
 
+    public function scopeRange($query, $ranges)
+    {
+        foreach ($ranges as $column => $range) {
+            $from = $range['from'] ?? null;
+            $to = $range['to'] ?? null;
+
+            $keySnakeCase = Str::snake($column);
+
+            if ($from && $to) {
+                $query->whereBetween($keySnakeCase, [$from, $to]);
+            } elseif ($from) {
+                $query->where($keySnakeCase, $from);
+            } elseif ($to) {
+                $query->where($keySnakeCase, $to);
+            }
+        }
+
+        return $query;
+    }
+
 
     public static function scopeDataTable($query, $request, $searchColumns = [])
     {
@@ -54,6 +74,10 @@ trait HasDataTable
 
         if ($request->has('filters') && is_array($request->filters)) {
             $query->filter($request->filters);
+        }
+
+        if ($request->has('ranges') && is_array($request->ranges)) {
+            $query->range($request->ranges);
         }
 
         if ($request->has('search')) {

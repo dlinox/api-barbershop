@@ -7,6 +7,7 @@ use App\Modules\Administrator\Academy\Http\Requests\Group\AssignTeacherRequest;
 use App\Modules\Administrator\Academy\Http\Requests\Group\GroupRequest;
 use App\Modules\Administrator\Academy\Http\Resources\Group\GroupDataTableItemResource;
 use App\Modules\Administrator\Academy\Http\Resources\Group\EnrollmentGroupItemResource;
+use App\Modules\Administrator\Academy\Http\Resources\Group\GroupSelectItemResource;
 use App\Modules\Administrator\Academy\Services\GroupService;
 use Illuminate\Http\Request;
 
@@ -44,10 +45,24 @@ class GroupController
         return ApiResponse::success($items);
     }
 
+    public function getActiveAndUpcoming()
+    {
+        $items = $this->groupService->getActiveAndUpcoming();
+        $items = GroupSelectItemResource::collection($items);
+        return ApiResponse::success($items);
+    }
+
     public function assignTeacher(AssignTeacherRequest $request)
     {
         $data = $request->validated();
         $this->groupService->assignTeacher($data);
         return ApiResponse::success(null, 'Docente asignado correctamente');
+    }
+
+    public function selectItems()
+    {
+        $items = $this->groupService->selectItems();
+        $items = GroupSelectItemResource::collection($items);
+        return ApiResponse::success($items);
     }
 }

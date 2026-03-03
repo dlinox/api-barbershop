@@ -22,6 +22,14 @@ class Student extends Model
         'core_person_id',
     ];
 
+    public static $searchColumns = [
+        'core_persons.name',
+        'core_persons.paternal_surname',
+        'core_persons.maternal_surname',
+        'core_persons.document_number',
+        'core_persons.phone',
+    ];
+
     public function person(): BelongsTo
     {
         return $this->belongsTo(Person::class, 'core_person_id');

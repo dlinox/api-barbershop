@@ -24,6 +24,17 @@ class Enrollment extends Model
         'group_id' => 'integer',
     ];
 
+
+    public static $searchColumns = [
+        'core_persons.name',
+        'core_persons.paternal_surname',
+        'core_persons.maternal_surname',
+        'core_persons.document_number',
+        'core_persons.phone',
+
+        'academy_groups.name',
+    ];
+
     public function payments()
     {
         return $this->hasMany(EnrollmentPayment::class);

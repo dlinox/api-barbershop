@@ -5,7 +5,6 @@ namespace App\Modules\Administrator\Academy\Services;
 use App\Models\Academy\Branch;
 use App\Modules\Administrator\Academy\Repositories\GroupRepository;
 use Illuminate\Http\Request;
-use Pest\Plugin\Commands\DumpCommand;
 
 class GroupService
 {
@@ -39,6 +38,16 @@ class GroupService
     public function getAvailableEnrollmentGroups(int $studentId)
     {
         return $this->groupRepository->getAvailableEnrollmentGroups($studentId);
+    }
+
+    public function selectItems()
+    {
+        return $this->groupRepository->selectItems();
+    }
+
+    public function getActiveAndUpcoming()
+    {
+        return $this->groupRepository->getActiveAndUpcoming();
     }
 
     public function assignTeacher(array $data)

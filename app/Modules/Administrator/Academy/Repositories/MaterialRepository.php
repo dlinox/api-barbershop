@@ -19,7 +19,7 @@ class MaterialRepository
             'inventory_product_presentations.name as product_presentation_name',
             'inventory_product_presentations.unit_type as product_presentation_unit_type',
             'inventory_product_presentations.quantity as product_presentation_quantity',
-            
+
             'academy_materials.is_active',
         )
             ->join('inventory_product_presentations', 'academy_materials.presentation_id', '=', 'inventory_product_presentations.id')
@@ -52,6 +52,7 @@ class MaterialRepository
             'academy_materials.id',
             'academy_materials.quantity',
             'academy_materials.presentation_id',
+
             'inventory_product_presentations.name as presentation_name',
             'inventory_products.name as product_name',
         )

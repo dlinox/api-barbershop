@@ -102,6 +102,33 @@ class GroupRepository
         return $group->delete();
     }
 
+    //obyener grupos activos y proximos
+    public function getActiveAndUpcoming()
+    {
+        return Group::select(
+            'academy_groups.id',
+            'academy_groups.name',
+            'academy_groups.start_date',
+            'academy_groups.end_date',
+            'academy_groups.days_of_week',
+            'academy_groups.enrollment_price',
+            'academy_groups.monthly_price',
+            'academy_groups.attendance_tolerance_minutes',
+            'academy_groups.is_active',
+
+            'academy_groups.branch_id',
+            'academy_branches.name as branch_name',
+
+            'academy_groups.level_id',
+            'academy_levels.name as level_name',
+        )
+            ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id')
+            ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
+            ->where('academy_groups.end_date', '>', now())
+            ->where('academy_groups.is_active', true)
+            ->get();
+    }
+
     public function getAvailableEnrollmentGroups(int $studentId)
     {
 
@@ -116,6 +143,31 @@ class GroupRepository
             ->get();
     }
 
+
+    public function selectItems()
+    {
+        return Group::select(
+            'academy_groups.id',
+            'academy_groups.name',
+            'academy_groups.start_date',
+            'academy_groups.end_date',
+            'academy_groups.days_of_week',
+            'academy_groups.enrollment_price',
+            'academy_groups.monthly_price',
+            'academy_groups.attendance_tolerance_minutes',
+            'academy_groups.is_active',
+
+
+            'academy_groups.branch_id',
+            'academy_branches.name as branch_name',
+
+            'academy_groups.level_id',
+            'academy_levels.name as level_name',
+        )
+            ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id')
+            ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
+            ->get();
+    }
 
     public function assignTeacher(int $groupId, ?int $teacherId): Group
     {

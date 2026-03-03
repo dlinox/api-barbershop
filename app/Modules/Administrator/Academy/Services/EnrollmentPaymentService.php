@@ -42,4 +42,9 @@ class EnrollmentPaymentService
     {
         return $this->enrollmentPaymentRepository->delete($id);
     }
+
+    public function historyByEnrollmentId(int $enrollmentId)
+    {
+        return $this->enrollmentPaymentRepository->historyByEnrollmentId($enrollmentId);
+    }
 }

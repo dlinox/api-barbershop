@@ -66,4 +66,27 @@ class EnrollmentPaymentRepository
         $payment = EnrollmentPayment::findOrFail($id);
         return $payment->delete();
     }
+
+    public function historyByEnrollmentId(int $enrollmentId)
+    {
+        return EnrollmentPayment::select(
+            'academy_enrollment_payments.id',
+            'academy_enrollment_payment_details.type',
+            'treasury_incomes.subtotal',
+            'treasury_incomes.discount',
+            'treasury_incomes.total',
+            'treasury_incomes.receipt_serie',
+            'treasury_incomes.receipt_number',
+            'treasury_incomes.observations',
+            'treasury_incomes.transaction_date',
+            'treasury_incomes.status'
+        )
+            ->join('academy_enrollment_payment_details', 'academy_enrollment_payments.id', '=', 'academy_enrollment_payment_details.enrollment_payment_id')
+            ->join('treasury_incomes', function ($join) {
+                $join->on('treasury_incomes.transactionable_id', '=', 'academy_enrollment_payments.id')
+                    ->where('treasury_incomes.transactionable_type', 'academy_enrollment_payments');
+            })
+            ->where('academy_enrollment_payments.enrollment_id', $enrollmentId)
+            ->get();
+    }
 }

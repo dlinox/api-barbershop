@@ -48,8 +48,9 @@ Route::middleware(['auth:api'])->prefix('/groups')->group(function () {
     Route::post('/save', [GroupController::class, 'save'])->name('groups.save');
     Route::delete('/delete/{id}', [GroupController::class, 'delete'])->name('groups.delete');
     Route::post('/assign-teacher', [GroupController::class, 'assignTeacher'])->name('groups.assignTeacher');
-
+    Route::get('/select-items', [GroupController::class, 'selectItems'])->name('groups.selectItems');
     Route::get('/enrollment/get-availables/{studentId}', [GroupController::class, 'getAvailableEnrollmentGroups'])->name('groups.getAvailableEnrollmentGroups');
+    Route::get('/get-active-and-upcoming', [GroupController::class, 'getActiveAndUpcoming'])->name('groups.getActiveAndUpcoming');
 });
 
 Route::middleware(['auth:api'])->prefix('/students')->group(function () {
@@ -67,6 +68,7 @@ Route::middleware(['auth:api'])->prefix('/teachers')->group(function () {
 Route::middleware(['auth:api'])->prefix('/enrollments')->group(function () {
     Route::post('/data-table', [EnrollmentController::class, 'dataTable'])->name('enrollments.dataTable');
     Route::post('/save', [EnrollmentController::class, 'save'])->name('enrollments.save');
+    Route::post('/update', [EnrollmentController::class, 'update'])->name('enrollments.update');
     Route::get('/get/{id}', [EnrollmentController::class, 'getEnrollment'])->name('enrollments.getEnrollment');
     Route::post('/register-payment', [EnrollmentController::class, 'registerPayment'])->name('enrollments.registerPayment');
 });
@@ -85,6 +87,7 @@ Route::middleware(['auth:api'])->prefix('/enrollment-payments')->group(function 
     Route::post('/data-table', [EnrollmentPaymentController::class, 'dataTable'])->name('enrollment-payments.dataTable');
     Route::post('/save', [EnrollmentPaymentController::class, 'save'])->name('enrollment-payments.save');
     Route::delete('/delete/{id}', [EnrollmentPaymentController::class, 'delete'])->name('enrollment-payments.delete');
+    Route::get('/history-by-enrollment-id/{enrollmentId}', [EnrollmentPaymentController::class, 'historyByEnrollmentId'])->name('enrollment-payments.historyByEnrollmentId');
 });
 
 Route::middleware(['auth:api'])->prefix('/materials')->group(function () {

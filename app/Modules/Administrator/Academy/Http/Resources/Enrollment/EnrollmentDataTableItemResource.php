@@ -2,6 +2,7 @@
 
 namespace App\Modules\Administrator\Academy\Http\Resources\Enrollment;
 
+use App\Common\Helpers\DateHelper;
 use App\Models\Academy\EnrollmentPayment;
 use App\Models\Academy\EnrollmentPaymentDetail;
 use App\Models\Academy\Group;
@@ -39,10 +40,13 @@ class EnrollmentDataTableItemResource extends JsonResource
 
         $payments = $payments->sortBy('type')->values();
 
+        //ids de materiales
+        $materials = $this->materials->pluck('id')->toArray();
+
         return [
             'id' => $this->id,
-            'status' => $this->status == 'active' ? 'Activa' : ($this->status == 'cancelled' ? 'Cancelada' : 'Completada'),
-            'createdAt' =>  $this->created_at->format('d \d\e M Y'),
+            'status' => $this->status,
+            'date' =>  $this->date,
             'student' => [
                 'id' => $this->student_id,
                 'person' => [
@@ -64,6 +68,7 @@ class EnrollmentDataTableItemResource extends JsonResource
                 ],
             ],
             'payments' => $payments,
+            'materials' => $materials,
         ];
     }
 }

@@ -12,7 +12,7 @@ class EnrollmentRepository
         return Enrollment::select(
             'academy_enrollments.id',
             'academy_enrollments.status',
-            'academy_enrollments.created_at',
+            'academy_enrollments.date',
 
             'academy_enrollments.profile_student_id as student_id',
             'core_persons.name as student_person_name',
@@ -39,6 +39,8 @@ class EnrollmentRepository
     {
         $query = $this->query();
 
+        $query->orderBy('academy_enrollments.date', 'desc');
+
         $items = $query->dataTable($request);
 
         return $items;
@@ -64,5 +66,12 @@ class EnrollmentRepository
     public function findByStudentIdAndGroupId($studentId, $groupId)
     {
         return Enrollment::where('profile_student_id', $studentId)->where('group_id', $groupId)->first();
+    }
+
+    public function update($data)
+    {
+        $enrollment = Enrollment::findOrFail($data['id']);
+        $enrollment->update($data);
+        return $enrollment;
     }
 }
