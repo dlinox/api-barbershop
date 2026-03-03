@@ -51,7 +51,8 @@ class EnrollmentDataTableItemResource extends JsonResource
                 'id' => $this->student_id,
                 'person' => [
                     'name' => $this->student_person_name,
-                    'surname' => collect([$this->student_person_paternal_surname, $this->student_person_maternal_surname])->filter()->implode(' '),
+                    'paternalSurname' => $this->student_person_paternal_surname,
+                    'maternalSurname' => $this->student_person_maternal_surname,
                     'phone' => $this->student_person_phone,
                 ],
             ],
