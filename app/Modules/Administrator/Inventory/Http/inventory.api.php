@@ -62,7 +62,6 @@ Route::middleware(['auth:api'])->prefix('/inventory-purchase-orders')->group(fun
     Route::post('/data-table', [PurchaseOrderController::class, 'dataTable'])->name('inventory-purchase-orders.dataTable');
     Route::post('/save', [PurchaseOrderController::class, 'save'])->name('inventory-purchase-orders.save');
     Route::get('/get/{id}', [PurchaseOrderController::class, 'getById'])->name('inventory-purchase-orders.getById');
-    Route::put('/update-status/{id}', [PurchaseOrderController::class, 'updateStatus'])->name('inventory-purchase-orders.updateStatus');
     Route::post('/receive/{id}', [PurchaseOrderController::class, 'receiveOrder'])->name('inventory-purchase-orders.receiveOrder');
-    Route::delete('/delete/{id}', [PurchaseOrderController::class, 'delete'])->name('inventory-purchase-orders.delete');
+    Route::post('/cancel/{id}', [PurchaseOrderController::class, 'cancelOrder'])->name('inventory-purchase-orders.cancelOrder');
 });

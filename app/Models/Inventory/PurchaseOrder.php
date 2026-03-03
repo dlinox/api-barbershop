@@ -8,6 +8,7 @@ use App\Common\Traits\HasDataTable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseOrder extends Model
 {
@@ -15,10 +16,25 @@ class PurchaseOrder extends Model
 
     protected $table = 'inventory_purchase_orders';
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (PurchaseOrder $order) {
+            $order->created_by = $order->created_by ?? Auth::id();
+            $order->order_date = $order->order_date ?? now();
+            $order->order_number = $order->order_number
+                ?? 'OC-' . str_pad((self::max('id') ?? 0) + 1, 6, '0', STR_PAD_LEFT);
+        });
+    }
+
     protected $fillable = [
         'supplier_id',
         'infrastructure_id',
         'order_number',
+        'receipt_type',
+        'receipt_serie',
+        'receipt_number',
         'status',
         'order_date',
         'expected_date',
@@ -29,9 +45,6 @@ class PurchaseOrder extends Model
     ];
 
     protected $casts = [
-        'order_date' => 'date',
-        'expected_date' => 'date',
-        'received_date' => 'date',
         'total_amount' => 'decimal:2',
     ];
 
