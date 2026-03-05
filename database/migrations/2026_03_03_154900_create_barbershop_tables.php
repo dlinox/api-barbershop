@@ -133,55 +133,11 @@ return new class extends Migration
             $table->foreign('ticket_id')->references('id')->on('barbershop_tickets')->onDelete('cascade');
             $table->foreign('service_branch_id')->references('id')->on('barbershop_service_branches')->onDelete('cascade');
         });
-
-        // ─── VENTAS DE PRODUCTOS (cabecera) ───
-        Schema::create('barbershop_sales', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('branch_id');
-            $table->unsignedBigInteger('cash_session_id');
-            $table->unsignedBigInteger('ticket_id')->nullable(); // si la venta es parte de un ticket de servicio
-            $table->unsignedBigInteger('profile_client_id')->nullable(); // nullable para ventas rápidas
-            $table->decimal('subtotal', 12, 2)->default(0);
-            $table->decimal('discount', 12, 2)->default(0);
-            $table->decimal('total', 12, 2)->default(0);
-            $table->enum('status', ['completed', 'cancelled'])->default('completed');
-            $table->timestamps();
-
-            $table->foreign('branch_id')->references('id')->on('barbershop_branches')->restrictOnDelete();
-            $table->foreign('cash_session_id')->references('id')->on('treasury_cash_sessions')->restrictOnDelete();
-            $table->foreign('ticket_id')->references('id')->on('barbershop_tickets')->nullOnDelete();
-            $table->foreign('profile_client_id')->references('id')->on('profile_clients')->nullOnDelete();
-
-            $table->index('branch_id');
-            $table->index('cash_session_id');
-            $table->index('ticket_id');
-            $table->index('profile_client_id');
-            $table->index('status');
-        });
-
-        // ─── DETALLE DE VENTAS DE PRODUCTOS ───
-        Schema::create('barbershop_sale_items', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('sale_id');
-            $table->unsignedBigInteger('presentation_id'); // inventory_product_presentations
-            $table->integer('quantity')->default(1);
-            $table->decimal('unit_price', 10, 2)->default(0); // precio al momento de la venta
-            $table->decimal('discount', 10, 2)->default(0);
-            $table->decimal('total', 10, 2)->default(0); // (quantity * unit_price) - discount
-            $table->timestamps();
-
-            $table->foreign('sale_id')->references('id')->on('barbershop_sales')->cascadeOnDelete();
-            $table->foreign('presentation_id')->references('id')->on('inventory_product_presentations')->restrictOnDelete();
-
-            $table->index('sale_id');
-            $table->index('presentation_id');
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('barbershop_sale_items');
-        Schema::dropIfExists('barbershop_sales');
+
         Schema::dropIfExists('barbershop_ticket_services');
         Schema::dropIfExists('barbershop_tickets');
         Schema::dropIfExists('barbershop_service_branches');

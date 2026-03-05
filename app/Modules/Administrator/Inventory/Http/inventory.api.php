@@ -10,6 +10,7 @@ use App\Modules\Administrator\Inventory\Http\Controllers\ProductPresentationCont
 use App\Modules\Administrator\Inventory\Http\Controllers\StockController;
 use App\Modules\Administrator\Inventory\Http\Controllers\KardexController;
 use App\Modules\Administrator\Inventory\Http\Controllers\PurchaseOrderController;
+use App\Modules\Administrator\Inventory\Http\Controllers\SaleController;
 
 Route::middleware(['auth:api'])->prefix('/inventory-categories')->group(function () {
     Route::post('/data-table', [CategoryController::class, 'dataTable'])->name('inventory-categories.dataTable');
@@ -64,4 +65,10 @@ Route::middleware(['auth:api'])->prefix('/inventory-purchase-orders')->group(fun
     Route::get('/get/{id}', [PurchaseOrderController::class, 'getById'])->name('inventory-purchase-orders.getById');
     Route::post('/receive/{id}', [PurchaseOrderController::class, 'receiveOrder'])->name('inventory-purchase-orders.receiveOrder');
     Route::post('/cancel/{id}', [PurchaseOrderController::class, 'cancelOrder'])->name('inventory-purchase-orders.cancelOrder');
+});
+
+Route::middleware(['auth:api'])->prefix('/inventory-sales')->group(function () {
+    Route::post('/data-table/{cashRegisterId}', [SaleController::class, 'dataTable'])->name('inventory-sales.dataTable');
+    Route::get('/products/{infrastructureId}', [SaleController::class, 'getProducts'])->name('inventory-sales.getProducts');
+    Route::post('/save', [SaleController::class, 'save'])->name('inventory-sales.save');
 });

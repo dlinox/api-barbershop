@@ -8,6 +8,7 @@ class InfrastructureSelectItemResource extends JsonResource
 {
     private const TYPE_LABELS = [
         'academy_branches' => 'Sede Académica',
+        'barbershop_branches' => 'Barbería',
     ];
 
     public function toArray($request)

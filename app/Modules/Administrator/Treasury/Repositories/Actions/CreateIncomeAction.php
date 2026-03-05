@@ -49,7 +49,7 @@ class CreateIncomeAction
         // ─── Crear cabecera del ingreso ───
         $income = Income::create([
             'infrastructure_id'    => $infrastructureId,
-            'cash_session_id'      => $data['cash_register_id'] ?? null,
+            'cash_session_id'      => $data['cash_session_id'] ?? $data['cash_register_id'] ?? null,
             'receipt_type'         => $data['receipt_type'],
             'receipt_serie'        => $data['receipt_serie'],
             'person_id'            => $data['client_id'] ?? null,

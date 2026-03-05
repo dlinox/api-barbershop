@@ -15,6 +15,7 @@ class IncomeRequest extends ApiFormRequest
             'receipt_serie' => 'required|string|max:4',
             'observations' => 'nullable|string|max:255',
             'cash_register_id' => 'nullable|exists:treasury_cash_registers,id',
+            'cash_session_id' => 'nullable|exists:treasury_cash_sessions,id',
             'details' => 'required|array',
             'details.*.income_id' => 'nullable|exists:treasury_incomes,id',
             'details.*.description' => 'required|string|max:255',
