@@ -26,7 +26,7 @@ class StudentController
     {
         $data = $request->validated();
         $this->studentService->save($data);
-        return ApiResponse::success(null, 'Estudiante creado correctamente');
+        return ApiResponse::success($data, 'Estudiante creado correctamente');
     }
 
     public function selectAsyncItems(Request $request)

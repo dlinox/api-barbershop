@@ -12,8 +12,11 @@ class CreateOrUpdatePersonAction
     public function execute(array $data, ?int $id = null): Person
     {
 
-        if ($id) {
-            $person = Person::where('id', $id)->first();
+        if ($data['id']) {
+            $person = Person::where('id', $data['id'])->first();
+            
+            // throw new ApiException('El id es :' . $person->id);
+
             if (!$person) throw new ApiException('La persona no existe');
 
             self::validate($data, $person->id);
@@ -29,6 +32,7 @@ class CreateOrUpdatePersonAction
     private static function validate(array $data, ?int $id = null): void
     {
 
+      throw new ApiException('El id esss :' .  $data['document_type'] . ' - ' . $data['document_number'] . ' - ' . $id);
         $documentExists = Person::where('document_type', $data['document_type'])
             ->where('document_number', $data['document_number'])
             ->where('id', '!=', $id)

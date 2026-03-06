@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('infrastructure_id');             // local/sucursal donde ocurrió la venta
             $table->unsignedBigInteger('cash_session_id')->nullable();   // sesión de caja activa (nullable para ventas fuera de caja)
             $table->unsignedBigInteger('person_id')->nullable();         // cliente (nullable para ventas rápidas sin identificar)
+            $table->unsignedBigInteger('barbershop_ticket_id')->nullable(); // ticket de barbershop (si la venta se originó en ese módulo)
 
             // Origen de la venta (qué módulo generó la venta)
             $table->enum('context', ['barbershop', 'academy', 'other'])->default('other');
@@ -27,7 +28,7 @@ return new class extends Migration
             $table->decimal('discount', 12, 2)->default(0);             // descuento global de la venta
             $table->decimal('total', 12, 2)->default(0);                // subtotal - discount
 
-            $table->enum('status', ['completed', 'cancelled'])->default('completed');
+            $table->enum('status', ['pending', 'completed', 'cancelled'])->default('completed');
 
             $table->unsignedBigInteger('user_id');                       // quién registró la venta
             $table->timestamps();
@@ -36,6 +37,7 @@ return new class extends Migration
             $table->foreign('cash_session_id')->references('id')->on('treasury_cash_sessions')->restrictOnDelete();
             $table->foreign('person_id')->references('id')->on('core_persons')->nullOnDelete();
             $table->foreign('user_id')->references('id')->on('auth_users')->restrictOnDelete();
+            $table->foreign('barbershop_ticket_id')->references('id')->on('barbershop_tickets')->nullOnDelete();
 
             $table->index('infrastructure_id');
             $table->index('cash_session_id');

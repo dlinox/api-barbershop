@@ -8,6 +8,7 @@ use App\Modules\Administrator\Barbershop\Http\Controllers\BranchController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\CategoryController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\ServiceController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\ReservationController;
+use App\Modules\Administrator\Barbershop\Http\Controllers\TicketController;
 
 Route::middleware(['auth:api'])->prefix('/clients')->group(function () {
     Route::post('/data-table', [ClientController::class, 'dataTable'])->name('clients.dataTable');
@@ -46,4 +47,11 @@ Route::middleware(['auth:api'])->prefix('/barbershop-reservations')->group(funct
     Route::post('/data-table', [ReservationController::class, 'dataTable'])->name('barbershop-reservations.dataTable');
     Route::post('/save', [ReservationController::class, 'save'])->name('barbershop-reservations.save');
     Route::delete('/delete/{id}', [ReservationController::class, 'delete'])->name('barbershop-reservations.delete');
+});
+
+Route::middleware(['auth:api'])->prefix('/barbershop-tickets')->group(function () {
+    Route::post('/data-table/{branchId}', [TicketController::class, 'dataTable'])->name('barbershop-tickets.dataTable');
+    Route::get('/get/{id}', [TicketController::class, 'getById'])->name('barbershop-tickets.getById');
+    Route::post('/save', [TicketController::class, 'save'])->name('barbershop-tickets.save');
+    Route::post('/cancel/{id}', [TicketController::class, 'cancel'])->name('barbershop-tickets.cancel');
 });

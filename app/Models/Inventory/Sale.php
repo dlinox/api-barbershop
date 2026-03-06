@@ -4,6 +4,7 @@ namespace App\Models\Inventory;
 
 use App\Common\Traits\HasDataTable;
 use App\Models\Auth\User;
+use App\Models\Barbershop\Ticket;
 use App\Models\Core\Infrastructure;
 use App\Models\Core\Person;
 use App\Models\Treasury\CashSession;
@@ -30,6 +31,7 @@ class Sale extends Model
     protected $fillable = [
         'infrastructure_id',
         'cash_session_id',
+        'barbershop_ticket_id',
         'person_id',
         'context',
         'subtotal',
@@ -63,6 +65,11 @@ class Sale extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function ticket(): BelongsTo
+    {
+        return $this->belongsTo(Ticket::class, 'barbershop_ticket_id');
     }
 
     public function items(): HasMany

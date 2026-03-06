@@ -96,7 +96,7 @@ return new class extends Migration
             $table->unsignedBigInteger('cash_session_id')->nullable(); // sesión de caja
             $table->unsignedBigInteger('reservation_id')->nullable();
             $table->unsignedBigInteger('profile_worker_id')->nullable();
-            $table->unsignedBigInteger('profile_client_id');
+            $table->unsignedBigInteger('profile_client_id')->nullable();
 
             //el monto que se pago
             $table->decimal('amount', 12, 2)->default(0); //el monto que se pago

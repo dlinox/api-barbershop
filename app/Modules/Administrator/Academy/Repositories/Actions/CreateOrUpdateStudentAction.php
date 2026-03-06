@@ -31,7 +31,7 @@ class CreateOrUpdateStudentAction
         try {
             DB::beginTransaction();
 
-            $person = $this->createOrUpdatePersonAction->execute($data['person'], $data['id']);
+            $person = $this->createOrUpdatePersonAction->execute($data['person'], $data['person']['id']);
 
             $profile = $this->profileRepository->findByProfileableId($person->id);
 

@@ -4,7 +4,7 @@ namespace App\Modules\Shared\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class InfrastructureSelectItemResource extends JsonResource
+class InfrastructureItemResource extends JsonResource
 {
     private const TYPE_LABELS = [
         'academy_branches' => 'Académica',
@@ -17,8 +17,10 @@ class InfrastructureSelectItemResource extends JsonResource
         $name = $this->infrastructurable->name ?? 'Sin nombre';
 
         return [
-            'value' => $this->id,
-            'title' => "({$type}) {$name}",
+            'id' => $this->id,
+            'type' => $type,
+            'name' =>  "({$type}) {$name}",
+            'isActive' => $this->infrastructurable->is_active ?? false,
         ];
     }
 }
