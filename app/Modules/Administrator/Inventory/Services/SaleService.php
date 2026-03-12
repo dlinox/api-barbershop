@@ -7,8 +7,10 @@ use App\Modules\Administrator\Inventory\Repositories\SaleRepository;
 use App\Modules\Administrator\Inventory\Repositories\Actions\CreateSaleAction;
 use App\Modules\Administrator\Inventory\Repositories\Actions\UpdateSaleAction;
 use App\Modules\Administrator\Inventory\Repositories\Actions\EnsureClientProfileAction;
+use App\Modules\Administrator\Inventory\Repositories\Actions\RegisterKardexMovementAction;
 use App\Modules\Administrator\Treasury\Repositories\Actions\CreateIncomeAction;
 use App\Models\Inventory\Sale;
+use App\Models\Treasury\Income;
 use Illuminate\Support\Facades\DB;
 
 class SaleService
@@ -19,6 +21,7 @@ class SaleService
         private UpdateSaleAction $updateSaleAction,
         private EnsureClientProfileAction $ensureClientProfileAction,
         private CreateIncomeAction $createIncomeAction,
+        private RegisterKardexMovementAction $registerKardexMovementAction,
     ) {}
 
     public function getProductsWithStock(int $infrastructureId)
@@ -108,6 +111,48 @@ class SaleService
 
         $sale->items()->delete();
         $sale->delete();
+    }
+
+    public function annul(int $id): void
+    {
+        $sale = Sale::with('items.presentation')->findOrFail($id);
+
+        if ($sale->status !== 'completed') {
+            throw new ApiException('Solo se puede anular una venta completada.');
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($sale->items as $item) {
+                $this->registerKardexMovementAction->execute([
+                    'product_id'        => $item->presentation->product_id,
+                    'presentation_id'   => $item->presentation_id,
+                    'infrastructure_id' => $sale->infrastructure_id,
+                    'quantity'          => $item->quantity,
+                    'unit_cost'         => $item->unit_price,
+                    'movement_type'     => 'in',
+                    'reason'            => 'return',
+                    'reference_id'      => $sale->id,
+                    'reference_type'    => Sale::class,
+                    'notes'             => 'Devolución por anulación de venta #' . $sale->id,
+                ]);
+            }
+
+            $income = Income::where('transactionable_type', 'inventory_sales')
+                ->where('transactionable_id', $sale->id)
+                ->first();
+
+            if ($income) {
+                $income->update(['status' => 'cancelled']);
+            }
+
+            $sale->update(['status' => 'cancelled']);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     private function createIncome(array $data, int $infrastructureId, Sale $sale): void
