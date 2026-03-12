@@ -46,4 +46,10 @@ class SaleController
         $this->saleService->delete($id);
         return ApiResponse::success(null, 'Venta eliminada correctamente');
     }
+
+    public function annul(int $id)
+    {
+        $this->saleService->annul($id);
+        return ApiResponse::success(null, 'Venta anulada correctamente');
+    }
 }

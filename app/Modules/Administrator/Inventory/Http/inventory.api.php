@@ -72,4 +72,5 @@ Route::middleware(['auth:api'])->prefix('/inventory-sales')->group(function () {
     Route::get('/products/{infrastructureId}', [SaleController::class, 'getProducts'])->name('inventory-sales.getProducts');
     Route::post('/save', [SaleController::class, 'save'])->name('inventory-sales.save');
     Route::delete('/delete/{id}', [SaleController::class, 'delete'])->name('inventory-sales.delete');
+    Route::post('/annul/{id}', [SaleController::class, 'annul'])->name('inventory-sales.annul');
 });
