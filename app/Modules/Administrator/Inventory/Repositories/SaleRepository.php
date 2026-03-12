@@ -8,42 +8,46 @@ use Illuminate\Http\Request;
 
 class SaleRepository
 {
-    /**
-     * Obtiene las presentaciones con stock > 0 para una sede (infrastructure).
-     */
-    public function getProductsWithStock(int $infrastructureId): array
+
+    public function getProductsWithStock(int $infrastructureId)
     {
-        return ProductPresentation::select([
+        return ProductPresentation::select(
             'inventory_product_presentations.id',
             'inventory_product_presentations.product_id',
+            'inventory_product_presentations.name',
             'inventory_product_presentations.sku',
-            'inventory_product_presentations.name as presentation_name',
             'inventory_product_presentations.sale_price',
+            'inventory_product_presentations.quantity',
+
+            'inventory_products.id as product_id',
             'inventory_products.name as product_name',
-            'inventory_products.category_id',
+
             'inventory_stocks.current_stock',
-        ])
-            ->join('inventory_products', 'inventory_products.id', '=', 'inventory_product_presentations.product_id')
-            ->leftJoin('inventory_stocks', function ($join) use ($infrastructureId) {
-                $join->on('inventory_product_presentations.id', '=', 'inventory_stocks.presentation_id')
-                    ->where('inventory_stocks.infrastructure_id', '=', $infrastructureId);
-            })
-            ->where(function ($q) {
-                $q->where('inventory_stocks.current_stock', '>', 0)
-                    ->orWhereNull('inventory_stocks.current_stock');
-            })
+        )
+            ->join('inventory_stocks', 'inventory_product_presentations.id', '=', 'inventory_stocks.presentation_id')
+            ->join ('inventory_products', 'inventory_product_presentations.product_id', '=', 'inventory_products.id')
+            ->where('inventory_stocks.infrastructure_id', $infrastructureId)
             ->where('inventory_product_presentations.is_active', true)
-            ->get()
-            ->toArray();
+            ->where('inventory_stocks.current_stock', '>', 0)
+            ->get();
     }
 
-    public function dataTable(Request $request, int $cashRegisterId)
+    public function dataTable(Request $request)
     {
-        $query = Sale::with(['person:id,name,last_name,document_number', 'user:id,username'])
-            ->whereHas('cashSession', function ($q) use ($cashRegisterId) {
-                $q->where('cash_register_id', $cashRegisterId);
-            });
+        $query = Sale::select(
+                'inventory_sales.*',
+                'core_persons.name as person_name',
+                'core_persons.paternal_surname as person_paternal_surname',
+                'core_persons.maternal_surname as person_maternal_surname',
+                'core_persons.document_number as person_document_number',
+                'auth_users.username as user_username',
+            )
+            ->join('treasury_cash_sessions', 'treasury_cash_sessions.id', 'inventory_sales.cash_session_id')
+            ->join('treasury_cash_registers', 'treasury_cash_registers.id', 'treasury_cash_sessions.cash_register_id')
+            ->leftJoin('core_persons', 'core_persons.id', 'inventory_sales.person_id')
+            ->leftJoin('auth_users', 'auth_users.id', 'inventory_sales.user_id');
 
+        $query->orderBy('inventory_sales.created_at', 'desc');
         return $query->dataTable($request);
     }
 }

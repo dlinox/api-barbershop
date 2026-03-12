@@ -6,7 +6,6 @@ use App\Models\Auth\User;
 use App\Common\Traits\HasDataTable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CashSession extends Model
 {
@@ -38,6 +37,7 @@ class CashSession extends Model
     ];
 
     public static $searchColumns = [
+        'opened_at',
         'status',
     ];
 
@@ -56,8 +56,13 @@ class CashSession extends Model
         return $this->belongsTo(User::class, 'closed_by');
     }
 
-    public function transactions(): HasMany
+    public function expenses()
     {
-        return $this->hasMany(Transaction::class, 'cash_session_id');
+        return $this->hasMany(Expense::class, 'cash_session_id');
+    }
+
+    public function incomes()
+    {
+        return $this->hasMany(Income::class, 'cash_session_id');
     }
 }

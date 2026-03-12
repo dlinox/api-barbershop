@@ -13,9 +13,9 @@ class CreateSaleAction
     ) {}
 
     /**
-     * Crea la venta (sale + items) y descuenta stock vía kardex.
+     * Crea la venta (sale + items). Si status es 'completed', descuenta stock vía kardex.
      */
-    public function execute(array $data, int $infrastructureId): Sale
+    public function execute(array $data, int $infrastructureId, string $status = 'completed'): Sale
     {
         $subtotal      = 0;
         $totalDiscount = 0;
@@ -40,11 +40,10 @@ class CreateSaleAction
             'subtotal'          => $subtotal,
             'discount'          => $totalDiscount,
             'total'             => $total,
-            'status'            => 'completed',
-            'user_id'           => auth()->id(),
+            'status'            => $status,
         ]);
 
-        // ─── Crear ítems y descontar stock ───
+        // ─── Crear ítems ───
         foreach ($data['items'] as $item) {
             $sale->items()->create([
                 'presentation_id' => $item['presentation_id'],
@@ -53,11 +52,24 @@ class CreateSaleAction
                 'discount'        => $item['discount'] ?? 0,
                 'total'           => $item['total'],
             ]);
+        }
 
-            // Obtener product_id de la presentación
+        // ─── Descontar stock solo si la venta está completada ───
+        if ($status === 'completed') {
+            $this->registerStockMovements($sale, $data['items'], $infrastructureId);
+        }
+
+        return $sale->load('items');
+    }
+
+    /**
+     * Registra las salidas en kardex para cada ítem de la venta.
+     */
+    public function registerStockMovements(Sale $sale, array $items, int $infrastructureId): void
+    {
+        foreach ($items as $item) {
             $presentation = ProductPresentation::findOrFail($item['presentation_id']);
 
-            // Registrar salida en kardex (descuenta stock automáticamente)
             $this->registerKardexMovementAction->execute([
                 'product_id'        => $presentation->product_id,
                 'presentation_id'   => $item['presentation_id'],
@@ -71,7 +83,5 @@ class CreateSaleAction
                 'notes'             => 'Venta POS #' . $sale->id,
             ]);
         }
-
-        return $sale->load('items');
     }
 }

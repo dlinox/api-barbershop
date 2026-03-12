@@ -9,14 +9,18 @@ class SaleProductResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id'           => $this['id'],
-            'productId'    => $this['product_id'],
-            'productName'  => $this['product_name'],
-            'presentation' => $this['presentation_name'],
-            'sku'          => $this['sku'],
-            'salePrice'    => (float) $this['sale_price'],
-            'categoryId'   => $this['category_id'],
-            'stock'        => (int) ($this['current_stock'] ?? 0),
+            'product' => [
+                'id' => $this->product_id,
+                'name' => $this->product_name,
+            ],
+            'presentation' => [
+                'id' => $this->id,
+                'name' => $this->name,
+                'sku' => $this->sku,
+                'quantity' => $this->quantity,
+                'salePrice' => (float) $this->sale_price,
+            ],
+            'stock' => (float) ($this->current_stock ?? 0),
         ];
     }
 }

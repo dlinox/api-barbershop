@@ -2,8 +2,11 @@
 
 namespace App\Modules\Administrator\Inventory\Services;
 
+use App\Common\Exceptions\ApiException;
 use App\Modules\Administrator\Inventory\Repositories\SaleRepository;
 use App\Modules\Administrator\Inventory\Repositories\Actions\CreateSaleAction;
+use App\Modules\Administrator\Inventory\Repositories\Actions\UpdateSaleAction;
+use App\Modules\Administrator\Inventory\Repositories\Actions\EnsureClientProfileAction;
 use App\Modules\Administrator\Treasury\Repositories\Actions\CreateIncomeAction;
 use App\Models\Inventory\Sale;
 use Illuminate\Support\Facades\DB;
@@ -13,41 +16,110 @@ class SaleService
     public function __construct(
         private SaleRepository $saleRepository,
         private CreateSaleAction $createSaleAction,
+        private UpdateSaleAction $updateSaleAction,
+        private EnsureClientProfileAction $ensureClientProfileAction,
         private CreateIncomeAction $createIncomeAction,
     ) {}
 
-    public function getProductsWithStock(int $infrastructureId): array
+    public function getProductsWithStock(int $infrastructureId)
     {
         return $this->saleRepository->getProductsWithStock($infrastructureId);
     }
 
-    public function dataTable($request, int $cashRegisterId)
+    public function dataTable($request)
     {
-        return $this->saleRepository->dataTable($request, $cashRegisterId);
+        return $this->saleRepository->dataTable($request);
     }
 
     public function save(array $data, int $infrastructureId): void
     {
         DB::beginTransaction();
         try {
-            // 1. Crear venta + ítems + kardex (descuento stock)
-            $sale = $this->createSaleAction->execute($data, $infrastructureId);
+            $hasIncome = !empty($data['income']);
+            $isEdit    = !empty($data['id']);
 
-            // 2. Crear ingreso en treasury (income + details + payment methods)
-            $incomeData = $data['income'];
-            $incomeData['cash_session_id'] = $data['cash_session_id'];
+            if (!empty($data['client_id'])) {
+                $this->ensureClientProfileAction->execute($data['client_id']);
+            }
 
-            $this->createIncomeAction->execute(
-                data: $incomeData,
-                infrastructureId: $infrastructureId,
-                transactionableType: 'inventory_sales',
-                transactionableId: $sale->id,
-            );
+            if ($isEdit) {
+                $sale = $this->editPendingSale($data, $infrastructureId, $hasIncome);
+            } else {
+                $sale = $this->createSale($data, $infrastructureId, $hasIncome);
+            }
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Caso 1: Crear venta nueva.
+     * - Sin income → status 'pending', sin kardex/stock.
+     * - Con income → status 'completed', con kardex/stock/income.
+     */
+    private function createSale(array $data, int $infrastructureId, bool $hasIncome): Sale
+    {
+        $status = $hasIncome ? 'completed' : 'pending';
+
+        $sale = $this->createSaleAction->execute($data, $infrastructureId, $status);
+
+        if ($hasIncome) {
+            $this->createIncome($data, $infrastructureId, $sale);
+        }
+
+        return $sale;
+    }
+
+    /**
+     * Caso 2 y 3: Editar venta pendiente.
+     * - Sin income → actualiza datos, sigue 'pending'.
+     * - Con income → actualiza datos, crea kardex/stock/income, pasa a 'completed'.
+     */
+    private function editPendingSale(array $data, int $infrastructureId, bool $hasIncome): Sale
+    {
+        $sale = Sale::findOrFail($data['id']);
+
+        if ($sale->status !== 'pending') {
+            throw new ApiException('Solo se puede editar una venta en estado pendiente.');
+        }
+
+        $sale = $this->updateSaleAction->execute($data, $sale);
+
+        if ($hasIncome) {
+            $sale->update(['status' => 'completed']);
+
+            $this->createSaleAction->registerStockMovements($sale, $data['items'], $infrastructureId);
+            $this->createIncome($data, $infrastructureId, $sale);
+        }
+
+        return $sale;
+    }
+
+    public function delete(int $id): void
+    {
+        $sale = Sale::findOrFail($id);
+
+        if ($sale->status !== 'pending') {
+            throw new ApiException('Solo se puede eliminar una venta en estado pendiente.');
+        }
+
+        $sale->items()->delete();
+        $sale->delete();
+    }
+
+    private function createIncome(array $data, int $infrastructureId, Sale $sale): void
+    {
+        $incomeData = $data['income'];
+        $incomeData['cash_session_id'] = $data['cash_session_id'];
+
+        $this->createIncomeAction->execute(
+            data: $incomeData,
+            infrastructureId: $infrastructureId,
+            transactionableType: 'inventory_sales',
+            transactionableId: $sale->id,
+        );
     }
 }

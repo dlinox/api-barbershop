@@ -12,6 +12,8 @@ return new class extends Migration
         // Representa la venta de productos del inventario desde cualquier módulo
         // (barbería, academia, etc.). El comprobante financiero vive en treasury_incomes
         // apuntando a este registro via transactionable.
+        //si existe no se crea
+        Schema::hasTable('inventory_sales') ||
         Schema::create('inventory_sales', function (Blueprint $table) {
             $table->id();
 
@@ -50,6 +52,7 @@ return new class extends Migration
         // ─── DETALLE DE VENTAS (ítems vendidos) ───
         // Sirve para dos propósitos: (1) descuento de stock via kardex,
         // (2) referencia cruzada con treasury_income_details via itemable.
+        Schema::hasTable('inventory_sale_items') ||
         Schema::create('inventory_sale_items', function (Blueprint $table) {
             $table->id();
 

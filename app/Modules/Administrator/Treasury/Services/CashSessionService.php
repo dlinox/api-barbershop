@@ -12,9 +12,9 @@ class CashSessionService
         private readonly CashSessionRepository $repository,
     ) {}
 
-    public function dataTable($request, int $cashRegisterId)
+    public function dataTable($request)
     {
-        return $this->repository->dataTable($request, $cashRegisterId);
+        return $this->repository->dataTable($request);
     }
 
     public function getOpenSession(int $cashRegisterId): ?CashSession

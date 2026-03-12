@@ -6,10 +6,9 @@ use App\Models\Treasury\CashSession;
 
 class CashSessionRepository
 {
-    public function dataTable($request, int $cashRegisterId)
+    public function dataTable($request)
     {
         $query = CashSession::with(['openedByUser', 'closedByUser'])
-            ->where('cash_register_id', $cashRegisterId)
             ->orderBy('opened_at', 'desc');
 
         return $query->dataTable($request);

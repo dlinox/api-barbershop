@@ -16,9 +16,9 @@ class CashSessionController
         private readonly CashSessionService $service,
     ) {}
 
-    public function dataTable(Request $request, int $cashRegisterId): JsonResponse
+    public function dataTable(Request $request): JsonResponse
     {
-        $items = $this->service->dataTable($request, $cashRegisterId);
+        $items = $this->service->dataTable($request);
         $items['data'] = CashSessionDataTableItemResource::collection($items['data']);
         return ApiResponse::success($items);
     }
@@ -60,5 +60,12 @@ class CashSessionController
         return ApiResponse::success(
             $session ? new CashSessionDataTableItemResource($session->load(['openedByUser', 'closedByUser'])) : null,
         );
+    }
+
+    public function currentSessionId(int $cashRegisterId): JsonResponse
+    {
+        $session = $this->service->getOpenSession($cashRegisterId);
+
+        return ApiResponse::success($session?->id);
     }
 }

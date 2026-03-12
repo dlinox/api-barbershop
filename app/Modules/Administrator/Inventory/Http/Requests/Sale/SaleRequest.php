@@ -9,12 +9,19 @@ class SaleRequest extends ApiFormRequest
 {
     public function rules(): array
     {
-        $incomeRequest = new IncomeRequest();
-        $incomeRules = collect($incomeRequest->rules())
-            ->mapWithKeys(fn($rule, $key) => ["income.{$key}" => $rule])
-            ->all();
+        //si income es null no se aplican las reglas de income, por eso se agrega el nullable
+
+        if ($this->input('income') === null) {
+            $incomeRules = [];
+        } else {
+            $incomeRequest = new IncomeRequest();
+            $incomeRules = collect($incomeRequest->rules())
+                ->mapWithKeys(fn($rule, $key) => ["income.{$key}" => $rule])
+                ->all();
+        }
 
         $saleRules = [
+            'id'                            => 'nullable|exists:inventory_sales,id',
             'cash_session_id'              => 'required|exists:treasury_cash_sessions,id',
             'client_id'                    => 'nullable|exists:core_persons,id',
             'context'                      => 'required|string|in:barbershop,academy,other',

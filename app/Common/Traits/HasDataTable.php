@@ -27,6 +27,8 @@ trait HasDataTable
                 $query->where(function ($query) use ($keySnakeCase, $value) {
                     if (is_array($value)) {
                         $query->whereIn($keySnakeCase, $value);
+                    } else if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+                        $query->whereDate($keySnakeCase, $value);
                     } else {
                         $query->where($keySnakeCase, $value);
                     }

@@ -140,6 +140,7 @@ class GroupRepository
             ->where('academy_groups.end_date', '>', now()) // fecha de fin mayor a la fecha actual
             ->where('academy_groups.is_active', true)
             ->whereNotIn('academy_groups.id', $groupIds)
+            ->orderBy('academy_groups.id', 'desc')
             ->get();
     }
 

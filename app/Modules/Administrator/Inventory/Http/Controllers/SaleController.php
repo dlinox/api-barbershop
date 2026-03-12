@@ -7,6 +7,7 @@ use App\Modules\Administrator\Inventory\Services\SaleService;
 use App\Modules\Administrator\Inventory\Http\Requests\Sale\SaleRequest;
 use App\Modules\Administrator\Inventory\Http\Resources\Sale\SaleProductResource;
 use App\Modules\Administrator\Inventory\Http\Resources\Sale\SaleDataTableItemResource;
+use Illuminate\Http\Request;
 
 class SaleController
 {
@@ -14,9 +15,9 @@ class SaleController
         private SaleService $saleService
     ) {}
 
-    public function dataTable(\Illuminate\Http\Request $request, int $cashRegisterId)
+    public function dataTable(Request $request)
     {
-        $items = $this->saleService->dataTable($request, $cashRegisterId);
+        $items = $this->saleService->dataTable($request);
         $items['data'] = SaleDataTableItemResource::collection($items['data']);
         return ApiResponse::success($items);
     }
@@ -38,5 +39,11 @@ class SaleController
 
         $this->saleService->save($data, $infrastructureId);
         return ApiResponse::success(null, 'Venta registrada correctamente');
+    }
+
+    public function delete(int $id)
+    {
+        $this->saleService->delete($id);
+        return ApiResponse::success(null, 'Venta eliminada correctamente');
     }
 }

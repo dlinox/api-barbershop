@@ -8,11 +8,15 @@ class SaleDataTableItemResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $clientName = $this->person_name
+            ? trim("{$this->person_name} {$this->person_paternal_surname}")
+            : 'Público General';
+
         return [
             'id' => $this->id,
-            'clientName' => $this->person ? $this->person->name . ' ' . $this->person->last_name : 'Público General',
-            'clientDoc' => $this->person ? $this->person->document_number : '-',
-            'userName' => $this->user?->username ?? '',
+            'clientName' => $clientName,
+            'clientDoc' => $this->person_document_number ?? '-',
+            'userName' => $this->user_username ?? '',
             'context' => $this->context,
             'subtotal' => (float) $this->subtotal,
             'discount' => (float) $this->discount,

@@ -68,7 +68,8 @@ Route::middleware(['auth:api'])->prefix('/inventory-purchase-orders')->group(fun
 });
 
 Route::middleware(['auth:api'])->prefix('/inventory-sales')->group(function () {
-    Route::post('/data-table/{cashRegisterId}', [SaleController::class, 'dataTable'])->name('inventory-sales.dataTable');
+    Route::post('/data-table', [SaleController::class, 'dataTable'])->name('inventory-sales.dataTable');
     Route::get('/products/{infrastructureId}', [SaleController::class, 'getProducts'])->name('inventory-sales.getProducts');
     Route::post('/save', [SaleController::class, 'save'])->name('inventory-sales.save');
+    Route::delete('/delete/{id}', [SaleController::class, 'delete'])->name('inventory-sales.delete');
 });

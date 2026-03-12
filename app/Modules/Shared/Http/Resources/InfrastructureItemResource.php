@@ -19,7 +19,7 @@ class InfrastructureItemResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => $type,
-            'name' =>  "({$type}) {$name}",
+            'name' =>  $name,
             'isActive' => $this->infrastructurable->is_active ?? false,
         ];
     }
