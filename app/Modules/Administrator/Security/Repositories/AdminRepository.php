@@ -34,8 +34,8 @@ class AdminRepository
             'behavior_roles.display_name as role_display_name',
         )
             ->join('core_persons', 'profile_admins.core_person_id', '=', 'core_persons.id')
-            ->join('auth_users', 'core_persons.id', '=', 'auth_users.id')
-            ->join('behavior_profiles', 'auth_users.id', '=', 'behavior_profiles.auth_user_id')
+            ->join('behavior_profiles', 'profile_admins.core_person_id', '=', 'behavior_profiles.profileable_id')
+            ->join('auth_users', 'behavior_profiles.auth_user_id', '=', 'auth_users.id')
             ->join('behavior_roles', 'behavior_roles.id', '=', 'behavior_profiles.behavior_role_id')
             ->where('behavior_roles.level', '1')
             ->with('infrastructures')

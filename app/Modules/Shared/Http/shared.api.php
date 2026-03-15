@@ -11,4 +11,5 @@ Route::middleware(['auth:api'])->prefix('/infrastructures')->group(function () {
 
 Route::middleware(['auth:api'])->prefix('/persons')->group(function () {
     Route::get('/select-async-items', [PersonController::class, 'selectAsyncItems'])->name('persons.selectAsyncItems');
+    Route::get('/search-by-document', [PersonController::class, 'searchByDocument'])->name('persons.searchByDocument');
 });

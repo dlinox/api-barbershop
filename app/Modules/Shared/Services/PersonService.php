@@ -14,4 +14,9 @@ class PersonService
     {
         return $this->personRepository->selectAsyncItems($request->search, $request->value);
     }
+
+    public function searchByDocument(string $documentType, string $documentNumber, string $profile, ?int $id = null): ?array
+    {
+        return $this->personRepository->searchByDocument($documentType, $documentNumber, $profile, $id);
+    }
 }
