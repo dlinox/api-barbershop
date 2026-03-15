@@ -232,6 +232,7 @@ return new class extends Migration
         Schema::dropIfExists('academy_attendances');
         Schema::dropIfExists('academy_attendance_deadlines');
         Schema::dropIfExists('academy_enrollment_payment_advances');
+        Schema::dropIfExists('academy_enrollment_payment_details');
         Schema::dropIfExists('academy_enrollment_payments');
         Schema::dropIfExists('academy_enrollments');
         Schema::dropIfExists('academy_group_payment_plans');

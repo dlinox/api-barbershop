@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Modules\Administrator\Barbershop\Http\Controllers\ClientController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\WorkerController;
+use App\Modules\Administrator\Barbershop\Http\Controllers\BarberController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\BranchController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\CategoryController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\ServiceController;
@@ -20,6 +21,12 @@ Route::middleware(['auth:api'])->prefix('/workers')->group(function () {
     Route::post('/data-table', [WorkerController::class, 'dataTable'])->name('workers.dataTable');
     Route::post('/save', [WorkerController::class, 'save'])->name('workers.save');
     Route::get('/select-async-items', [WorkerController::class, 'selectAsyncItems'])->name('workers.selectAsyncItems');
+});
+
+Route::middleware(['auth:api'])->prefix('/barbers')->group(function () {
+    Route::post('/data-table', [BarberController::class, 'dataTable'])->name('barbers.dataTable');
+    Route::post('/save', [BarberController::class, 'save'])->name('barbers.save');
+    Route::get('/select-async-items', [BarberController::class, 'selectAsyncItems'])->name('barbers.selectAsyncItems');
 });
 
 Route::middleware(['auth:api'])->prefix('/barbershop-branches')->group(function () {
@@ -40,6 +47,7 @@ Route::middleware(['auth:api'])->prefix('/barbershop-services')->group(function 
     Route::post('/data-table', [ServiceController::class, 'dataTable'])->name('barbershop-services.dataTable');
     Route::post('/save', [ServiceController::class, 'save'])->name('barbershop-services.save');
     Route::get('/select-items', [ServiceController::class, 'selectItems'])->name('barbershop-services.selectItems');
+    Route::get('/by-infrastructure/{infrastructureId}', [ServiceController::class, 'getByInfrastructure'])->name('barbershop-services.getByInfrastructure');
     Route::delete('/delete/{id}/{branchId}', [ServiceController::class, 'delete'])->name('barbershop-services.delete');
 });
 

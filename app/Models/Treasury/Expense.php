@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Expense extends Model
 {
-    protected $table = 'treasury_expenses';
+    protected $table = 'treasury_cash_expenses';
 
     protected static function boot()
     {

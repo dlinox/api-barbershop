@@ -50,4 +50,10 @@ class SaleRepository
         $query->orderBy('inventory_sales.created_at', 'desc');
         return $query->dataTable($request);
     }
+
+    public function getById(int $id)
+    {
+        return Sale::with(['items.presentation.product'])
+            ->findOrFail($id);
+    }
 }

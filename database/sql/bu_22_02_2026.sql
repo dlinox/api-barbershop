@@ -60,7 +60,8 @@ INSERT INTO `behavior_roles` (`id`, `name`, `display_name`, `redirect_to`, `leve
 	(1, 'super_admin', 'Super Admin', '/admin', '0', 1, '2026-02-16 16:40:07', '2026-02-16 16:40:07'),
 	(2, 'estudiante', 'Estudiante', '/admin', '3', 1, '2026-02-16 16:40:08', '2026-02-16 16:40:08'),
 	(3, 'administrador', 'Administrador', '/admin', '1', 1, '2026-02-16 16:41:10', '2026-02-16 16:41:10'),
-	(4, 'docentes', 'Docentes', '/admin', '2', 1, '2026-02-16 16:40:08', '2026-02-16 16:40:08');
+	(4, 'docente', 'Docente', '/admin', '2', 1, '2026-02-16 16:40:08', '2026-02-16 16:40:08'),
+	(5, 'barbero', 'Barbero', '/admin', '4', 1, '2026-02-16 16:40:08', '2026-02-16 16:40:08');
 
 
 -- Volcando datos para la tabla db_barbershop.core_persons: ~36 rows (aproximadamente)

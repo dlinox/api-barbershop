@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use App\Models\Core\Person;
+use App\Models\Profile\AdminInfrastructure;
 use App\Models\Behavior\Profile;
 use App\Common\Traits\HasDataTable;
 
@@ -28,5 +29,17 @@ class Admin extends Model
     public function profile(): MorphOne
     {
         return $this->morphOne(Profile::class, 'profileable');
+    }
+
+    public function infrastructures()
+    {
+        return $this->belongsToMany(
+            \App\Models\Core\Infrastructure::class, 
+            'profile_admin_infrastructures', 
+            'profile_admin_id', 
+            'core_infrastructure_id', 
+            'core_person_id', 
+            'id'
+        );
     }
 }

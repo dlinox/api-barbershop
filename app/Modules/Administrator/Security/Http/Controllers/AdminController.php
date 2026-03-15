@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Common\Http\Responses\ApiResponse;
 
 use App\Modules\Administrator\Security\Http\Requests\Admin\AdminCreateRequest;
+use App\Modules\Administrator\Security\Http\Requests\Admin\AssignInfrastructureRequest;
 use App\Modules\Administrator\Security\Services\AdminService;
 use App\Modules\Administrator\Security\Http\Resources\Admin\AdminDataTableItemResource;
 
@@ -26,5 +27,12 @@ class AdminController
         $req = $request->validated();
         $this->adminService->create($req);
         return ApiResponse::success(null, 'Admin created successfully', 201);
+    }
+
+    public function syncInfrastructures(AssignInfrastructureRequest $request): JsonResponse
+    {
+        $req = $request->validated();
+        $this->adminService->syncInfrastructures($req);
+        return ApiResponse::success(null, 'Infraestructuras asignadas correctamente');
     }
 }

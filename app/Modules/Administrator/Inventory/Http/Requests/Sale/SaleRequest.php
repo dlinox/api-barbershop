@@ -24,6 +24,7 @@ class SaleRequest extends ApiFormRequest
             'id'                            => 'nullable|exists:inventory_sales,id',
             'cash_session_id'              => 'required|exists:treasury_cash_sessions,id',
             'client_id'                    => 'nullable|exists:core_persons,id',
+            'ticket_id'                    => 'nullable|exists:barbershop_tickets,id',
             'context'                      => 'required|string|in:barbershop,academy,other',
             'items'                        => 'required|array|min:1',
             'items.*.presentation_id'      => 'required|exists:inventory_product_presentations,id',
@@ -45,6 +46,7 @@ class SaleRequest extends ApiFormRequest
         return array_merge([
             'cash_session_id.required'             => 'La sesión de caja es requerida',
             'cash_session_id.exists'               => 'La sesión de caja no existe',
+            'ticket_id.exists'                     => 'El ticket no existe',
             'context.required'                     => 'El contexto es requerido',
             'context.in'                           => 'El contexto no es válido',
             'items.required'                       => 'Los productos son requeridos',
@@ -69,6 +71,7 @@ class SaleRequest extends ApiFormRequest
         return array_merge([
             'cash_session_id'          => 'sesión de caja',
             'client_id'                => 'cliente',
+            'ticket_id'                => 'ticket',
             'context'                  => 'contexto',
             'items'                    => 'productos',
             'items.*.presentation_id'  => 'presentación',

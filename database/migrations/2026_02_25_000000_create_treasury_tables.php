@@ -51,6 +51,21 @@ return new class extends Migration
             $table->index('closed_at');
         });
 
+        Schema::create('treasury_cash_expenses', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('cash_session_id');
+            $table->unsignedBigInteger('user_id');
+            $table->decimal('amount', 12, 2);
+            $table->string('description')->nullable();
+            $table->timestamps();
+
+            $table->foreign('cash_session_id')->references('id')->on('treasury_cash_sessions')->cascadeOnDelete();
+            $table->foreign('user_id')->references('id')->on('auth_users')->restrictOnDelete();
+
+            $table->index('cash_session_id');
+            $table->index('user_id');
+        });
+
         // ─── INGRESOS (cabecera: comprobante de cobro/venta) ───
         Schema::create('treasury_incomes', function (Blueprint $table) {
             $table->id();
@@ -139,7 +154,7 @@ return new class extends Migration
 
 
         // ─── EGRESOS (pagos, gastos, adelantos, etc.) ───
-        // Schema::create('treasury_expenses', function (Blueprint $table) {
+        // Schema::create('treasury_cash_expenses_full', function (Blueprint $table) {
         //     $table->id();
         //     $table->unsignedBigInteger('cash_session_id')->nullable();       // nullable para egresos fuera de caja
         //     $table->unsignedBigInteger('infrastructure_id');
@@ -202,6 +217,7 @@ return new class extends Migration
         Schema::dropIfExists('treasury_income_payment_methods');
         Schema::dropIfExists('treasury_income_details');
         Schema::dropIfExists('treasury_incomes');
+        Schema::dropIfExists('treasury_cash_expenses');
         Schema::dropIfExists('treasury_cash_sessions');
         Schema::dropIfExists('treasury_cash_registers');
     }

@@ -10,7 +10,7 @@ class ExpenseRequest extends ApiFormRequest
     {
         $id = $this->id ?? null;
         return [
-            'id' => $id ? 'exists:treasury_expenses,id' : 'nullable',
+            'id' => $id ? 'exists:treasury_cash_expenses,id' : 'nullable',
             'cash_session_id' => 'required|exists:treasury_cash_sessions,id',
             'amount' => 'required|numeric|min:0.01',
             'description' => 'required|string|max:255',

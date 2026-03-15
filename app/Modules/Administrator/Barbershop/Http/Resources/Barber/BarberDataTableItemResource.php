@@ -1,18 +1,21 @@
 <?php
 
-namespace App\Modules\Administrator\Security\Http\Resources\Admin;
+namespace App\Modules\Administrator\Barbershop\Http\Resources\Barber;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AdminDataTableItemResource extends JsonResource
+class BarberDataTableItemResource extends JsonResource
 {
     public function toArray($request)
     {
         return [
-            'id' => $this->core_person_id,
-            'infrastructures' => $this->infrastructures->pluck('id')->toArray(),
+            'id' => $this->id,
+            'branchId' => $this->branch_id,
+            'branchName' => $this->branch_name,
+            'commissionPercentage' => (float) $this->commission_percentage,
+            'isActive' => (bool) $this->is_active,
             'person' => [
-                'id' => $this->core_person_id,
+                'id' => $this->id,
                 'documentType' => $this->person_document_type,
                 'documentNumber' => $this->person_document_number,
                 'name' => $this->person_name,

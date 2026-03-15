@@ -29,6 +29,7 @@ class UpdateSaleAction
         $sale->update([
             'cash_session_id' => $data['cash_session_id'] ?? $sale->cash_session_id,
             'person_id'       => $data['client_id'] ?? $sale->person_id,
+            'barbershop_ticket_id' => $data['ticket_id'] ?? $sale->barbershop_ticket_id,
             'context'         => $data['context'] ?? $sale->context,
             'subtotal'        => $subtotal,
             'discount'        => $totalDiscount,

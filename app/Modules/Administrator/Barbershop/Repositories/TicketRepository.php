@@ -9,21 +9,17 @@ class TicketRepository
 {
     public function dataTable(Request $request, int $branchId)
     {
-        $query = Ticket::join('barbershop_branches', 'barbershop_branches.id', '=', 'barbershop_tickets.branch_id')
-            ->leftJoin('profile_workers', 'profile_workers.id', '=', 'barbershop_tickets.profile_worker_id')
-            ->leftJoin('core_persons as worker_persons', 'worker_persons.id', '=', 'profile_workers.id')
-            ->leftJoin('profile_clients', 'profile_clients.id', '=', 'barbershop_tickets.profile_client_id')
-            ->leftJoin('core_persons as client_persons', 'client_persons.id', '=', 'profile_clients.id')
-            ->where('barbershop_tickets.branch_id', $branchId)
-            ->select(
-                'barbershop_tickets.*',
-                'barbershop_branches.name as branch_name',
-                'worker_persons.name as worker_name',
-                'worker_persons.paternal_surname as worker_paternal_surname',
-                'client_persons.name as client_name',
-                'client_persons.paternal_surname as client_paternal_surname',
-                'client_persons.maternal_surname as client_maternal_surname',
-            );
+        $query = Ticket::select(
+            'barbershop_tickets.*',
+            'core_persons.name as client_name',
+            'core_persons.paternal_surname as client_paternal_surname',
+            'core_persons.maternal_surname as client_maternal_surname',
+            // 'auth_users.username as user_username',
+        )->join('treasury_cash_sessions', 'treasury_cash_sessions.id', 'barbershop_tickets.cash_session_id')
+            ->join('treasury_cash_registers', 'treasury_cash_registers.id', 'treasury_cash_sessions.cash_register_id')
+            ->leftJoin('core_persons', 'core_persons.id', 'barbershop_tickets.profile_client_id');
+        // ->leftJoin('auth_users', 'auth_users.id', 'barbershop_tickets.user_id');
+
 
         $query->orderBy('barbershop_tickets.created_at', 'desc');
 

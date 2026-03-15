@@ -7,6 +7,7 @@ use App\Modules\Administrator\Inventory\Services\SaleService;
 use App\Modules\Administrator\Inventory\Http\Requests\Sale\SaleRequest;
 use App\Modules\Administrator\Inventory\Http\Resources\Sale\SaleProductResource;
 use App\Modules\Administrator\Inventory\Http\Resources\Sale\SaleDataTableItemResource;
+use App\Modules\Administrator\Inventory\Http\Resources\Sale\SaleDetailResource;
 use Illuminate\Http\Request;
 
 class SaleController
@@ -51,5 +52,12 @@ class SaleController
     {
         $this->saleService->annul($id);
         return ApiResponse::success(null, 'Venta anulada correctamente');
+    }
+
+    public function getById(int $id)
+    {
+        $sale = $this->saleService->getById($id);
+        $sale = new SaleDetailResource($sale);
+        return ApiResponse::success($sale);
     }
 }

@@ -34,6 +34,11 @@ class SaleService
         return $this->saleRepository->dataTable($request);
     }
 
+    public function getById(int $id)
+    {
+        return $this->saleRepository->getById($id);
+    }
+
     public function save(array $data, int $infrastructureId): void
     {
         DB::beginTransaction();

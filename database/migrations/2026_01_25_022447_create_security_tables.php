@@ -58,7 +58,12 @@ return new class extends Migration
             $table->string('name', 50)->unique();
             $table->string('display_name', 100)->unique();
             $table->string('redirect_to', 255)->nullable();
-            $table->enum('level', ['0', '1', '2', '3'])->default('1');
+            // 0: Super Admin
+            // 1: Admin
+            // 2: Teacher
+            // 3: Student
+            // 4: Client
+            $table->enum('level', ['0', '1', '2', '3', '4'])->default('1');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
@@ -71,9 +76,9 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50)->unique();
             $table->string('display_name', 100);
-            $table->enum('type', ['module', 'menu', 'view', 'action', 'feature'])->default('action');
+            $table->enum('type', ['module', 'menu', 'view', 'action', 'feature'])->default('feature');
             $table->unsignedBigInteger('parent_id')->nullable();
-            $table->enum('level', ['0', '1', '2', '3'])->default('1');
+            $table->enum('level', ['0', '1', '2', '3', '4'])->default('1');
             $table->timestamps();
 
             $table->foreign('parent_id')->references('id')->on('behavior_permissions')->onDelete('cascade');

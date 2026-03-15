@@ -36,6 +36,7 @@ class CreateSaleAction
             'infrastructure_id' => $infrastructureId,
             'cash_session_id'   => $data['cash_session_id'] ?? null,
             'person_id'         => $data['client_id'] ?? null,
+            'barbershop_ticket_id' => $data['ticket_id'] ?? null,
             'context'           => $data['context'] ?? 'barbershop',
             'subtotal'          => $subtotal,
             'discount'          => $totalDiscount,

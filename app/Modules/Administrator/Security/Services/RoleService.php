@@ -49,4 +49,22 @@ class RoleService
     {
         return $this->roleRepository->getRolesForAdmins();
     }
+
+    public function getAllPermissions(string $level)
+    {
+        return $this->roleRepository->getAllPermissions($level);
+    }
+
+    public function syncPermissions(array $data): void
+    {
+        try {
+            DB::beginTransaction();
+            $role = Role::findOrFail($data['roleId']);
+            $this->roleRepository->assignPermissions($role, $data['permissions']);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new ApiException($e->getMessage(), 500);
+        }
+    }
 }

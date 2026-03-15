@@ -20,12 +20,17 @@ class CheckPermission
      *
      * @param string $permissions Comma-separated permission names (OR logic)
      */
-    public function handle(Request $request, Closure $next, string $permissions): Response
+    public function handle(Request $request, Closure $next, ...$permissions): Response
     {
-        $requiredPermissions = array_map('trim', explode(',', $permissions));
+        $requiredPermissions = $permissions;
 
         // Get user permissions from cache or load them
         $userPermissions = $this->getUserPermissions($request);
+
+        // If user is super admin, bypass permission check
+        if ($request->attributes->get('is_super_admin', false)) {
+            return $next($request);
+        }
 
         // Check if user has at least one of the required permissions (OR)
         foreach ($requiredPermissions as $permission) {
@@ -39,7 +44,7 @@ class CheckPermission
 
     /**
      * Get user permissions from request cache or load from database.
-     * Caches permissions in request attributes for performance.
+     * Caches permissions and super admin status in request attributes for performance.
      *
      * @return array<string>
      */
@@ -51,6 +56,7 @@ class CheckPermission
         }
 
         $permissions = [];
+        $isSuperAdmin = false;
 
         // Get profile ID from JWT 'prf' claim
         $profileId = $this->getProfileIdFromToken();
@@ -63,6 +69,11 @@ class CheckPermission
                 ->first();
 
             if ($profile?->role) {
+                // Check if user is super admin
+                if ($profile->role->name === 'super_admin' && (int)$profile->role->level === 0) {
+                    $isSuperAdmin = true;
+                }
+
                 $permissions = $profile->role->permissions
                     ->pluck('name')
                     ->toArray();
@@ -70,6 +81,7 @@ class CheckPermission
         }
 
         // Cache in request attributes
+        $request->attributes->set('is_super_admin', $isSuperAdmin);
         $request->attributes->set('user_permissions', $permissions);
 
         return $permissions;

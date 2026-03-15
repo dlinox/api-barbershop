@@ -9,23 +9,6 @@ return new class extends Migration
     public function up(): void
     {
 
-        Schema::create('profile_clients', function (Blueprint $table) {
-            $table->unsignedBigInteger('id'); // core_person_id
-            $table->timestamps();
-
-            $table->foreign('id')->references('id')->on('core_persons')->onDelete('restrict');
-            $table->primary('id');
-        });
-
-        Schema::create('profile_workers', function (Blueprint $table) {
-            $table->unsignedBigInteger('id'); // core_person_id
-            $table->enum('position', ['barber', 'administrative', 'cashier'])->default('barber');
-            $table->timestamps();
-
-            $table->foreign('id')->references('id')->on('core_persons')->onDelete('restrict');
-            $table->primary('id');
-        });
-
         Schema::create('barbershop_branches', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -89,13 +72,27 @@ return new class extends Migration
             $table->foreign('branch_id')->references('id')->on('barbershop_branches')->onDelete('cascade');
         });
 
+        Schema::create('profile_barbers', function (Blueprint $table) {
+            $table->unsignedBigInteger('id'); // core_person_id
+            $table->unsignedBigInteger('branch_id'); // barbershop_branches
+            $table->decimal('commission_percentage', 5, 2)->default(0);
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+
+            $table->foreign('id')->references('id')->on('core_persons')->onDelete('restrict');
+            $table->foreign('branch_id')->references('id')->on('barbershop_branches')->onDelete('restrict');
+            $table->index('branch_id');
+            $table->index('is_active');
+            $table->primary('id');
+        });
+
         //ticket de atencion
         Schema::create('barbershop_tickets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('branch_id');
-            $table->unsignedBigInteger('cash_session_id')->nullable(); // sesión de caja
+            $table->unsignedBigInteger('branch_id'); //barbershop_branches
             $table->unsignedBigInteger('reservation_id')->nullable();
-            $table->unsignedBigInteger('profile_worker_id')->nullable();
+            $table->unsignedBigInteger('cash_session_id')->nullable(); // sesión de caja
+            $table->unsignedBigInteger('profile_barber_id')->nullable();
             $table->unsignedBigInteger('profile_client_id')->nullable();
 
             //el monto que se pago
@@ -110,12 +107,12 @@ return new class extends Migration
 
             $table->foreign('cash_session_id')->references('id')->on('treasury_cash_sessions')->restrictOnDelete();
             $table->foreign('reservation_id')->references('id')->on('barbershop_reservations')->onDelete('cascade');
-            $table->foreign('profile_worker_id')->references('id')->on('profile_workers')->onDelete('cascade');
+            $table->foreign('profile_barber_id')->references('id')->on('profile_barbers')->onDelete('cascade');
             $table->foreign('profile_client_id')->references('id')->on('profile_clients')->onDelete('cascade');
             $table->foreign('branch_id')->references('id')->on('barbershop_branches')->onDelete('cascade');
 
             $table->index('cash_session_id');
-            $table->index('profile_worker_id');
+            $table->index('profile_barber_id');
             $table->index('profile_client_id');
             $table->index('status');
         });
@@ -133,19 +130,18 @@ return new class extends Migration
             $table->foreign('ticket_id')->references('id')->on('barbershop_tickets')->onDelete('cascade');
             $table->foreign('service_branch_id')->references('id')->on('barbershop_service_branches')->onDelete('cascade');
         });
+
     }
 
     public function down(): void
     {
-
         Schema::dropIfExists('barbershop_ticket_services');
         Schema::dropIfExists('barbershop_tickets');
+        Schema::dropIfExists('barbershop_reservations');
         Schema::dropIfExists('barbershop_service_branches');
         Schema::dropIfExists('barbershop_services');
         Schema::dropIfExists('barbershop_categories');
-        Schema::dropIfExists('barbershop_reservations');
+        Schema::dropIfExists('profile_barbers');
         Schema::dropIfExists('barbershop_branches');
-        Schema::dropIfExists('profile_workers');
-        Schema::dropIfExists('profile_clients');
     }
 };

@@ -26,4 +26,14 @@ class Permission extends Model
             'behavior_role_id'
         )->withTimestamps();
     }
+
+    public function children()
+    {
+        return $this->hasMany(Permission::class, 'parent_id')->with('children');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Permission::class, 'parent_id');
+    }
 }

@@ -19,7 +19,7 @@ class CreateTicketAction
             [
                 'branch_id'         => $data['branch_id'],
                 'reservation_id'    => $data['reservation_id'] ?? null,
-                'profile_client_id' => $data['profile_client_id'] ?? null,
+                'profile_client_id' => $data['client_id'] ?? null,
                 'ticket_date'       => now(),
                 'status'            => 'pending',
             ]

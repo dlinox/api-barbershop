@@ -39,12 +39,7 @@ class Ticket extends Model
     ];
 
     public static $searchColumns = [
-        'barbershop_tickets.status',
-        'barbershop_branches.name',
-        'worker_persons.name',
-        'client_persons.name',
-        'client_persons.paternal_surname',
-        'client_persons.document_number',
+        'core_persons.name',
     ];
 
     public function branch(): BelongsTo

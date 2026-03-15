@@ -39,18 +39,40 @@ class RoleRepository
 
     public function assignPermissions(Role $role, array $permissions): void
     {
-
         //eliminar todos los permisos del rol
         RolePermission::where('behavior_role_id', $role->id)->delete();
 
-        //validar que los permisos existan y sean del mismo nivel
-        $newPermissions = Permission::whereIn('id', $permissions)->where('level', $role->level)->get();
+        // Obtener todos los permisos solicitados por ID
+        $requestedPermissions = Permission::whereIn('id', $permissions)
+            ->where('level', $role->level)
+            ->get();
+
+        $allPermissionIds = [];
+
+        // Función recursiva para obtener todos los padres
+        $collectParentIds = function ($permission) use (&$collectParentIds, &$allPermissionIds) {
+            if ($permission) {
+                $allPermissionIds[] = $permission->id;
+                // Cargar explícitamente el padre
+                if ($permission->parent_id && !in_array($permission->parent_id, $allPermissionIds)) {
+                    $parent = Permission::find($permission->parent_id);
+                    $collectParentIds($parent);
+                }
+            }
+        };
+
+        foreach ($requestedPermissions as $permission) {
+            $collectParentIds($permission);
+        }
+
+        // Eliminar valores duplicados
+        $uniquePermissionIds = array_unique($allPermissionIds);
 
         //asignar los nuevos permisos
-        foreach ($newPermissions as $permission) {
+        foreach ($uniquePermissionIds as $permissionId) {
             RolePermission::create([
                 'behavior_role_id' => $role->id,
-                'behavior_permission_id' => $permission->id,
+                'behavior_permission_id' => $permissionId,
             ]);
         }
     }
@@ -58,5 +80,13 @@ class RoleRepository
     public function getRolesForAdmins()
     {
         return Role::where('level', '1')->where('is_active', true)->get();
+    }
+
+    public function getAllPermissions(string $level)
+    {
+        return Permission::with('children')
+            ->where('level', $level)
+            ->whereNull('parent_id')
+            ->get();
     }
 }

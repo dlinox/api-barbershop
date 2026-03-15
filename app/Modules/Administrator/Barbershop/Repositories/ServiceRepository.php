@@ -77,4 +77,30 @@ class ServiceRepository
     {
         return Service::all();
     }
+
+    public function getActiveServicesByInfrastructure(int $infrastructureId)
+    {
+        return Service::select(
+            'barbershop_services.id',
+            'barbershop_services.name',
+            'barbershop_services.description',
+
+            'barbershop_services.category_id',
+            'barbershop_categories.name as category_name',
+
+            'barbershop_service_branches.id as service_branch_id',
+            'barbershop_service_branches.price',
+            'barbershop_service_branches.duration',
+            'barbershop_service_branches.is_active',
+        )
+            ->join('barbershop_service_branches', 'barbershop_services.id', '=', 'barbershop_service_branches.service_id')
+            ->join('barbershop_categories', 'barbershop_services.category_id', '=', 'barbershop_categories.id')
+            ->join('core_infrastructures', function ($join) use ($infrastructureId) {
+                $join->on('barbershop_service_branches.branch_id', '=', 'core_infrastructures.infrastructurable_id')
+                    ->where('core_infrastructures.infrastructurable_type', 'barbershop_branches')
+                    ->where('core_infrastructures.id', $infrastructureId);
+            })
+            ->where('barbershop_service_branches.is_active', true)
+            ->get();
+    }
 }

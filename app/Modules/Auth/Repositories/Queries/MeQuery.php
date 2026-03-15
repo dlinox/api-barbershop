@@ -38,7 +38,7 @@ class MeQuery
                 'id' => $profile->id,
                 'role' => $profile->role->display_name,
                 'redirectTo' => $profile->role->redirect_to,
-                'permissions' => $profile->role->permissions,
+                'permissions' => $profile->role->permissions->pluck('name')->toArray(),
             ],
         ];
     }

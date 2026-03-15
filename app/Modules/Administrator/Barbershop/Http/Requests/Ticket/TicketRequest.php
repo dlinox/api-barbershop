@@ -16,8 +16,8 @@ class TicketRequest extends ApiFormRequest
             'branch_id'                    => 'required|exists:barbershop_branches,id',
             'reservation_id'               => 'nullable|exists:barbershop_reservations,id',
             'cash_session_id'              => 'nullable|exists:treasury_cash_sessions,id',
-            'profile_worker_id'            => 'nullable|exists:profile_workers,id',
-            'profile_client_id'            => 'nullable|exists:profile_clients,id',
+            'barber_id'                    => 'nullable|exists:profile_barbers,id',
+            'client_id'                    => 'nullable|exists:profile_clients,id',
 
             'services'                     => 'nullable|array',
             'services.*.service_branch_id' => 'required|exists:barbershop_service_branches,id',

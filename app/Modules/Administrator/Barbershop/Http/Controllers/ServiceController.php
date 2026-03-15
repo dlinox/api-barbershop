@@ -11,6 +11,7 @@ use App\Modules\Administrator\Barbershop\Services\ServiceService;
 use App\Modules\Administrator\Barbershop\Http\Requests\Service\ServiceRequest;
 use App\Modules\Administrator\Barbershop\Http\Resources\Service\ServiceDataTableItemResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Service\ServiceSelectItemResource;
+use App\Modules\Administrator\Barbershop\Http\Resources\Service\ServiceSelectItemByInfrastructureResource;
 
 class ServiceController
 {
@@ -37,6 +38,13 @@ class ServiceController
     {
         $this->serviceService->delete($id, $branchId);
         return ApiResponse::success(null, 'Servicio eliminado correctamente');
+    }
+
+    public function getByInfrastructure(int $infrastructureId)
+    {
+        $items = $this->serviceService->getActiveServicesByInfrastructure($infrastructureId);
+        $items = ServiceSelectItemByInfrastructureResource::collection($items);
+        return ApiResponse::success($items);
     }
 
     public function selectItems()
