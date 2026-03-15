@@ -31,8 +31,13 @@ class StudentRepository
             ->join('core_persons', 'profile_students.core_person_id', '=', 'core_persons.id')
             ->join('behavior_profiles', 'profile_students.core_person_id', '=', 'behavior_profiles.profileable_id')
             ->join('auth_users', 'behavior_profiles.auth_user_id', '=', 'auth_users.id')
-            ->withCount('enrollments')
-            ->dataTable($request);
+            ->withCount('enrollments');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $items->orderBy('profile_students.core_person_id', 'desc');
+        }
+
+        $items = $items->dataTable($request);
         return $items;
     }
 

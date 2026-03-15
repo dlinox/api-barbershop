@@ -8,7 +8,13 @@ class PaymentMethodsRepository
 {
     public function dataTable($request)
     {
-        return PaymentMethods::dataTable($request);
+        $query = PaymentMethods::query();
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('id', 'desc');
+        }
+
+        return $query->dataTable($request);
     }
 
     public function createOrUpdate(array $data)

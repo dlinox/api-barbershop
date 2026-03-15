@@ -8,8 +8,11 @@ class CashSessionRepository
 {
     public function dataTable($request)
     {
-        $query = CashSession::with(['openedByUser', 'closedByUser'])
-            ->orderBy('opened_at', 'desc');
+        $query = CashSession::with(['openedByUser', 'closedByUser']);
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('id', 'desc');
+        }
 
         return $query->dataTable($request);
     }

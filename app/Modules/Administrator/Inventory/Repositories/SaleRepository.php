@@ -47,7 +47,10 @@ class SaleRepository
             ->leftJoin('core_persons', 'core_persons.id', 'inventory_sales.person_id')
             ->leftJoin('auth_users', 'auth_users.id', 'inventory_sales.user_id');
 
-        $query->orderBy('inventory_sales.created_at', 'desc');
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('inventory_sales.id', 'desc');
+        }
+
         return $query->dataTable($request);
     }
 

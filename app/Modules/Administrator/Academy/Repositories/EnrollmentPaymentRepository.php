@@ -45,6 +45,10 @@ class EnrollmentPaymentRepository
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
             ->join('academy_group_payment_plans', 'academy_enrollment_payment_details.group_payment_plan_id', '=', 'academy_group_payment_plans.id');
 
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('academy_enrollment_payments.id', 'desc');
+        }
+
         return $query->dataTable($request);
     }
 

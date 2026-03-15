@@ -13,6 +13,11 @@ class RoleRepository
     public function dataTable(Request $request)
     {
         $query = Role::select()->where('level', '=', '1');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('id', 'desc');
+        }
+
         return $query->dataTable($request);
     }
 

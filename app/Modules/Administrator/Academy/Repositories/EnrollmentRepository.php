@@ -39,7 +39,9 @@ class EnrollmentRepository
     {
         $query = $this->query();
 
-        $query->orderBy('academy_enrollments.date', 'desc');
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('academy_enrollments.id', 'desc');
+        }
 
         $items = $query->dataTable($request);
 

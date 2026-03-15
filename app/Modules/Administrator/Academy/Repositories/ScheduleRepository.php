@@ -8,7 +8,13 @@ class ScheduleRepository
 {
     public function dataTable($request)
     {
-        return Schedule::dataTable($request);
+        $query = Schedule::query();
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('id', 'desc');
+        }
+
+        return $query->dataTable($request);
     }
 
     public function createOrUpdate(array $data)

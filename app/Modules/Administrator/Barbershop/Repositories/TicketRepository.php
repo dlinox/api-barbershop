@@ -21,7 +21,9 @@ class TicketRepository
         // ->leftJoin('auth_users', 'auth_users.id', 'barbershop_tickets.user_id');
 
 
-        $query->orderBy('barbershop_tickets.created_at', 'desc');
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('barbershop_tickets.id', 'desc');
+        }
 
         $items = $query->dataTable($request);
 

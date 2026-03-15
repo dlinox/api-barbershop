@@ -8,7 +8,13 @@ class BranchRepository
 {
     public function dataTable($request)
     {
-        return Branch::dataTable($request);
+        $query = Branch::query();
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('id', 'desc');
+        }
+
+        return $query->dataTable($request);
     }
 
     public function createOrUpdate(array $data)

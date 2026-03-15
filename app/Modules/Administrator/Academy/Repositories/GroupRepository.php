@@ -10,16 +10,22 @@ class GroupRepository
 {
     public function dataTable($request)
     {
-        return $this->getGroupsQuery()
+        $query = $this->getGroupsQuery()
             ->addSelect(
                 'academy_groups.teacher_id',
                 'core_persons.name as teacher_person_name',
                 'core_persons.paternal_surname as teacher_person_paternal_surname',
                 'core_persons.maternal_surname as teacher_person_maternal_surname'
             )
+            ->withCount('enrollments')
             ->leftJoin('profile_teachers', 'academy_groups.teacher_id', '=', 'profile_teachers.core_person_id')
-            ->leftJoin('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id')
-            ->dataTable($request);
+            ->leftJoin('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('academy_groups.id', 'desc');
+        }
+
+        return $query->dataTable($request);
     }
 
     public function find(int $id): ?Group

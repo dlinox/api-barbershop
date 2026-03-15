@@ -25,6 +25,10 @@ class MaterialRepository
             ->join('inventory_product_presentations', 'academy_materials.presentation_id', '=', 'inventory_product_presentations.id')
             ->join('inventory_products', 'inventory_product_presentations.product_id', '=', 'inventory_products.id');
 
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('academy_materials.id', 'desc');
+        }
+
         $items = $query->dataTable($request);
         return $items;
     }

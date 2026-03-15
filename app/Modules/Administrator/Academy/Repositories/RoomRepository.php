@@ -8,7 +8,7 @@ class RoomRepository
 {
     public function dataTable($request)
     {
-        return Room::select(
+        $query = Room::select(
             'academy_rooms.id',
             'academy_rooms.number',
             'academy_rooms.description',
@@ -19,8 +19,13 @@ class RoomRepository
             'academy_rooms.branch_id',
             'academy_branches.name as branch_name',
         )
-            ->join('academy_branches', 'academy_rooms.branch_id', '=', 'academy_branches.id')
-            ->dataTable($request);
+            ->join('academy_branches', 'academy_rooms.branch_id', '=', 'academy_branches.id');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('academy_rooms.id', 'desc');
+        }
+
+        return $query->dataTable($request);
     }
 
     public function createOrUpdate(array $data)

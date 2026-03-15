@@ -8,8 +8,13 @@ class CashRegisterRepository
 {
     public function dataTable($request, int $infrastructureId)
     {
-        return CashRegister::where('infrastructure_id', $infrastructureId)
-            ->dataTable($request);
+        $query = CashRegister::where('infrastructure_id', $infrastructureId);
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('id', 'desc');
+        }
+
+        return $query->dataTable($request);
     }
 
     public function createOrUpdate(array $data)

@@ -37,8 +37,13 @@ class BarberRepository
             ->join('core_persons', 'profile_barbers.id', '=', 'core_persons.id')
             ->join('behavior_profiles', 'profile_barbers.id', '=', 'behavior_profiles.profileable_id')
             ->join('auth_users', 'behavior_profiles.auth_user_id', '=', 'auth_users.id')
-            ->join('barbershop_branches', 'profile_barbers.branch_id', '=', 'barbershop_branches.id')
-            ->dataTable($request);
+            ->join('barbershop_branches', 'profile_barbers.branch_id', '=', 'barbershop_branches.id');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $items->orderBy('profile_barbers.id', 'desc');
+        }
+
+        $items = $items->dataTable($request);
         return $items;
     }
 

@@ -21,8 +21,13 @@ class ServiceRepository
         )
             ->join('barbershop_categories', 'barbershop_services.category_id', '=', 'barbershop_categories.id')
             ->join('barbershop_service_branches', 'barbershop_services.id', '=', 'barbershop_service_branches.service_id')
-            ->where('barbershop_service_branches.branch_id', $request->branchId)
-            ->dataTable($request);
+            ->where('barbershop_service_branches.branch_id', $request->branchId);
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $items->orderBy('barbershop_services.id', 'desc');
+        }
+
+        $items = $items->dataTable($request);
 
         return $items;
     }

@@ -8,7 +8,13 @@ class DocumentTypeRepository
 {
     public function dataTable($request)
     {
-        return DocumentType::dataTable($request);
+        $query = DocumentType::query();
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('code', 'desc');
+        }
+
+        return $query->dataTable($request);
     }
 
     public function createOrUpdate(array $data)

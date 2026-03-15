@@ -24,8 +24,13 @@ class WorkerRepository
             'core_persons.email as person_email',
             'core_persons.phone as person_phone',
         )
-            ->join('core_persons', 'profile_workers.id', '=', 'core_persons.id')
-            ->dataTable($request);
+            ->join('core_persons', 'profile_workers.id', '=', 'core_persons.id');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $items->orderBy('profile_workers.id', 'desc');
+        }
+
+        $items = $items->dataTable($request);
         return $items;
     }
 

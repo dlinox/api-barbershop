@@ -54,6 +54,7 @@ class GroupDataTableItemResource extends JsonResource
                     'amount' => (float) $paymentPlan->amount,
                 ];
             }),
+            'enrollmentsCount' => $this->enrollments_count ?? 0,
         ];
     }
 }

@@ -8,7 +8,13 @@ class LevelRepository
 {
     public function dataTable($request)
     {
-        return Level::dataTable($request);
+        $query = Level::query();
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('id', 'desc');
+        }
+
+        return $query->dataTable($request);
     }
 
     public function createOrUpdate(array $data)

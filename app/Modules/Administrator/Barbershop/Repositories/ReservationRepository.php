@@ -23,6 +23,10 @@ class ReservationRepository
                 'barbershop_services.name as service_name',
             );
 
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $query->orderBy('barbershop_reservations.id', 'desc');
+        }
+
         return Reservation::scopeDataTable($query, $request, [
             'core_persons.name',
             'core_persons.paternal_surname',

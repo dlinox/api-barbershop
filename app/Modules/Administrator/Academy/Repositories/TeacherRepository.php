@@ -29,8 +29,13 @@ class TeacherRepository
             'auth_users.is_active as user_is_active',
         )
             ->join('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id')
-            ->join('auth_users', 'core_persons.id', '=', 'auth_users.id')
-            ->dataTable($request);
+            ->join('auth_users', 'core_persons.id', '=', 'auth_users.id');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $items->orderBy('profile_teachers.core_person_id', 'desc');
+        }
+
+        $items = $items->dataTable($request);
         return $items;
     }
 
