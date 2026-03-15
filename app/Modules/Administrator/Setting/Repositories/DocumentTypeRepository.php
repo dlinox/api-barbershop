@@ -25,6 +25,6 @@ class DocumentTypeRepository
 
     public function getActiveDocumentTypes()
     {
-        return DocumentType::all();
+        return DocumentType::where('is_active', true)->get();
     }
 }

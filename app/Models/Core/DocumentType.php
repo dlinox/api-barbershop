@@ -18,6 +18,11 @@ class DocumentType extends Model
     protected $fillable = [
         'code',
         'name',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public static $searchColumns = [

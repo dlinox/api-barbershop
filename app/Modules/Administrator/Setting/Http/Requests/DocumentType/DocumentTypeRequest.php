@@ -12,6 +12,7 @@ class DocumentTypeRequest extends ApiFormRequest
         return [
             'code' => $code ? 'required|string|max:2|exists:core_document_types,code' : 'required|string|max:2|unique:core_document_types,code',
             'name' => 'required|string|max:100|unique:core_document_types,name,' . $code . ',code',
+            'is_active' => 'required|boolean',
         ];
     }
 
@@ -27,6 +28,8 @@ class DocumentTypeRequest extends ApiFormRequest
             'name.string' => 'El nombre debe ser una cadena de texto',
             'name.max' => 'El nombre debe tener un máximo de 100 caracteres',
             'name.unique' => 'El nombre ya existe',
+            'is_active.required' => 'El estado es requerido',
+            'is_active.boolean' => 'El estado debe ser un booleano',
         ];
     }
 
@@ -35,6 +38,7 @@ class DocumentTypeRequest extends ApiFormRequest
         return [
             'code' => 'Código',
             'name' => 'Nombre',
+            'is_active' => 'Estado',
         ];
     }
 }

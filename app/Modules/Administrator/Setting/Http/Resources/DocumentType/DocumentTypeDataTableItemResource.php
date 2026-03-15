@@ -11,6 +11,7 @@ class DocumentTypeDataTableItemResource extends JsonResource
         return [
             'code' => $this->code,
             'name' => $this->name,
+            'isActive' => $this->is_active,
         ];
     }
 }

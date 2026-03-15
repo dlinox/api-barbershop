@@ -21,9 +21,11 @@ return new class extends Migration
         Schema::create('core_document_types', function (Blueprint $table) {
             $table->char('code', 2)->unique();
             $table->string('name', 100)->unique();
+            $table->boolean('is_active')->default(true);
 
             $table->primary('code');
             $table->index('name');
+            $table->index('is_active');
         });
 
         Schema::create('core_genders', function (Blueprint $table) {
