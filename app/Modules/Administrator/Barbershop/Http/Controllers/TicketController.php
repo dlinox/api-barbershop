@@ -19,9 +19,9 @@ class TicketController
         private TicketService $ticketService
     ) {}
 
-    public function dataTable(Request $request, int $branchId)
+    public function dataTable(Request $request)
     {
-        $items = $this->ticketService->dataTable($request, $branchId);
+        $items = $this->ticketService->dataTable($request);
         $items['data'] = TicketDataTableItemResource::collection($items['data']);
         return ApiResponse::success($items);
     }

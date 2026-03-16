@@ -13,6 +13,7 @@ class CategoryRequest extends ApiFormRequest
             'id' => $id ? 'exists:barbershop_categories,id' : 'nullable',
             'name' => 'required|string|max:255|unique:barbershop_categories,name,' . $id,
             'description' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
         ];
     }
 

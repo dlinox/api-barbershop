@@ -3,14 +3,16 @@
 namespace App\Models\Barbershop;
 
 use App\Common\Traits\HasDataTable;
+use App\Models\Auth\User;
 use App\Models\Inventory\Sale;
 use App\Models\Profile\Client;
-use App\Models\Profile\Worker;
+use App\Models\Profile\Barber;
 use App\Models\Treasury\CashSession;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Auth;
 
 class Ticket extends Model
 {
@@ -18,12 +20,22 @@ class Ticket extends Model
 
     protected $table = 'barbershop_tickets';
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (Ticket $ticket) {
+            $ticket->auth_user_id = $ticket->auth_user_id ?? Auth::user()?->id;
+        });
+    }
+
     protected $fillable = [
         'branch_id',
         'cash_session_id',
         'reservation_id',
-        'profile_worker_id',
+        'profile_barber_id',
         'profile_client_id',
+        'auth_user_id',
         'amount',
         'discount',
         'total',
@@ -38,9 +50,9 @@ class Ticket extends Model
         'ticket_date' => 'datetime',
     ];
 
-    public static $searchColumns = [
-        'core_persons.name',
-    ];
+    // public static $searchColumns = [
+    //     'core_persons.name',
+    // ];
 
     public function branch(): BelongsTo
     {
@@ -57,9 +69,9 @@ class Ticket extends Model
         return $this->belongsTo(Reservation::class, 'reservation_id');
     }
 
-    public function worker(): BelongsTo
+    public function barber(): BelongsTo
     {
-        return $this->belongsTo(Worker::class, 'profile_worker_id');
+        return $this->belongsTo(Barber::class, 'profile_barber_id');
     }
 
     public function client(): BelongsTo
@@ -75,5 +87,10 @@ class Ticket extends Model
     public function sale(): HasOne
     {
         return $this->hasOne(Sale::class, 'barbershop_ticket_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'auth_user_id');
     }
 }

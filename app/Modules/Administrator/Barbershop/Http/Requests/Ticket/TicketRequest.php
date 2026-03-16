@@ -15,11 +15,11 @@ class TicketRequest extends ApiFormRequest
             'id'                           => $id ? 'exists:barbershop_tickets,id' : 'nullable',
             'branch_id'                    => 'required|exists:barbershop_branches,id',
             'reservation_id'               => 'nullable|exists:barbershop_reservations,id',
-            'cash_session_id'              => 'nullable|exists:treasury_cash_sessions,id',
+            'cash_session_id'              => 'required|exists:treasury_cash_sessions,id',
             'barber_id'                    => 'nullable|exists:profile_barbers,id',
-            'client_id'                    => 'nullable|exists:profile_clients,id',
+            'client_id'                    => 'nullable|exists:core_persons,id',
 
-            'services'                     => 'nullable|array',
+            'services'                     => 'required|array|min:1',
             'services.*.service_branch_id' => 'required|exists:barbershop_service_branches,id',
             'services.*.quantity'          => 'nullable|integer|min:1',
             'services.*.amount'            => 'required|numeric|min:0',
@@ -36,8 +36,6 @@ class TicketRequest extends ApiFormRequest
 
         // Si se envía income, es una confirmación con pago
         if ($this->has('income') && $this->income !== null) {
-            $rules['cash_session_id'] = 'required|exists:treasury_cash_sessions,id';
-
             $incomeRequest = new IncomeRequest();
             $incomeRules = collect($incomeRequest->rules())
                 ->mapWithKeys(fn($rule, $key) => ["income.{$key}" => $rule])
@@ -58,8 +56,8 @@ class TicketRequest extends ApiFormRequest
             'reservation_id.exists'                  => 'La reservación no existe',
             'cash_session_id.required'               => 'La sesión de caja es requerida',
             'cash_session_id.exists'                 => 'La sesión de caja no existe',
-            'profile_worker_id.exists'               => 'El trabajador no existe',
-            'profile_client_id.exists'               => 'El cliente no existe',
+            'barber_id.exists'                       => 'El barbero no existe',
+            'client_id.exists'                       => 'El cliente no existe',
             'services.*.service_branch_id.required'  => 'El servicio es requerido',
             'services.*.service_branch_id.exists'    => 'El servicio no existe',
             'services.*.quantity.min'                => 'La cantidad debe ser al menos 1',
@@ -93,8 +91,8 @@ class TicketRequest extends ApiFormRequest
             'branch_id'                    => 'sucursal',
             'reservation_id'               => 'reservación',
             'cash_session_id'              => 'sesión de caja',
-            'profile_worker_id'            => 'trabajador',
-            'profile_client_id'            => 'cliente',
+            'barber_id'                    => 'barbero',
+            'client_id'                    => 'cliente',
             'services'                     => 'servicios',
             'services.*.service_branch_id' => 'servicio',
             'services.*.quantity'          => 'cantidad',

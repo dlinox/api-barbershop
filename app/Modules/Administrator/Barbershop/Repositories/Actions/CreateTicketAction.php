@@ -18,24 +18,57 @@ class CreateTicketAction
             ['id' => $data['id'] ?? null],
             [
                 'branch_id'         => $data['branch_id'],
+                'cash_session_id'   => $data['cash_session_id'] ?? null,
                 'reservation_id'    => $data['reservation_id'] ?? null,
+                'profile_barber_id' => $data['barber_id'] ?? null,
                 'profile_client_id' => $data['client_id'] ?? null,
                 'ticket_date'       => now(),
                 'status'            => 'pending',
             ]
         );
 
-        // ─── Sincronizar servicios si se indicaron ───
-        if (!empty($data['services'])) {
-            $this->syncServices($ticket, $data['services']);
-        }
+        // ─── Sincronizar servicios ───
+        $this->syncServices($ticket, $data['services']);
 
         // ─── Crear venta pendiente si hay productos ───
         if (!empty($data['products'])) {
             $this->createPendingSale($ticket, $data);
         }
 
+        // ─── Calcular totales (servicios + productos) ───
+        $this->updateTicketTotals($ticket, $data);
+
         return $ticket->load('services');
+    }
+
+    /**
+     * Calcula y actualiza los totales del ticket sumando servicios y productos.
+     */
+    private function updateTicketTotals(Ticket $ticket, array $data): void
+    {
+        $servicesAmount   = 0;
+        $servicesDiscount = 0;
+        foreach ($data['services'] as $s) {
+            $qty = $s['quantity'] ?? 1;
+            $servicesAmount   += $s['amount'] * $qty;
+            $servicesDiscount += $s['discount'] ?? 0;
+        }
+
+        $productsAmount   = 0;
+        $productsDiscount = 0;
+        foreach ($data['products'] ?? [] as $p) {
+            $productsAmount   += $p['unit_price'] * $p['quantity'];
+            $productsDiscount += $p['discount'] ?? 0;
+        }
+
+        $totalAmount   = $servicesAmount + $productsAmount;
+        $totalDiscount = $servicesDiscount + $productsDiscount;
+
+        $ticket->update([
+            'amount'   => $totalAmount,
+            'discount' => $totalDiscount,
+            'total'    => $totalAmount - $totalDiscount,
+        ]);
     }
 
     /**
@@ -89,7 +122,7 @@ class CreateTicketAction
         $sale = Sale::create([
             'infrastructure_id'    => $infrastructureId,
             'barbershop_ticket_id' => $ticket->id,
-            'person_id'            => $data['profile_client_id'] ?? null,
+            'person_id'            => $data['client_id'] ?? null,
             'context'              => 'barbershop',
             'subtotal'             => $subtotal,
             'discount'             => $totalDiscount,

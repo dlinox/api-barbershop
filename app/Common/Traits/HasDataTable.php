@@ -67,7 +67,6 @@ trait HasDataTable
         return $query;
     }
 
-
     public static function scopeDataTable($query, $request, $searchColumns = [])
     {
         $itemsPerPage = $request->has('perPage') ? $request->perPage : 10;

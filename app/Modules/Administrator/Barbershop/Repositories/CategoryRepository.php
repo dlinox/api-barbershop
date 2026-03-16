@@ -37,6 +37,6 @@ class CategoryRepository
 
     public function getActiveCategories()
     {
-        return Category::all();
+        return Category::where('is_active', true)->get();
     }
 }

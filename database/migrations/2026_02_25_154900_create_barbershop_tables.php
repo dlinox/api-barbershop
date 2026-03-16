@@ -28,6 +28,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->index('name');
         });
@@ -94,6 +95,7 @@ return new class extends Migration
             $table->unsignedBigInteger('cash_session_id')->nullable(); // sesión de caja
             $table->unsignedBigInteger('profile_barber_id')->nullable();
             $table->unsignedBigInteger('profile_client_id')->nullable();
+            $table->unsignedBigInteger('auth_user_id')->nullable();
 
             //el monto que se pago
             $table->decimal('amount', 12, 2)->default(0); //el monto que se pago
@@ -110,6 +112,7 @@ return new class extends Migration
             $table->foreign('profile_barber_id')->references('id')->on('profile_barbers')->onDelete('cascade');
             $table->foreign('profile_client_id')->references('id')->on('profile_clients')->onDelete('cascade');
             $table->foreign('branch_id')->references('id')->on('barbershop_branches')->onDelete('cascade');
+            $table->foreign('auth_user_id')->references('id')->on('auth_users')->restrictOnDelete();
 
             $table->index('cash_session_id');
             $table->index('profile_barber_id');

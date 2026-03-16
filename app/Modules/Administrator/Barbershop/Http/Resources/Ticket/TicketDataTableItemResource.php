@@ -11,7 +11,7 @@ class TicketDataTableItemResource extends JsonResource
         return [
             'id'         => $this->id,
             'branchName' => $this->branch_name,
-            'workerName' => trim(($this->worker_name ?? '') . ' ' . ($this->worker_paternal_surname ?? '')),
+            // 'workerName' => trim(($this->worker_name ?? '') . ' ' . ($this->worker_paternal_surname ?? '')),
             'clientName' => trim(($this->client_name ?? '') . ' ' . ($this->client_paternal_surname ?? '') . ' ' . ($this->client_maternal_surname ?? '')),
             'amount'     => (float) $this->amount,
             'discount'   => (float) $this->discount,

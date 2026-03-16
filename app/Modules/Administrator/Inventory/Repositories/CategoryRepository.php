@@ -28,10 +28,6 @@ class CategoryRepository
             throw new \Exception('No se puede eliminar la categoría porque tiene productos relacionados');
         }
 
-        if ($category->services()->count() > 0) {
-            throw new \Exception('No se puede eliminar la categoría porque tiene servicios relacionados');
-        }
-
         $category->delete();
         return $category;
     }

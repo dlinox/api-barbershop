@@ -32,22 +32,32 @@ class ConfirmTicketAction
             $this->completePendingSale($sale, $infrastructureId, $data['cash_session_id']);
         }
 
-        // ─── Actualizar montos y estado del ticket ───
+        // ─── Actualizar montos y estado del ticket (servicios + productos) ───
         $servicesAmount   = $ticket->services->sum(fn($s) => $s->amount * $s->quantity);
         $servicesDiscount = $ticket->services->sum('discount');
 
+        $productsAmount   = 0;
+        $productsDiscount = 0;
+        if ($sale) {
+            $productsAmount   = $sale->items->sum(fn($i) => $i->unit_price * $i->quantity);
+            $productsDiscount = $sale->items->sum('discount');
+        }
+
+        $totalAmount   = $servicesAmount + $productsAmount;
+        $totalDiscount = $servicesDiscount + $productsDiscount;
+
         $ticket->update([
             'cash_session_id' => $data['cash_session_id'],
-            'amount'          => $servicesAmount,
-            'discount'        => $servicesDiscount,
-            'total'           => $servicesAmount - $servicesDiscount,
+            'amount'          => $totalAmount,
+            'discount'        => $totalDiscount,
+            'total'           => $totalAmount - $totalDiscount,
             'status'          => 'confirmed',
         ]);
 
         // ─── Crear ingreso (income) ───
         $incomeData                    = $data['income'];
         $incomeData['cash_session_id'] = $data['cash_session_id'];
-        $incomeData['client_id']       = $data['profile_client_id'] ?? $ticket->profile_client_id;
+        $incomeData['client_id']       = $data['client_id'] ?? $ticket->profile_client_id;
 
         $this->createIncomeAction->execute(
             data: $incomeData,

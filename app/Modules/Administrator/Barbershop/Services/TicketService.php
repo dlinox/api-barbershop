@@ -6,6 +6,7 @@ use App\Modules\Administrator\Barbershop\Repositories\TicketRepository;
 use App\Modules\Administrator\Barbershop\Repositories\Actions\CreateTicketAction;
 use App\Modules\Administrator\Barbershop\Repositories\Actions\ConfirmTicketAction;
 use App\Modules\Administrator\Barbershop\Repositories\Actions\CancelTicketAction;
+use App\Modules\Administrator\Inventory\Repositories\Actions\EnsureClientProfileAction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,11 +17,12 @@ class TicketService
         private CreateTicketAction $createTicketAction,
         private ConfirmTicketAction $confirmTicketAction,
         private CancelTicketAction $cancelTicketAction,
+        private EnsureClientProfileAction $ensureClientProfileAction,
     ) {}
 
-    public function dataTable(Request $request, int $branchId)
+    public function dataTable(Request $request)
     {
-        return $this->ticketRepository->dataTable($request, $branchId);
+        return $this->ticketRepository->dataTable($request);
     }
 
     public function findById(int $id)
@@ -36,6 +38,11 @@ class TicketService
     {
         DB::beginTransaction();
         try {
+            // 0. Asegurar perfil de cliente si se indicó
+            if (!empty($data['client_id'])) {
+                $this->ensureClientProfileAction->execute($data['client_id']);
+            }
+
             // 1. Crear o actualizar ticket + servicios + venta pendiente
             $ticket = $this->createTicketAction->execute($data);
 

@@ -57,7 +57,7 @@ Route::middleware(['auth:api'])->prefix('/barbershop-reservations')->group(funct
 });
 
 Route::middleware(['auth:api'])->prefix('/barbershop-tickets')->group(function () {
-    Route::post('/data-table/{branchId}', [TicketController::class, 'dataTable'])->name('barbershop-tickets.dataTable')->middleware('permission:barbershop.ticket.view');
+    Route::post('/data-table', [TicketController::class, 'dataTable'])->name('barbershop-tickets.dataTable')->middleware('permission:barbershop.ticket.view');
     Route::get('/get/{id}', [TicketController::class, 'getById'])->name('barbershop-tickets.getById')->middleware('permission:barbershop.ticket.view');
     Route::post('/save', [TicketController::class, 'save'])->name('barbershop-tickets.save')->middleware('permission:barbershop.ticket.create');
     Route::post('/cancel/{id}', [TicketController::class, 'cancel'])->name('barbershop-tickets.cancel')->middleware('permission:barbershop.ticket.cancel');
