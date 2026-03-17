@@ -204,6 +204,23 @@ return [
                     ]
                 ]
             ],
+            [
+                'name' => 'academy.teacher_attendance',
+                'display_name' => 'Asistencia de Docentes',
+                'type' => 'module',
+                'level' => '1',
+                'children' => [
+                    [
+                        'name' => 'academy.teacher_attendance.view',
+                        'display_name' => 'Gestionar Asistencia de Docentes',
+                        'type' => 'view',
+                        'children' => [
+                            ['name' => 'academy.teacher_attendance.register', 'display_name' => 'Registrar Asistencia', 'type' => 'action'],
+                            ['name' => 'academy.teacher_attendance.edit', 'display_name' => 'Editar', 'type' => 'action'],
+                        ]
+                    ]
+                ]
+            ],
         ]
     ]
 ];

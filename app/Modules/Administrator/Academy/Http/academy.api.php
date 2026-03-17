@@ -98,4 +98,9 @@ Route::middleware(['auth:api'])->prefix('/materials')->group(function () {
 
 Route::middleware(['auth:api'])->prefix('/teacher-attendances')->group(function () {
     Route::post('/data-table/{date?}', [TeacherAttendanceController::class, 'dataTable'])->name('teacher-attendances.dataTable')->middleware('permission:academy.teacher_attendance.view');
+    Route::post('/register-check-in', [TeacherAttendanceController::class, 'registerCheckIn'])->name('teacher-attendances.registerCheckIn')->middleware('permission:academy.teacher_attendance.register');
+    Route::post('/register-check-out', [TeacherAttendanceController::class, 'registerCheckOut'])->name('teacher-attendances.registerCheckOut')->middleware('permission:academy.teacher_attendance.register');
+    Route::post('/register-absent', [TeacherAttendanceController::class, 'registerAbsent'])->name('teacher-attendances.registerAbsent')->middleware('permission:academy.teacher_attendance.register');
+    Route::post('/update', [TeacherAttendanceController::class, 'update'])->name('teacher-attendances.update')->middleware('permission:academy.teacher_attendance.edit');
+    Route::post('/generate-qr-code', [TeacherAttendanceController::class, 'generateQrCode'])->name('teacher-attendances.generateQrCode')->middleware('permission:academy.teacher_attendance.register');
 });

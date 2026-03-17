@@ -2,12 +2,15 @@
 
 namespace App\Models\Academy;
 
+use App\Common\Traits\HasDataTable;
 use App\Models\Profile\Teacher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GroupTeacher extends Model
 {
+    use HasDataTable;
+
     protected $table = 'academy_group_teachers';
 
     protected $fillable = [

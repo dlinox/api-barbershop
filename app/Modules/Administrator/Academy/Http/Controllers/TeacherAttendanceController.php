@@ -20,4 +20,34 @@ class TeacherAttendanceController
         $items['data'] = TeacherAttendanceDataTableResource::collection($items['data']);
         return ApiResponse::success($items);
     }
+
+    public function registerCheckIn(Request $request)
+    {
+        $this->teacherAttendanceService->registerCheckIn($request->all());
+        return ApiResponse::success(null, 'Entrada registrada correctamente');
+    }
+
+    public function registerCheckOut(Request $request)
+    {
+        $this->teacherAttendanceService->registerCheckOut($request->all());
+        return ApiResponse::success(null, 'Salida registrada correctamente');
+    }
+
+    public function update(Request $request)
+    {
+        $this->teacherAttendanceService->update($request->all());
+        return ApiResponse::success(null, 'Asistencia actualizada correctamente');
+    }
+
+    public function registerAbsent(Request $request)
+    {
+        $this->teacherAttendanceService->registerAbsent($request->all());
+        return ApiResponse::success(null, 'Falta registrada correctamente');
+    }
+
+    public function generateQrCode(Request $request)
+    {
+        $data = $this->teacherAttendanceService->generateQrCode();
+        return ApiResponse::success($data);
+    }
 }
