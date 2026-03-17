@@ -3,6 +3,8 @@
 namespace App\Modules\Administrator\Academy\Services;
 
 use App\Models\Academy\Branch;
+use App\Models\Academy\GroupTeacher;
+use App\Common\Exceptions\ApiException;
 use App\Modules\Administrator\Academy\Repositories\GroupRepository;
 use Illuminate\Http\Request;
 
@@ -52,6 +54,16 @@ class GroupService
 
     public function assignTeacher(array $data)
     {
-        return $this->groupRepository->assignTeacher($data['group_id'], $data['teacher_id'] ?? null);
+        $exists = GroupTeacher::where('group_id', $data['group_id'])
+            ->where('teacher_id', $data['teacher_id'])
+            ->where('status', 'active')
+            ->when(!empty($data['id']), fn($q) => $q->where('id', '!=', $data['id']))
+            ->exists();
+
+        if ($exists) {
+            throw new ApiException('Este docente ya está asignado como activo en este grupo', 422);
+        }
+
+        return $this->groupRepository->assignTeacher($data);
     }
 }

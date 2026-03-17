@@ -72,6 +72,6 @@ class TeacherRepository
             });
         }
 
-        return $items->limit(20)->get();
+        return $items->limit(100)->get();
     }
 }

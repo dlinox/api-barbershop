@@ -4,6 +4,7 @@ namespace App\Modules\Administrator\Academy\Repositories;
 
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\Group;
+use App\Models\Academy\GroupTeacher;
 use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Support\Facades\DB;
 
@@ -13,15 +14,18 @@ class GroupRepository
     public function dataTable($request)
     {
         $query = $this->getGroupsQuery()
-            ->addSelect(
-                'academy_groups.teacher_id',
-                'core_persons.name as teacher_person_name',
-                'core_persons.paternal_surname as teacher_person_paternal_surname',
-                'core_persons.maternal_surname as teacher_person_maternal_surname'
-            )
-            ->withCount('enrollments')
-            ->leftJoin('profile_teachers', 'academy_groups.teacher_id', '=', 'profile_teachers.core_person_id')
-            ->leftJoin('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id');
+            ->with(['groupTeachers' => function ($q) {
+                $q->where('status', 'active')
+                    ->join('profile_teachers', 'academy_group_teachers.teacher_id', '=', 'profile_teachers.core_person_id')
+                    ->join('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id')
+                    ->select(
+                        'academy_group_teachers.*',
+                        'core_persons.name as person_name',
+                        'core_persons.paternal_surname as person_paternal_surname',
+                        'core_persons.maternal_surname as person_maternal_surname'
+                    );
+            }])
+            ->withCount('enrollments');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $query->orderBy('academy_groups.id', 'desc');
@@ -184,11 +188,12 @@ class GroupRepository
         return $query->get();
     }
 
-    public function assignTeacher(int $groupId, ?int $teacherId): Group
+    public function assignTeacher(array $data): GroupTeacher
     {
-        $group = Group::findOrFail($groupId);
-        $group->update(['teacher_id' => $teacherId]);
-        return $group;
+        return GroupTeacher::updateOrCreate(
+            ['id' => $data['id'] ?? null],
+            $data
+        );
     }
 
     private function getGroupsQuery()

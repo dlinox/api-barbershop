@@ -38,14 +38,23 @@ class GroupDataTableItemResource extends JsonResource
                 'number' => $this->room_number,
                 'floor' => $this->room_floor,
             ],
-            'teacher' => $this->teacher_id ? [
-                'id' => $this->teacher_id,
-                'person' => [
-                    'name' => $this->teacher_person_name,
-                    'paternalSurname' => $this->teacher_person_paternal_surname,
-                    'maternalSurname' => $this->teacher_person_maternal_surname,
-                ],
-            ] : null,
+            'teachers' => $this->groupTeachers->map(function ($gt) {
+                return [
+                    'id' => $gt->id,
+                    'teacherId' => $gt->teacher_id,
+                    'hourlyRate' => (float) $gt->hourly_rate,
+                    'holidayHourlyRate' => (float) $gt->holiday_hourly_rate,
+                    'status' => $gt->status,
+                    'startDate' => $gt->start_date,
+                    'endDate' => $gt->end_date,
+                    'observation' => $gt->observation,
+                    'person' => [
+                        'name' => $gt->person_name,
+                        'paternalSurname' => $gt->person_paternal_surname,
+                        'maternalSurname' => $gt->person_maternal_surname,
+                    ],
+                ];
+            }),
             'paymentPlans' => $this->paymentPlans()->where('type', '!=', 'enrollment')->get()->map(function ($paymentPlan) {
                 return [
                     'id' => $paymentPlan->id,
