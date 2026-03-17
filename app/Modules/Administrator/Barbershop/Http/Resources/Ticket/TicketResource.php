@@ -22,13 +22,13 @@ class TicketResource extends JsonResource
             'ticketDate'    => $this->ticket_date?->format('Y-m-d H:i:s'),
             'status'        => $this->status,
             'services'      => $this->whenLoaded('services', fn() => $this->services->map(fn($s) => [
-                'serviceBranchId' => $s->service_branch_id,
-                'name'            => $s->serviceBranch?->service?->name,
-                'category'        => $s->serviceBranch?->service?->category?->name ?? '',
+                'serviceId' => $s->service_id,
+                'name'            => $s->service?->name,
+                'category'        => $s->service?->category?->name ?? '',
                 'quantity'        => $s->quantity,
                 'amount'          => (float) $s->amount,
                 'discount'        => (float) $s->discount,
-                'duration'        => $s->serviceBranch?->duration,
+                'duration'        => $s->service?->duration,
             ])),
             'products'      => $this->sale ? $this->sale->items->map(function ($item) {
                 $presentation = $item->presentation;

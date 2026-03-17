@@ -16,7 +16,7 @@ class Reservation extends Model
     protected $fillable = [
         'branch_id',
         'profile_client_id',
-        'service_branch_id',
+        'service_id',
         'date',
         'time',
         'status',
@@ -42,8 +42,8 @@ class Reservation extends Model
         return $this->belongsTo(Client::class, 'profile_client_id');
     }
 
-    public function serviceBranch(): BelongsTo
+    public function service(): BelongsTo
     {
-        return $this->belongsTo(ServiceBranch::class, 'service_branch_id');
+        return $this->belongsTo(Service::class, 'service_id');
     }
 }

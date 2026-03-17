@@ -31,12 +31,12 @@ class ServiceController
     {
         $data = $request->validated();
         $this->serviceService->save($data);
-        return ApiResponse::success($data, 'Servicio guardado correctamente');
+        return ApiResponse::success(null, 'Servicio guardado correctamente');
     }
 
-    public function delete(int $id, int $branchId)
+    public function delete(int $id)
     {
-        $this->serviceService->delete($id, $branchId);
+        $this->serviceService->delete($id);
         return ApiResponse::success(null, 'Servicio eliminado correctamente');
     }
 

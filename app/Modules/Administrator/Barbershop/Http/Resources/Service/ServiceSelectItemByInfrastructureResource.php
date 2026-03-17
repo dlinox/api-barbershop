@@ -10,7 +10,7 @@ class ServiceSelectItemByInfrastructureResource extends JsonResource
     {
 
         return [
-            'serviceBranchId' => $this->service_branch_id,
+            'serviceId' => $this->id,
             'name' => $this->name,
             'category' => $this->category_name,
             'amount' => $this->price,

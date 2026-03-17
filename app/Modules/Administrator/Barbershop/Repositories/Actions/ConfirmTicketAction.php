@@ -62,7 +62,7 @@ class ConfirmTicketAction
         $this->createIncomeAction->execute(
             data: $incomeData,
             infrastructureId: $infrastructureId,
-            transactionableType: Ticket::class,
+            transactionableType: 'barbershop_tickets',
             transactionableId: $ticket->id,
         );
 

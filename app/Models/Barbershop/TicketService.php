@@ -11,7 +11,7 @@ class TicketService extends Model
 
     protected $fillable = [
         'ticket_id',
-        'service_branch_id',
+        'service_id',
         'quantity',
         'amount',
         'discount',
@@ -28,8 +28,8 @@ class TicketService extends Model
         return $this->belongsTo(Ticket::class, 'ticket_id');
     }
 
-    public function serviceBranch(): BelongsTo
+    public function service(): BelongsTo
     {
-        return $this->belongsTo(ServiceBranch::class, 'service_branch_id');
+        return $this->belongsTo(Service::class, 'service_id');
     }
 }

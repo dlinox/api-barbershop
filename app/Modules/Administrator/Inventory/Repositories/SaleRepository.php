@@ -4,13 +4,16 @@ namespace App\Modules\Administrator\Inventory\Repositories;
 
 use App\Models\Inventory\ProductPresentation;
 use App\Models\Inventory\Sale;
+use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Http\Request;
 
 class SaleRepository
 {
+    use HasInfrastructureScope;
 
     public function getProductsWithStock(int $infrastructureId)
     {
+        $this->validateInfrastructureAccess($infrastructureId);
         return ProductPresentation::select(
             'inventory_product_presentations.id',
             'inventory_product_presentations.product_id',
@@ -48,6 +51,8 @@ class SaleRepository
             ->join('treasury_cash_registers', 'treasury_cash_registers.id', 'treasury_cash_sessions.cash_register_id')
             ->leftJoin('core_persons', 'core_persons.id', 'inventory_sales.person_id')
             ->leftJoin('auth_users', 'auth_users.id', 'inventory_sales.user_id');
+
+        $this->scopeByInfrastructure($query, 'treasury_cash_registers.infrastructure_id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $query->orderBy('inventory_sales.id', 'desc');

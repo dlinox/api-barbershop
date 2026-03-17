@@ -38,37 +38,29 @@ return new class extends Migration
             $table->string('name');
             $table->string('description')->nullable();
             $table->unsignedBigInteger('category_id');
-            $table->timestamps();
-            $table->foreign('category_id')->references('id')->on('barbershop_categories')->onDelete('cascade');
-            $table->index('name');
-        });
-
-        Schema::create('barbershop_service_branches', function (Blueprint $table) {
-            $table->id();
             $table->unsignedBigInteger('branch_id');
-            $table->unsignedBigInteger('service_id');
-
             $table->integer('price')->default(0);
             $table->integer('duration')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
+            $table->foreign('category_id')->references('id')->on('barbershop_categories')->onDelete('cascade');
             $table->foreign('branch_id')->references('id')->on('barbershop_branches')->onDelete('cascade');
-            $table->foreign('service_id')->references('id')->on('barbershop_services')->onDelete('cascade');
-            $table->unique(['branch_id', 'service_id'], 'branch_service_unique');
+            $table->index('name');
+            $table->index('branch_id');
         });
 
         Schema::create('barbershop_reservations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('branch_id');
             $table->unsignedBigInteger('profile_client_id');
-            $table->unsignedBigInteger('service_branch_id')->nullable();
+            $table->unsignedBigInteger('service_id')->nullable();
             $table->date('date');
             $table->time('time');
             $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
             $table->timestamps();
 
-            $table->foreign('service_branch_id')->references('id')->on('barbershop_service_branches')->onDelete('cascade');
+            $table->foreign('service_id')->references('id')->on('barbershop_services')->onDelete('cascade');
             $table->foreign('profile_client_id')->references('id')->on('profile_clients')->onDelete('cascade');
             $table->foreign('branch_id')->references('id')->on('barbershop_branches')->onDelete('cascade');
         });
@@ -124,14 +116,14 @@ return new class extends Migration
         Schema::create('barbershop_ticket_services', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ticket_id');
-            $table->unsignedBigInteger('service_branch_id');
+            $table->unsignedBigInteger('service_id');
             $table->integer('quantity')->default(1);
             $table->decimal('amount', 12, 2)->default(0); //el monto que se pago
             $table->decimal('discount', 12, 2)->default(0); //descuento
             $table->timestamps();
 
             $table->foreign('ticket_id')->references('id')->on('barbershop_tickets')->onDelete('cascade');
-            $table->foreign('service_branch_id')->references('id')->on('barbershop_service_branches')->onDelete('cascade');
+            $table->foreign('service_id')->references('id')->on('barbershop_services')->onDelete('cascade');
         });
 
     }
@@ -141,7 +133,6 @@ return new class extends Migration
         Schema::dropIfExists('barbershop_ticket_services');
         Schema::dropIfExists('barbershop_tickets');
         Schema::dropIfExists('barbershop_reservations');
-        Schema::dropIfExists('barbershop_service_branches');
         Schema::dropIfExists('barbershop_services');
         Schema::dropIfExists('barbershop_categories');
         Schema::dropIfExists('profile_barbers');

@@ -76,7 +76,6 @@ return new class extends Migration
             $table->unsignedBigInteger('level_id');
             $table->unsignedBigInteger('schedule_id');
             $table->unsignedBigInteger('room_id');
-            $table->unsignedBigInteger('teacher_id')->nullable();
 
             $table->string('name');
 
@@ -98,10 +97,33 @@ return new class extends Migration
             $table->foreign('level_id')->references('id')->on('academy_levels')->restrictOnDelete();
             $table->foreign('schedule_id')->references('id')->on('academy_schedules')->restrictOnDelete();
             $table->foreign('room_id')->references('id')->on('academy_rooms')->restrictOnDelete();
-            $table->foreign('teacher_id')->references('core_person_id')->on('profile_teachers')->nullOnDelete();
 
             $table->index('is_active');
             $table->index('name');
+        });
+
+        Schema::create('academy_group_teachers', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('group_id');
+            $table->unsignedBigInteger('teacher_id');
+
+            $table->decimal('hourly_rate', 10, 2);
+            $table->decimal('holiday_hourly_rate', 10, 2);
+
+            $table->enum('status', ['active', 'withdrawn', 'replaced'])->default('active');
+
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
+            $table->text('observation')->nullable();
+
+            $table->timestamps();
+
+            $table->foreign('group_id')->references('id')->on('academy_groups')->cascadeOnDelete();
+            $table->foreign('teacher_id')->references('core_person_id')->on('profile_teachers')->restrictOnDelete();
+
+            $table->index('group_id');
+            $table->index('teacher_id');
+            $table->index('status');
         });
 
         Schema::create('academy_group_payment_plans', function (Blueprint $table) {
@@ -133,6 +155,7 @@ return new class extends Migration
         Schema::create('academy_enrollment_payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('enrollment_id');
+            $table->enum('status', ['active', 'cancelled'])->default('active');
             $table->timestamps();
             $table->foreign('enrollment_id')->references('id')->on('academy_enrollments')->restrictOnDelete();
         });
@@ -236,6 +259,7 @@ return new class extends Migration
         Schema::dropIfExists('academy_enrollment_payments');
         Schema::dropIfExists('academy_enrollments');
         Schema::dropIfExists('academy_group_payment_plans');
+        Schema::dropIfExists('academy_group_teachers');
         Schema::dropIfExists('academy_groups');
         Schema::dropIfExists('academy_schedules');
         Schema::dropIfExists('academy_rooms');

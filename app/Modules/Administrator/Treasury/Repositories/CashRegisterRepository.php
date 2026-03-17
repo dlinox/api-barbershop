@@ -3,11 +3,16 @@
 namespace App\Modules\Administrator\Treasury\Repositories;
 
 use App\Models\Treasury\CashRegister;
+use App\Common\Traits\HasInfrastructureScope;
 
 class CashRegisterRepository
 {
+    use HasInfrastructureScope;
+
     public function dataTable($request, int $infrastructureId)
     {
+        $this->validateInfrastructureAccess($infrastructureId);
+
         $query = CashRegister::where('infrastructure_id', $infrastructureId);
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
@@ -36,6 +41,8 @@ class CashRegisterRepository
 
     public function getActiveCashRegisters(int $infrastructureId)
     {
+        $this->validateInfrastructureAccess($infrastructureId);
+
         return CashRegister::where('infrastructure_id', $infrastructureId)
             ->where('is_active', true)
             ->get();

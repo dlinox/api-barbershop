@@ -3,17 +3,18 @@
 namespace App\Modules\Administrator\Barbershop\Repositories;
 
 use App\Models\Barbershop\Reservation;
+use App\Common\Traits\HasInfrastructureScope;
 
 class ReservationRepository
 {
+    use HasInfrastructureScope;
     public function dataTable($request)
     {
         $query = Reservation::query()
             ->join('barbershop_branches', 'barbershop_branches.id', '=', 'barbershop_reservations.branch_id')
             ->join('profile_clients', 'profile_clients.id', '=', 'barbershop_reservations.profile_client_id')
             ->join('core_persons', 'core_persons.id', '=', 'profile_clients.id')
-            ->leftJoin('barbershop_service_branches', 'barbershop_service_branches.id', '=', 'barbershop_reservations.service_branch_id')
-            ->leftJoin('barbershop_services', 'barbershop_services.id', '=', 'barbershop_service_branches.service_id')
+            ->leftJoin('barbershop_services', 'barbershop_services.id', '=', 'barbershop_reservations.service_id')
             ->select(
                 'barbershop_reservations.*',
                 'barbershop_branches.name as branch_name',
@@ -22,6 +23,8 @@ class ReservationRepository
                 'core_persons.maternal_surname as client_maternal_surname',
                 'barbershop_services.name as service_name',
             );
+
+        $this->scopeByBranch($query, 'barbershop_reservations.branch_id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $query->orderBy('barbershop_reservations.id', 'desc');

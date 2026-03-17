@@ -3,9 +3,12 @@
 namespace App\Modules\Administrator\Academy\Repositories;
 
 use App\Models\Academy\Branch;
+use App\Common\Traits\HasInfrastructureScope;
 
 class BranchRepository
 {
+    use HasInfrastructureScope;
+
     public function dataTable($request)
     {
         $query = Branch::query();
@@ -44,6 +47,8 @@ class BranchRepository
 
     public function getActiveBranches()
     {
-        return Branch::where('is_active', true)->get();
+        $query = Branch::where('is_active', true);
+        $this->scopeByAcademyBranch($query, 'id');
+        return $query->get();
     }
 }

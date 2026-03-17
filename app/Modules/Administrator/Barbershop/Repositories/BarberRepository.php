@@ -3,10 +3,12 @@
 namespace App\Modules\Administrator\Barbershop\Repositories;
 
 use App\Models\Profile\Barber;
+use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Support\Facades\DB;
 
 class BarberRepository
 {
+    use HasInfrastructureScope;
     public function dataTable($request)
     {
         $items = Barber::select(
@@ -38,6 +40,8 @@ class BarberRepository
             ->join('behavior_profiles', 'profile_barbers.id', '=', 'behavior_profiles.profileable_id')
             ->join('auth_users', 'behavior_profiles.auth_user_id', '=', 'auth_users.id')
             ->join('barbershop_branches', 'profile_barbers.branch_id', '=', 'barbershop_branches.id');
+
+        $this->scopeByBranch($items, 'profile_barbers.branch_id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $items->orderBy('profile_barbers.id', 'desc');
@@ -91,6 +95,8 @@ class BarberRepository
                     ->where('core_infrastructures.infrastructurable_type', 'barbershop_branches')
                     ->where('core_infrastructures.id', $infrastructureId);
             });
+        } else {
+            $this->scopeByBranch($query, 'profile_barbers.branch_id');
         }
 
         if (!empty($value)) {

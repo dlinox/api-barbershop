@@ -14,7 +14,7 @@ class ReservationDataTableItemResource extends JsonResource
             'branchName' => $this->branch_name,
             'profileClientId' => $this->profile_client_id,
             'clientName' => trim($this->client_name . ' ' . $this->client_paternal_surname . ' ' . $this->client_maternal_surname),
-            'serviceBranchId' => $this->service_branch_id,
+            'serviceId' => $this->service_id,
             'serviceName' => $this->service_name,
             'date' => $this->date,
             'time' => $this->time,

@@ -3,9 +3,12 @@
 namespace App\Modules\Administrator\Barbershop\Repositories;
 
 use App\Models\Barbershop\Branch;
+use App\Common\Traits\HasInfrastructureScope;
 
 class BranchRepository
 {
+    use HasInfrastructureScope;
+
     public function dataTable($request)
     {
         $query = Branch::query();
@@ -27,7 +30,7 @@ class BranchRepository
     {
         $branch = Branch::find($id);
 
-        if ($branch->serviceBranches()->exists()) {
+        if ($branch->services()->exists()) {
             throw new \Exception('No se puede eliminar la sucursal porque tiene servicios relacionados');
         }
 
@@ -37,6 +40,8 @@ class BranchRepository
 
     public function getActiveBranches()
     {
-        return Branch::where('is_active', true)->get();
+        $query = Branch::where('is_active', true);
+        $this->scopeByBranch($query, 'id');
+        return $query->get();
     }
 }

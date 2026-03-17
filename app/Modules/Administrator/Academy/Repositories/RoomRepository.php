@@ -3,9 +3,12 @@
 namespace App\Modules\Administrator\Academy\Repositories;
 
 use App\Models\Academy\Room;
+use App\Common\Traits\HasInfrastructureScope;
 
 class RoomRepository
 {
+    use HasInfrastructureScope;
+
     public function dataTable($request)
     {
         $query = Room::select(
@@ -20,6 +23,8 @@ class RoomRepository
             'academy_branches.name as branch_name',
         )
             ->join('academy_branches', 'academy_rooms.branch_id', '=', 'academy_branches.id');
+
+        $this->scopeByAcademyBranch($query, 'academy_rooms.branch_id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $query->orderBy('academy_rooms.id', 'desc');
@@ -47,6 +52,8 @@ class RoomRepository
 
     public function getActiveRooms()
     {
-        return Room::with('branch')->where('is_active', true)->get();
+        $query = Room::with('branch')->where('is_active', true);
+        $this->scopeByAcademyBranch($query, 'branch_id');
+        return $query->get();
     }
 }

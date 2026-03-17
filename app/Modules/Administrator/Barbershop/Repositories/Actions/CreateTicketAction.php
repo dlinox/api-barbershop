@@ -80,7 +80,7 @@ class CreateTicketAction
 
         foreach ($services as $service) {
             $ticket->services()->create([
-                'service_branch_id' => $service['service_branch_id'],
+                'service_id' => $service['service_id'],
                 'quantity'          => $service['quantity'] ?? 1,
                 'amount'            => $service['amount'],
                 'discount'          => $service['discount'] ?? 0,

@@ -39,8 +39,8 @@ class Branch extends Model
         'address',
     ];
 
-    public function serviceBranches(): HasMany
+    public function services(): HasMany
     {
-        return $this->hasMany(ServiceBranch::class, 'branch_id');
+        return $this->hasMany(Service::class, 'branch_id');
     }
 }

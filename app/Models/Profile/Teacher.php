@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use App\Models\Core\Person;
-use App\Models\Academy\Group;
 use App\Models\Behavior\Profile;
+use App\Models\Academy\GroupTeacher;
 use App\Common\Traits\HasDataTable;
 
 class Teacher extends Model
@@ -32,8 +32,8 @@ class Teacher extends Model
         return $this->morphOne(Profile::class, 'profileable');
     }
 
-    public function groups()
+    public function groupTeachers()
     {
-        return $this->hasMany(Group::class, 'teacher_id', 'core_person_id');
+        return $this->hasMany(GroupTeacher::class, 'teacher_id', 'core_person_id');
     }
 }

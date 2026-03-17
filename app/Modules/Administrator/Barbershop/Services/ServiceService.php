@@ -4,6 +4,7 @@ namespace App\Modules\Administrator\Barbershop\Services;
 
 use App\Modules\Administrator\Barbershop\Repositories\ServiceRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ServiceService
 {
@@ -18,12 +19,26 @@ class ServiceService
 
     public function save(array $data)
     {
-        return $this->serviceRepository->createOrUpdate($data);
+        try {
+            DB::beginTransaction();
+            $this->serviceRepository->createOrUpdate($data);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
-    public function delete(int $id, int $branchId)
+    public function delete(int $id)
     {
-        return $this->serviceRepository->delete($id, $branchId);
+        try {
+            DB::beginTransaction();
+            $this->serviceRepository->delete($id);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     public function getActiveServices()

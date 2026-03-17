@@ -15,6 +15,7 @@ class EnrollmentPayment extends Model
 
     protected $fillable = [
         'enrollment_id',
+        'status',
     ];
 
     protected $casts = [

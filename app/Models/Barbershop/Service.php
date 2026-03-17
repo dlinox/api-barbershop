@@ -17,6 +17,10 @@ class Service extends Model
         'name',
         'description',
         'category_id',
+        'branch_id',
+        'price',
+        'duration',
+        'is_active',
     ];
 
     protected $hidden = [
@@ -24,18 +28,25 @@ class Service extends Model
         'updated_at',
     ];
 
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'price' => 'integer',
+        'duration' => 'integer',
+    ];
+
     public static $searchColumns = [
         'barbershop_services.name',
         'barbershop_services.description',
     ];
 
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
-    }
-
-    public function serviceBranches(): HasMany
-    {
-        return $this->hasMany(ServiceBranch::class, 'service_id');
     }
 }

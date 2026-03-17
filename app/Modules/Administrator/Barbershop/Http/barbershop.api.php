@@ -47,7 +47,7 @@ Route::middleware(['auth:api'])->prefix('/barbershop-services')->group(function 
     Route::post('/save', [ServiceController::class, 'save'])->name('barbershop-services.save')->middleware('permission:barbershop.service.create,barbershop.service.edit');
     Route::get('/select-items', [ServiceController::class, 'selectItems'])->name('barbershop-services.selectItems');
     Route::get('/by-infrastructure/{infrastructureId}', [ServiceController::class, 'getByInfrastructure'])->name('barbershop-services.getByInfrastructure');
-    Route::delete('/delete/{id}/{branchId}', [ServiceController::class, 'delete'])->name('barbershop-services.delete')->middleware('permission:barbershop.service.delete');
+    Route::delete('/delete/{id}', [ServiceController::class, 'delete'])->name('barbershop-services.delete')->middleware('permission:barbershop.service.delete');
 });
 
 Route::middleware(['auth:api'])->prefix('/barbershop-reservations')->group(function () {

@@ -4,9 +4,12 @@ namespace App\Modules\Administrator\Academy\Repositories;
 
 use App\Models\Academy\Attendance;
 use App\Models\Academy\AttendanceDeadline;
+use App\Common\Traits\HasInfrastructureScope;
 
 class AttendanceRepository
 {
+    use HasInfrastructureScope;
+
     public function dataTable($request)
     {
         $query = Attendance::select(
@@ -41,6 +44,8 @@ class AttendanceRepository
             ->join('academy_groups', 'academy_attendance_deadlines.group_id', '=', 'academy_groups.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
             ->join('academy_schedules', 'academy_groups.schedule_id', '=', 'academy_schedules.id');
+
+        $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $query->orderBy('academy_attendances.id', 'desc');

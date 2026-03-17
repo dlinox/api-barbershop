@@ -3,10 +3,13 @@
 namespace App\Modules\Administrator\Barbershop\Repositories;
 
 use App\Models\Barbershop\Ticket;
+use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Http\Request;
 
 class TicketRepository
 {
+    use HasInfrastructureScope;
+
     public function dataTable(Request $request)
     {
         $query = Ticket::select(
@@ -20,6 +23,7 @@ class TicketRepository
             ->leftJoin('core_persons', 'core_persons.id', 'barbershop_tickets.profile_client_id');
             // ->leftJoin('core_persons as barber_persons', 'barber_persons.id', 'barbershop_tickets.profile_barber_id');
 
+        $this->scopeByBranch($query, 'barbershop_tickets.branch_id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $query->orderBy('barbershop_tickets.id', 'desc');
@@ -31,7 +35,7 @@ class TicketRepository
     public function findById(int $id): Ticket
     {
         return Ticket::with([
-            'services.serviceBranch.service.category',
+            'services.service.category',
             'sale.items.presentation.product',
         ])->findOrFail($id);
     }

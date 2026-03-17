@@ -4,10 +4,12 @@ namespace App\Modules\Administrator\Academy\Repositories;
 
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\Group;
+use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Support\Facades\DB;
 
 class GroupRepository
 {
+    use HasInfrastructureScope;
     public function dataTable($request)
     {
         $query = $this->getGroupsQuery()
@@ -111,7 +113,7 @@ class GroupRepository
     //obyener grupos activos y proximos
     public function getActiveAndUpcoming()
     {
-        return Group::select(
+        $query = Group::select(
             'academy_groups.id',
             'academy_groups.name',
             'academy_groups.start_date',
@@ -131,8 +133,11 @@ class GroupRepository
             ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
             ->where('academy_groups.end_date', '>', now())
-            ->where('academy_groups.is_active', true)
-            ->get();
+            ->where('academy_groups.is_active', true);
+
+        $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');
+
+        return $query->get();
     }
 
     public function getAvailableEnrollmentGroups(int $studentId)
@@ -153,7 +158,7 @@ class GroupRepository
 
     public function selectItems()
     {
-        return Group::select(
+        $query = Group::select(
             'academy_groups.id',
             'academy_groups.name',
             'academy_groups.start_date',
@@ -172,8 +177,11 @@ class GroupRepository
             'academy_levels.name as level_name',
         )
             ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id')
-            ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
-            ->get();
+            ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id');
+
+        $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');
+
+        return $query->get();
     }
 
     public function assignTeacher(int $groupId, ?int $teacherId): Group
@@ -185,7 +193,7 @@ class GroupRepository
 
     private function getGroupsQuery()
     {
-        return Group::select(
+        $query = Group::select(
             'academy_groups.id',
             'academy_groups.name',
             'academy_groups.start_date',
@@ -216,5 +224,9 @@ class GroupRepository
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
             ->join('academy_schedules', 'academy_groups.schedule_id', '=', 'academy_schedules.id')
             ->join('academy_rooms', 'academy_groups.room_id', '=', 'academy_rooms.id');
+
+        $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');
+
+        return $query;
     }
 }

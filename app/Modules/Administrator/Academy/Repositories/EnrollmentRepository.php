@@ -3,13 +3,15 @@
 namespace App\Modules\Administrator\Academy\Repositories;
 
 use App\Models\Academy\Enrollment;
+use App\Common\Traits\HasInfrastructureScope;
 
 class EnrollmentRepository
 {
+    use HasInfrastructureScope;
 
     protected function query()
     {
-        return Enrollment::select(
+        $query = Enrollment::select(
             'academy_enrollments.id',
             'academy_enrollments.status',
             'academy_enrollments.date',
@@ -33,6 +35,10 @@ class EnrollmentRepository
         )->join('core_persons', 'academy_enrollments.profile_student_id', '=', 'core_persons.id')
             ->join('academy_groups', 'academy_enrollments.group_id', '=', 'academy_groups.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id');
+
+        $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');
+
+        return $query;
     }
 
     public function dataTable($request)

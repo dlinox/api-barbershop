@@ -3,15 +3,22 @@
 namespace App\Modules\Administrator\Treasury\Repositories;
 
 use App\Models\Treasury\CashSession;
+use App\Common\Traits\HasInfrastructureScope;
 
 class CashSessionRepository
 {
+    use HasInfrastructureScope;
+
     public function dataTable($request)
     {
-        $query = CashSession::with(['openedByUser', 'closedByUser']);
+        $query = CashSession::with(['openedByUser', 'closedByUser'])
+            ->join('treasury_cash_registers', 'treasury_cash_registers.id', '=', 'treasury_cash_sessions.cash_register_id')
+            ->select('treasury_cash_sessions.*');
+
+        $this->scopeByInfrastructure($query, 'treasury_cash_registers.infrastructure_id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
-            $query->orderBy('id', 'desc');
+            $query->orderBy('treasury_cash_sessions.id', 'desc');
         }
 
         return $query->dataTable($request);
