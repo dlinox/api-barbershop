@@ -12,6 +12,7 @@ use App\Modules\Administrator\Academy\Http\Controllers\EnrollmentController;
 use App\Modules\Administrator\Academy\Http\Controllers\AttendanceController;
 use App\Modules\Administrator\Academy\Http\Controllers\EnrollmentPaymentController;
 use App\Modules\Administrator\Academy\Http\Controllers\MaterialController;
+use App\Modules\Administrator\Academy\Http\Controllers\TeacherAttendanceController;
 
 Route::middleware(['auth:api'])->prefix('/branches')->group(function () {
     Route::post('/data-table', [BranchController::class, 'dataTable'])->name('branches.dataTable')->middleware('permission:academy.branch.view');
@@ -93,4 +94,8 @@ Route::middleware(['auth:api'])->prefix('/materials')->group(function () {
     Route::post('/save', [MaterialController::class, 'save'])->name('materials.save')->middleware('permission:academy.material.create,academy.material.edit');
     Route::get('/select-items', [MaterialController::class, 'selectItems'])->name('materials.selectItems');
     Route::delete('/delete/{id}', [MaterialController::class, 'delete'])->name('materials.delete')->middleware('permission:academy.material.delete');
+});
+
+Route::middleware(['auth:api'])->prefix('/teacher-attendances')->group(function () {
+    Route::post('/data-table/{date?}', [TeacherAttendanceController::class, 'dataTable'])->name('teacher-attendances.dataTable')->middleware('permission:academy.teacher_attendance.view');
 });
