@@ -48,7 +48,7 @@ return new class extends Migration
             $table->foreign('paid_by')->references('id')->on('auth_users')->restrictOnDelete();
 
             // Indexes
-            $table->index(['employee_type', 'employee_id']);
+            $table->index(['employee_type', 'employee_id'], 'employee_index');
             $table->index('infrastructure_id');
             $table->index('period_start');
             $table->index('period_end');
@@ -56,7 +56,7 @@ return new class extends Migration
             $table->index('status');
 
             // No duplicar pagos del mismo período para el mismo empleado
-            $table->unique(['employee_type', 'employee_id', 'period_start', 'period_end']);
+            $table->unique(['employee_type', 'employee_id', 'period_start', 'period_end'], 'unique_employee_payment');
         });
 
         // ─── ADELANTOS DE SUELDO (polimórfico) ───
@@ -94,7 +94,7 @@ return new class extends Migration
             $table->foreign('discounted_in_payment_id')->references('id')->on('treasury_employee_payments')->nullOnDelete();
 
             // Indexes
-            $table->index(['employee_type', 'employee_id']);
+            $table->index(['employee_type', 'employee_id'], 'employee_index');
             $table->index('advance_date');
             $table->index('status');
         });

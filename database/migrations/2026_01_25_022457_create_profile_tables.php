@@ -19,18 +19,6 @@ return new class extends Migration
             $table->index('is_active');
         });
 
-        Schema::create('profile_teachers', function (Blueprint $table) {
-            $table->unsignedBigInteger('core_person_id');
-            $table->unsignedBigInteger('branch_id')->nullable(); // academy_branches
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-
-            $table->foreign('core_person_id')->references('id')->on('core_persons')->onDelete('cascade');
-            $table->foreign('branch_id')->references('id')->on('academy_branches')->nullOnDelete();
-            $table->primary('core_person_id');
-            $table->index('is_active');
-        });
-
         Schema::create('profile_students', function (Blueprint $table) {
             $table->unsignedBigInteger('core_person_id');
             $table->boolean('is_active')->default(true);
@@ -54,8 +42,8 @@ return new class extends Migration
         Schema::create('profile_workers', function (Blueprint $table) {
             $table->unsignedBigInteger('id'); // core_person_id
             $table->string('position')->nullable();
-            $table->decimal('monthly_salary', 10, 2)->nullable()->after('position');         // salario mensual
-            $table->enum('payment_frequency', ['monthly', 'biweekly'])->nullable()->after('monthly_salary'); // frecuencia
+            $table->decimal('monthly_salary', 10, 2)->nullable();         // salario mensual
+            $table->enum('payment_frequency', ['monthly', 'biweekly'])->nullable(); // frecuencia
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
