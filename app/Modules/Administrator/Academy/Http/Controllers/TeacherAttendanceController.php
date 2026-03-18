@@ -45,7 +45,7 @@ class TeacherAttendanceController
         return ApiResponse::success(null, 'Falta registrada correctamente');
     }
 
-    public function generateQrCode(Request $request)
+    public function generateQrCode()
     {
         $data = $this->teacherAttendanceService->generateQrCode();
         return ApiResponse::success($data);

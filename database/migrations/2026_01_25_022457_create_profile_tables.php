@@ -52,6 +52,8 @@ return new class extends Migration
         Schema::create('profile_workers', function (Blueprint $table) {
             $table->unsignedBigInteger('id'); // core_person_id
             $table->string('position')->nullable();
+            $table->decimal('monthly_salary', 10, 2)->nullable()->after('position');         // salario mensual
+            $table->enum('payment_frequency', ['monthly', 'biweekly'])->nullable()->after('monthly_salary'); // frecuencia
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

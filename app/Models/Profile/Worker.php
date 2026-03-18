@@ -4,6 +4,7 @@ namespace App\Models\Profile;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use App\Models\Core\Person;
 use App\Models\Behavior\Profile;
@@ -20,10 +21,14 @@ class Worker extends Model
     protected $fillable = [
         'id',
         'position',
+        'monthly_salary',
+        'payment_frequency',
     ];
 
     protected $casts = [
         'position' => 'string',
+        'monthly_salary' => 'decimal:2',
+        'payment_frequency' => 'string',
     ];
 
     public static $searchColumns = [
@@ -42,5 +47,17 @@ class Worker extends Model
     public function profile(): MorphOne
     {
         return $this->morphOne(Profile::class, 'profileable');
+    }
+
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(\App\Models\Treasury\EmployeePayment::class, 'employee', 'employee_type', 'employee_id')
+            ->where('employee_type', 'worker');
+    }
+
+    public function advances(): MorphMany
+    {
+        return $this->morphMany(\App\Models\Treasury\EmployeeAdvance::class, 'employee', 'employee_type', 'employee_id')
+            ->where('employee_type', 'worker');
     }
 }

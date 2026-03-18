@@ -4,6 +4,7 @@ namespace App\Models\Profile;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use App\Models\Core\Person;
 use App\Models\Behavior\Profile;
@@ -32,5 +33,17 @@ class Barber extends Model
     public function profile(): MorphOne
     {
         return $this->morphOne(Profile::class, 'profileable');
+    }
+
+    public function payments(): MorphMany
+    {
+        return $this->morphMany(\App\Models\Treasury\EmployeePayment::class, 'employee', 'employee_type', 'employee_id')
+            ->where('employee_type', 'barber');
+    }
+
+    public function advances(): MorphMany
+    {
+        return $this->morphMany(\App\Models\Treasury\EmployeeAdvance::class, 'employee', 'employee_type', 'employee_id')
+            ->where('employee_type', 'barber');
     }
 }
