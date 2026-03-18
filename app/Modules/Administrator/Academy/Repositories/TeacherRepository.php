@@ -13,6 +13,13 @@ class TeacherRepository
             //profile_teachers id |  person id
             'profile_teachers.core_person_id as id',
 
+            //teacher
+            'profile_teachers.branch_id',
+            'profile_teachers.is_active',
+
+            //branch
+            'academy_branches.name as branch_name',
+
             //person
             'core_persons.document_type as person_document_type',
             'core_persons.document_number as person_document_number',
@@ -29,7 +36,8 @@ class TeacherRepository
             'auth_users.is_active as user_is_active',
         )
             ->join('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id')
-            ->join('auth_users', 'core_persons.id', '=', 'auth_users.id');
+            ->join('auth_users', 'core_persons.id', '=', 'auth_users.id')
+            ->leftJoin('academy_branches', 'profile_teachers.branch_id', '=', 'academy_branches.id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $items->orderBy('profile_teachers.core_person_id', 'desc');
@@ -44,11 +52,22 @@ class TeacherRepository
         return Teacher::where('core_person_id', $personId)->first();
     }
 
-    public function create(int $personId): Teacher
+    public function create(int $personId, ?int $branchId = null, bool $isActive = true): Teacher
     {
         return Teacher::create([
             'core_person_id' => $personId,
+            'branch_id' => $branchId,
+            'is_active' => $isActive,
         ]);
+    }
+
+    public function update(Teacher $teacher, ?int $branchId, bool $isActive): Teacher
+    {
+        $teacher->update([
+            'branch_id' => $branchId,
+            'is_active' => $isActive,
+        ]);
+        return $teacher;
     }
 
     public function selectAsyncItems($search)

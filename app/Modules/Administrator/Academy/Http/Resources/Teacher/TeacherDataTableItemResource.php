@@ -10,6 +10,12 @@ class TeacherDataTableItemResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'branchId' => $this->branch_id,
+            'isActive' => (bool) $this->is_active,
+            'branch' => $this->branch_id ? [
+                'id' => $this->branch_id,
+                'name' => $this->branch_name,
+            ] : null,
             'person' => [
                 'id' => $this->id,
                 'documentType' => $this->person_document_type,

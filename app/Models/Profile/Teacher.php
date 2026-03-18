@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use App\Models\Core\Person;
 use App\Models\Behavior\Profile;
 use App\Models\Academy\GroupTeacher;
+use App\Models\Academy\Branch;
 use App\Common\Traits\HasDataTable;
 
 class Teacher extends Model
@@ -22,11 +23,22 @@ class Teacher extends Model
 
     protected $fillable = [
         'core_person_id',
+        'branch_id',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function person(): BelongsTo
     {
         return $this->belongsTo(Person::class, 'core_person_id');
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
     }
 
     public function profile(): MorphOne

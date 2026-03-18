@@ -21,10 +21,12 @@ return new class extends Migration
 
         Schema::create('profile_teachers', function (Blueprint $table) {
             $table->unsignedBigInteger('core_person_id');
+            $table->unsignedBigInteger('branch_id')->nullable(); // academy_branches
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
             $table->foreign('core_person_id')->references('id')->on('core_persons')->onDelete('cascade');
+            $table->foreign('branch_id')->references('id')->on('academy_branches')->nullOnDelete();
             $table->primary('core_person_id');
             $table->index('is_active');
         });

@@ -47,7 +47,11 @@ class CreateOrUpdateTeacherAction
             if (!$data['id']) {
                 $teacher = $this->teacherRepository->findByPersonId($person->id);
                 if ($teacher) throw new ApiException('La persona ya tiene un perfil de docente');
-                $teacher = $this->teacherRepository->create($person->id);
+                $teacher = $this->teacherRepository->create(
+                    $person->id,
+                    $data['branchId'] ?? null,
+                    $data['isActive'] ?? true
+                );
                 if (!$teacher) throw new ApiException('Error al crear el perfil de docente');
 
                 $profile = $this->profileRepository->findUserIdAndType($user->id, 'teachers');
@@ -58,6 +62,12 @@ class CreateOrUpdateTeacherAction
                 $teacher = $this->teacherRepository->findByPersonId($data['id']);
                 if (!$teacher) throw new ApiException('Error al encontrar el perfil de docente');
                 if ($data['id'] != $person->id) throw new ApiException('El perfil de docente no coincide con la persona');
+
+                $this->teacherRepository->update(
+                    $teacher,
+                    $data['branchId'] ?? null,
+                    $data['isActive'] ?? true
+                );
             }
 
             DB::commit();
