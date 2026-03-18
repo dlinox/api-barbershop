@@ -5,6 +5,7 @@ use App\Modules\Administrator\Treasury\Http\Controllers\CashRegisterController;
 use App\Modules\Administrator\Treasury\Http\Controllers\CashSessionController;
 use App\Modules\Administrator\Treasury\Http\Controllers\ExpenseController;
 use App\Modules\Administrator\Treasury\Http\Controllers\IncomeController;
+use App\Modules\Administrator\Treasury\Http\Controllers\EmployeeAdvanceController;
 
 Route::middleware(['auth:api'])->prefix('/treasury-cash-registers')->group(function () {
     Route::post('/data-table/{infrastructureId}', [CashRegisterController::class, 'dataTable'])->name('treasury-cash-registers.dataTable')->middleware('permission:treasury.cash_register.view');
@@ -31,4 +32,10 @@ Route::middleware(['auth:api'])->prefix('/treasury-incomes')->group(function () 
     Route::post('/data-table', [IncomeController::class, 'dataTable'])->name('treasury-incomes.dataTable')->middleware('permission:treasury.income.view');
     Route::get('/get-by-id/{id}', [IncomeController::class, 'getById'])->name('treasury-incomes.getById')->middleware('permission:treasury.income.view');
     Route::post('/annul/{id}', [IncomeController::class, 'annul'])->name('treasury-incomes.annul')->middleware('permission:treasury.income.annul');
+});
+
+Route::middleware(['auth:api'])->prefix('/treasury-employee-advances')->group(function () {
+    Route::post('/data-table', [EmployeeAdvanceController::class, 'dataTable'])->name('treasury-employee-advances.dataTable')->middleware('permission:treasury.employee_advance.view');
+    Route::post('/save', [EmployeeAdvanceController::class, 'save'])->name('treasury-employee-advances.save')->middleware('permission:treasury.employee_advance.create,treasury.employee_advance.edit');
+    Route::delete('/delete/{id}', [EmployeeAdvanceController::class, 'delete'])->name('treasury-employee-advances.delete')->middleware('permission:treasury.employee_advance.delete');
 });
