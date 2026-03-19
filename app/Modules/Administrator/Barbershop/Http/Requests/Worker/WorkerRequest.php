@@ -13,6 +13,9 @@ class WorkerRequest extends ApiFormRequest
             'id' => ['nullable', 'integer'],
 
             'position' => ['required', 'string', 'max:50'],
+            'monthly_salary' => ['required', 'numeric', 'min:0'],
+            'payment_frequency' => ['required', 'string', 'in:monthly,biweekly'],
+            'is_active' => ['required', 'boolean'],
 
             'person.id'  => ['nullable', 'integer'],
             'person.document_type' => ['required', 'integer'],
@@ -30,6 +33,12 @@ class WorkerRequest extends ApiFormRequest
         return [
             'position.required' => 'El cargo es requerido',
             'position.max' => 'El cargo debe tener máximo 50 caracteres',
+            'monthly_salary.required' => 'El sueldo mensual es requerido',
+            'monthly_salary.numeric' => 'El sueldo mensual debe ser un número',
+            'monthly_salary.min' => 'El sueldo mensual debe ser mayor o igual a 0',
+            'payment_frequency.required' => 'La frecuencia de pago es requerida',
+            'payment_frequency.in' => 'La frecuencia de pago debe ser mensual o quincenal',
+            'is_active.required' => 'El estado del trabajador es requerido',
             'person.document_type.required' => 'Tipo de documento es requerido',
             'person.document_number.required' => 'Número de documento es requerido',
             'person.name.required' => 'Nombre es requerido',
@@ -43,6 +52,9 @@ class WorkerRequest extends ApiFormRequest
     {
         return [
             'position' => 'Cargo',
+            'monthly_salary' => 'Sueldo mensual',
+            'payment_frequency' => 'Frecuencia de pago',
+            'is_active' => 'Estado del trabajador',
             'person.document_type' => 'Tipo de documento',
             'person.document_number' => 'Número de documento',
             'person.name' => 'Nombre',

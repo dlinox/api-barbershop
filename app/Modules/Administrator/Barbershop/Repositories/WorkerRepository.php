@@ -12,8 +12,11 @@ class WorkerRepository
         $items = Worker::select(
             'profile_workers.id as id',
 
-            //position
+            //worker
             'profile_workers.position as position',
+            'profile_workers.monthly_salary as monthly_salary',
+            'profile_workers.payment_frequency as payment_frequency',
+            'profile_workers.is_active as is_active',
 
             //person
             'core_persons.document_type as person_document_type',
@@ -39,12 +42,26 @@ class WorkerRepository
         return Worker::where('id', $personId)->first();
     }
 
-    public function create(int $personId, string $position = 'barber'): Worker
+    public function create(int $personId, string $position = 'barber', ?float $monthlySalary = null, ?string $paymentFrequency = null, bool $isActive = true): Worker
     {
         return Worker::create([
             'id' => $personId,
             'position' => $position,
+            'monthly_salary' => $monthlySalary,
+            'payment_frequency' => $paymentFrequency,
+            'is_active' => $isActive,
         ]);
+    }
+
+    public function update(Worker $worker, string $position, ?float $monthlySalary, ?string $paymentFrequency, bool $isActive): Worker
+    {
+        $worker->update([
+            'position' => $position,
+            'monthly_salary' => $monthlySalary,
+            'payment_frequency' => $paymentFrequency,
+            'is_active' => $isActive,
+        ]);
+        return $worker;
     }
 
     public function selectAsyncItems($search)

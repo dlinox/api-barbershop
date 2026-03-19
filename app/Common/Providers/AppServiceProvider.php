@@ -5,6 +5,7 @@ namespace App\Common\Providers;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use App\Models\Profile\Admin;
+use App\Models\Profile\Worker;
 use App\Models\Academy\Branch;
 use App\Models\Barbershop\Branch as BarbershopBranch;
 use App\Models\Treasury\CashRegister;
@@ -30,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Relation::enforceMorphMap([
             'profile_admins' => Admin::class,
+            'profile_workers' => Worker::class,
             // 'profile_students' => Student::class,
             // 'profile_teachers' => Teacher::class,
             'academy_branches' => Branch::class,

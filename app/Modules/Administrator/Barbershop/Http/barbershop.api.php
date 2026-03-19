@@ -20,6 +20,7 @@ Route::middleware(['auth:api'])->prefix('/workers')->group(function () {
     Route::post('/data-table', [WorkerController::class, 'dataTable'])->name('workers.dataTable')->middleware('permission:barbershop.worker.view');
     Route::post('/save', [WorkerController::class, 'save'])->name('workers.save')->middleware('permission:barbershop.worker.create,barbershop.worker.edit');
     Route::get('/select-async-items', [WorkerController::class, 'selectAsyncItems'])->name('workers.selectAsyncItems');
+    Route::delete('/delete/{id}', [WorkerController::class, 'delete'])->name('workers.delete')->middleware('permission:barbershop.worker.delete');
 });
 
 Route::middleware(['auth:api'])->prefix('/barbers')->group(function () {

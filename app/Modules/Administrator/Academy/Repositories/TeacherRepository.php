@@ -36,7 +36,11 @@ class TeacherRepository
             'auth_users.is_active as user_is_active',
         )
             ->join('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id')
-            ->join('auth_users', 'core_persons.id', '=', 'auth_users.id')
+            ->join('behavior_profiles', function ($join) {
+                $join->on('profile_teachers.core_person_id', '=', 'behavior_profiles.profileable_id')
+                    ->where('behavior_profiles.profileable_type', 'profile_teachers');
+            })
+            ->join('auth_users', 'behavior_profiles.auth_user_id', '=', 'auth_users.id')
             ->leftJoin('academy_branches', 'profile_teachers.branch_id', '=', 'academy_branches.id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {

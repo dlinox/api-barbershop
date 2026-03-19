@@ -11,8 +11,8 @@ class TeacherRequest extends ApiFormRequest
         return [
 
             'id' => ['nullable', 'integer'],
-            'branchId' => ['nullable', 'integer', 'exists:academy_branches,id'],
-            'isActive' => ['required', 'boolean'],
+            'branch_id' => ['nullable', 'integer', 'exists:academy_branches,id'],
+            'is_active' => ['required', 'boolean'],
 
             'person.id'  => ['nullable', 'integer'],
             'person.document_type' => ['required', 'integer'],
@@ -26,7 +26,7 @@ class TeacherRequest extends ApiFormRequest
             'user.id' => ['nullable', 'integer'],
             'user.username' => ['required', 'max:50'],
             'user.email' => ['nullable', 'email', 'max:100'],
-            'user.is_active' => ['required', 'boolean'],
+            // 'user.is_active' => ['required', 'boolean'],
 
         ];
     }
@@ -34,8 +34,8 @@ class TeacherRequest extends ApiFormRequest
     public function messages(): array
     {
         return [
-            'branchId.exists' => 'La sede seleccionada no existe',
-            'isActive.required' => 'El estado del docente es requerido',
+            'branch_id.exists' => 'La sede seleccionada no existe',
+            'is_active.required' => 'El estado del docente es requerido',
 
             'person.document_type.required' => 'Tipo de documento es requerido',
             'person.document_number.required' => 'Número de documento es requerido',
@@ -55,8 +55,8 @@ class TeacherRequest extends ApiFormRequest
     public function attributes(): array
     {
         return [
-            'branchId' => 'Sede',
-            'isActive' => 'Estado del docente',
+            'branch_id' => 'Sede',
+            'is_active' => 'Estado del docente',
 
             'person.document_type' => 'Tipo de documento',
             'person.document_number' => 'Número de documento',

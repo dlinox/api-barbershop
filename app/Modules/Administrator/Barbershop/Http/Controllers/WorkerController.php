@@ -35,4 +35,10 @@ class WorkerController
         $item = WorkerSelectItemResource::collection($item);
         return ApiResponse::success($item);
     }
+
+    public function delete(int $id)
+    {
+        $this->workerService->delete($id);
+        return ApiResponse::success(null, 'Trabajador eliminado correctamente');
+    }
 }

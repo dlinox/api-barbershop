@@ -11,6 +11,9 @@ class WorkerDataTableItemResource extends JsonResource
         return [
             'id' => $this->id,
             'position' => $this->position,
+            'monthlySalary' => $this->monthly_salary,
+            'paymentFrequency' => $this->payment_frequency,
+            'isActive' => (bool) $this->is_active,
             'person' => [
                 'id' => $this->id,
                 'documentType' => $this->person_document_type,

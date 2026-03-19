@@ -23,12 +23,14 @@ class Worker extends Model
         'position',
         'monthly_salary',
         'payment_frequency',
+        'is_active',
     ];
 
     protected $casts = [
         'position' => 'string',
         'monthly_salary' => 'decimal:2',
         'payment_frequency' => 'string',
+        'is_active' => 'boolean',
     ];
 
     public static $searchColumns = [

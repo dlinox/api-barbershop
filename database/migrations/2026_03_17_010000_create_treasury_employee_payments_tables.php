@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('employee_type');                                      // 'worker', 'barber', 'teacher'
             $table->unsignedBigInteger('employee_id');                            // ID del profile correspondiente
 
-            $table->unsignedBigInteger('infrastructure_id');                      // sucursal
+            $table->unsignedBigInteger('infrastructure_id')->nullable();                      // sucursal
             $table->unsignedBigInteger('cash_session_id')->nullable();            // sesión de caja (si es efectivo)
             $table->unsignedBigInteger('payment_method_id');                      // método de pago
             $table->unsignedBigInteger('paid_by');                               // usuario que pagó
