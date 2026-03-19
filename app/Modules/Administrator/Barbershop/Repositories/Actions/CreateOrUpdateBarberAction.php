@@ -24,12 +24,10 @@ class CreateOrUpdateBarberAction
 
     public function execute(array $data): void
     {
-        $role = Role::where('name', 'barber')->where('is_active', true)->where('level', '3')->first();
+        $role = Role::where('name', 'barbero')->where('is_active', true)->where('level', '4')->first();
         if (!$role) {
-            $role = Role::where('name', 'barber')->first();
-            if (!$role) {
-                throw new ApiException('El rol barber no existe, comuníquese con el administrador');
-            }
+
+            throw new ApiException('El rol barber no existe, comuníquese con el administrador');
         }
 
         try {

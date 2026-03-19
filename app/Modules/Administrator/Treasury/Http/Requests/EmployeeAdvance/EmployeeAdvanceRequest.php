@@ -13,7 +13,7 @@ class EmployeeAdvanceRequest extends ApiFormRequest
             'id' => $id ? 'exists:treasury_employee_advances,id' : 'nullable',
             'employee_type' => 'required|string',
             'employee_id' => 'required|integer',
-            'infrastructure_id' => 'required|exists:core_infrastructure,id',
+            'infrastructure_id' => 'nullable|exists:core_infrastructure,id',
             'cash_session_id' => 'nullable|exists:treasury_cash_sessions,id',
             'payment_method_id' => 'required|exists:core_payment_methods,id',
             'authorized_by' => 'nullable|exists:auth_users,id',

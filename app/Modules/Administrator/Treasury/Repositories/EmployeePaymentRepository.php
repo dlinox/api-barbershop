@@ -2,24 +2,25 @@
 
 namespace App\Modules\Administrator\Treasury\Repositories;
 
-use App\Models\Treasury\EmployeeAdvance;
+use App\Models\Treasury\EmployeePayment;
 use App\Models\Profile\Barber;
 use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class EmployeeAdvanceRepository
+class EmployeePaymentRepository
 {
     use HasInfrastructureScope;
 
     public function dataTable($request)
     {
-        $query = EmployeeAdvance::with([
+        $query = EmployeePayment::with([
             'employee' => function (MorphTo $morphTo) {
                 $morphTo->morphWith([
                     Barber::class => ['branch'],
                 ]);
             },
             'paymentMethod',
+            'paidBy',
         ]);
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
@@ -32,25 +33,25 @@ class EmployeeAdvanceRepository
     public function createOrUpdate(array $data)
     {
         if (isset($data['id']) && $data['id']) {
-            $advance = EmployeeAdvance::findOrFail($data['id']);
+            $payment = EmployeePayment::findOrFail($data['id']);
 
-            if ($advance->status === 'discounted' || $advance->discounted_in_payment_id) {
-                throw new \Exception('No se puede editar un adelanto que ya fue aplicado o descontado');
+            if ($payment->status === 'cancelled') {
+                throw new \Exception('No se puede editar un pago cancelado');
             }
         }
 
-        return EmployeeAdvance::updateOrCreate(['id' => $data['id']], $data);
+        return EmployeePayment::updateOrCreate(['id' => $data['id']], $data);
     }
 
     public function delete(int $id)
     {
-        $advance = EmployeeAdvance::findOrFail($id);
+        $payment = EmployeePayment::findOrFail($id);
 
-        if ($advance->status === 'discounted' || $advance->discounted_in_payment_id) {
-            throw new \Exception('No se puede eliminar un adelanto que ya fue aplicado o descontado');
+        if ($payment->status === 'cancelled') {
+            throw new \Exception('No se puede eliminar un pago cancelado');
         }
 
-        $advance->delete();
-        return $advance;
+        $payment->delete();
+        return $payment;
     }
 }

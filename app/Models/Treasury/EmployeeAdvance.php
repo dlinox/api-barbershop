@@ -23,6 +23,7 @@ class EmployeeAdvance extends Model
 
         static::creating(function (EmployeeAdvance $advance) {
             $advance->paid_by = $advance->paid_by ?? Auth::user()?->id;
+            $advance->authorized_by = $advance->authorized_by ?? Auth::user()?->id;
             $advance->advance_date = $advance->advance_date ?? now();
         });
     }

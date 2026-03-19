@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\Administrator\Treasury\Http\Resources\EmployeeAdvance;
+namespace App\Modules\Administrator\Treasury\Http\Resources\EmployeePayment;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class EmployeeAdvanceDataTableItemResource extends JsonResource
+class EmployeePaymentDataTableItemResource extends JsonResource
 {
     public function toArray($request)
     {
@@ -25,15 +25,25 @@ class EmployeeAdvanceDataTableItemResource extends JsonResource
                 'id' => $this->paymentMethod->id,
                 'name' => $this->paymentMethod->name,
             ] : null,
-            'amount' => $this->amount,
-            'advanceDate' => $this->advance_date?->format('Y-m-d'),
+            'paidById' => $this->paid_by,
+            'paidBy' => $this->paidBy ? [
+                'id' => $this->paidBy->id,
+                'fullName' => $this->paidBy->person->full_name ?? null,
+            ] : null,
+            'period' => $this->period,
+            'periodStart' => $this->period_start?->format('Y-m-d'),
+            'periodEnd' => $this->period_end?->format('Y-m-d'),
+            'baseAmount' => $this->base_amount,
+            'bonus' => $this->bonus,
+            'deductions' => $this->deductions,
+            'totalAmount' => $this->total_amount,
+            'paymentDate' => $this->payment_date?->format('Y-m-d'),
             'paymentReference' => $this->payment_reference,
             'status' => $this->status,
-            'reason' => $this->reason,
             'notes' => $this->notes,
             'createdAt' => $this->created_at?->format('Y-m-d H:i:s'),
-            'canEdit' => $this->status !== 'discounted' && !$this->discounted_in_payment_id,
-            'canDelete' => $this->status !== 'discounted' && !$this->discounted_in_payment_id,
+            'canEdit' => $this->status !== 'cancelled',
+            'canDelete' => $this->status !== 'cancelled',
         ];
     }
 }

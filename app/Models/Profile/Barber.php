@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use App\Models\Core\Person;
 use App\Models\Behavior\Profile;
+use App\Models\Barbershop\Branch;
 use App\Common\Traits\HasDataTable;
 
 class Barber extends Model
@@ -24,6 +25,11 @@ class Barber extends Model
         'commission_percentage',
         'is_active',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
 
     public function person(): BelongsTo
     {
