@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Modules\Administrator\Barbershop\Http\Controllers\ClientController;
-use App\Modules\Administrator\Barbershop\Http\Controllers\WorkerController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\BarberController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\BranchController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\CategoryController;
@@ -16,15 +15,10 @@ Route::middleware(['auth:api'])->prefix('/clients')->group(function () {
     Route::get('/select-async-items', [ClientController::class, 'selectAsyncItems'])->name('clients.selectAsyncItems');
 });
 
-Route::middleware(['auth:api'])->prefix('/workers')->group(function () {
-    Route::post('/data-table', [WorkerController::class, 'dataTable'])->name('workers.dataTable')->middleware('permission:barbershop.worker.view');
-    Route::post('/save', [WorkerController::class, 'save'])->name('workers.save')->middleware('permission:barbershop.worker.create,barbershop.worker.edit');
-    Route::get('/select-async-items', [WorkerController::class, 'selectAsyncItems'])->name('workers.selectAsyncItems');
-    Route::delete('/delete/{id}', [WorkerController::class, 'delete'])->name('workers.delete')->middleware('permission:barbershop.worker.delete');
-});
-
 Route::middleware(['auth:api'])->prefix('/barbers')->group(function () {
     Route::post('/data-table', [BarberController::class, 'dataTable'])->name('barbers.dataTable')->middleware('permission:barbershop.barber.view');
+    Route::post('/payment-summary', [BarberController::class, 'paymentSummaryDataTable'])->name('barbers.paymentSummary')->middleware('permission:treasury.employee_payment.view');
+    Route::post('/payment-calculation/{barberId}', [BarberController::class, 'paymentCalculation'])->name('barbers.paymentCalculation')->middleware('permission:treasury.employee_payment.view');
     Route::post('/save', [BarberController::class, 'save'])->name('barbers.save')->middleware('permission:barbershop.barber.create,barbershop.barber.edit');
     Route::get('/select-async-items', [BarberController::class, 'selectAsyncItems'])->name('barbers.selectAsyncItems');
 });

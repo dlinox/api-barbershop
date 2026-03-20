@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Models\Profile\Admin;
 use App\Models\Profile\Worker;
 use App\Models\Profile\Barber;
+use App\Models\Profile\Teacher;
 use App\Models\Academy\Branch;
 use App\Models\Barbershop\Branch as BarbershopBranch;
 use App\Models\Treasury\CashRegister;
@@ -35,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
             'profile_workers' => Worker::class,
             'profile_barbers' => Barber::class,
             // 'profile_students' => Student::class,
-            // 'profile_teachers' => Teacher::class,
+            'profile_teachers' => Teacher::class,
             'academy_branches' => Branch::class,
             'barbershop_branches' => BarbershopBranch::class,
             'treasury_cash_registers' => CashRegister::class,

@@ -12,7 +12,7 @@ class BarberRequest extends ApiFormRequest
             'id' => ['nullable', 'integer'],
             'branch_id' => ['required', 'integer'],
             'commission_percentage' => ['required', 'numeric', 'min:0', 'max:100'],
-            // 'is_active' => ['required', 'boolean'],
+            'is_active' => ['required', 'boolean'],
 
             'person.id'  => ['nullable', 'integer'],
             'person.document_type' => ['required', 'integer'],

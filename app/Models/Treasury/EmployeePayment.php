@@ -5,7 +5,6 @@ namespace App\Models\Treasury;
 use App\Common\Traits\HasDataTable;
 use App\Models\Auth\User;
 use App\Models\Core\Infrastructure;
-use App\Models\Core\PaymentMethod;
 use App\Models\Core\PaymentMethods;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

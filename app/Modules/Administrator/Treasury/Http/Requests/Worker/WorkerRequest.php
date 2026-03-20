@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Administrator\Barbershop\Http\Requests\Worker;
+namespace App\Modules\Administrator\Treasury\Http\Requests\Worker;
 
 use App\Common\Http\Requests\ApiFormRequest;
 
@@ -14,7 +14,7 @@ class WorkerRequest extends ApiFormRequest
 
             'position' => ['required', 'string', 'max:50'],
             'monthly_salary' => ['required', 'numeric', 'min:0'],
-            'payment_frequency' => ['required', 'string', 'in:monthly,biweekly'],
+            'payment_frequency' => ['nullable', 'string', 'in:monthly,biweekly'],
             'is_active' => ['required', 'boolean'],
 
             'person.id'  => ['nullable', 'integer'],

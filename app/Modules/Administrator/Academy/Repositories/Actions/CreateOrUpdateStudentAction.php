@@ -5,6 +5,7 @@ namespace App\Modules\Administrator\Academy\Repositories\Actions;
 use Illuminate\Support\Facades\DB;
 
 use App\Common\Exceptions\ApiException;
+use App\Models\Auth\User;
 use App\Models\Behavior\Role;
 
 use App\Modules\Administrator\Academy\Repositories\StudentRepository;
@@ -33,31 +34,55 @@ class CreateOrUpdateStudentAction
 
             $person = $this->createOrUpdatePersonAction->execute($data['person'], $data['person']['id']);
 
-            $profile = $this->profileRepository->findByProfileableId($person->id);
+            $existingProfile = $this->profileRepository->findByProfileableId($person->id);
 
-            if ($profile !== null && isset($data['user']['id'])) {
-                if ($profile->auth_user_id !== $data['user']['id']) throw new ApiException('El usuario no coincide con la persona');
-            }
-
-            $data['user']['password'] = $person->document_number;
-            $data['user']['is_active'] = false; // TODO: Activar cuando se implemente el correo electrónico
-
-            $user = $this->createOrUpdateUserAction->execute($data['user']);
+            $isActive = $data['user']['is_active'] ?? false;
 
             if (!$data['id']) {
+                // Crear estudiante
                 $student = $this->studentRepository->findByPersonId($person->id);
                 if ($student) throw new ApiException('La persona ya tiene un perfil de estudiante');
+
+                if ($existingProfile) {
+                    // La persona ya tiene un usuario (otro perfil), reutilizar
+                    $user = User::find($existingProfile->auth_user_id);
+                    if (!$user) throw new ApiException('Error al encontrar el usuario asociado');
+                } else {
+                    // Crear nuevo usuario
+                    $data['user']['password'] = $person->document_number;
+                    $user = $this->createOrUpdateUserAction->execute($data['user']);
+                }
+
                 $student = $this->studentRepository->create($person->id);
                 if (!$student) throw new ApiException('Error al crear el perfil de estudiante');
 
-                $profile = $this->profileRepository->findUserIdAndType($user->id, 'students');
-                if ($profile) throw new ApiException('El usuario ya tiene un perfil de estudiante');
-                $profile = $this->profileRepository->create($user->id, 'students', $student->core_person_id, $role->id);
-            } else {
+                $student->update(['is_active' => $isActive]);
 
+                $profileExists = $this->profileRepository->findUserIdAndType($user->id, 'students');
+                if ($profileExists) throw new ApiException('El usuario ya tiene un perfil de estudiante');
+                $behaviorProfile = $this->profileRepository->create($user->id, 'students', $student->core_person_id, $role->id);
+                $behaviorProfile->update(['is_active' => $isActive]);
+            } else {
+                // Actualizar estudiante
                 $student = $this->studentRepository->findByPersonId($data['id']);
                 if (!$student) throw new ApiException('Error al encontrar el perfil de estudiante');
                 if ($data['id'] != $person->id) throw new ApiException('El perfil de estudiante no coincide con la persona');
+
+                if ($existingProfile && isset($data['user']['id'])) {
+                    if ($existingProfile->auth_user_id !== $data['user']['id']) throw new ApiException('El usuario no coincide con la persona');
+                }
+
+                $this->createOrUpdateUserAction->execute($data['user']);
+
+                $student->update(['is_active' => $isActive]);
+
+                $studentProfile = $this->profileRepository->findUserIdAndType(
+                    $data['user']['id'],
+                    'students'
+                );
+                if ($studentProfile) {
+                    $studentProfile->update(['is_active' => $isActive]);
+                }
             }
 
             DB::commit();

@@ -24,22 +24,6 @@ return [
                 ]
             ],
             [
-                'name' => 'barbershop.worker',
-                'display_name' => 'Trabajadores',
-                'type' => 'module',
-                'children' => [
-                    [
-                        'name' => 'barbershop.worker.view',
-                        'display_name' => 'Gestionar Trabajadores',
-                        'type' => 'view',
-                        'children' => [
-                            ['name' => 'barbershop.worker.create', 'display_name' => 'Crear', 'type' => 'action'],
-                            ['name' => 'barbershop.worker.edit', 'display_name' => 'Editar', 'type' => 'action'],
-                        ]
-                    ],
-                ]
-            ],
-            [
                 'name' => 'barbershop.barber',
                 'display_name' => 'Barberos',
                 'type' => 'module',

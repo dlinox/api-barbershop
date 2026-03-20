@@ -4,6 +4,7 @@ namespace App\Modules\Administrator\Treasury\Repositories;
 
 use App\Models\Treasury\EmployeeAdvance;
 use App\Models\Profile\Barber;
+use App\Models\Profile\Teacher;
 use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -17,6 +18,7 @@ class EmployeeAdvanceRepository
             'employee' => function (MorphTo $morphTo) {
                 $morphTo->morphWith([
                     Barber::class => ['branch'],
+                    Teacher::class => ['branch'],
                 ]);
             },
             'paymentMethod',

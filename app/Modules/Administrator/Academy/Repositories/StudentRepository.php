@@ -12,6 +12,7 @@ class StudentRepository
         $items = Student::select(
             //profile_students id |  person id
             'profile_students.core_person_id as id',
+            'profile_students.is_active as is_active',
 
             //person
             'core_persons.document_type as person_document_type',
@@ -29,7 +30,10 @@ class StudentRepository
             'auth_users.is_active as user_is_active',
         )
             ->join('core_persons', 'profile_students.core_person_id', '=', 'core_persons.id')
-            ->join('behavior_profiles', 'profile_students.core_person_id', '=', 'behavior_profiles.profileable_id')
+            ->join('behavior_profiles', function ($join) {
+                $join->on('behavior_profiles.profileable_id', '=', 'profile_students.core_person_id')
+                    ->where('behavior_profiles.profileable_type', '=', 'profile_students');
+            })
             ->join('auth_users', 'behavior_profiles.auth_user_id', '=', 'auth_users.id')
             ->withCount('enrollments');
 

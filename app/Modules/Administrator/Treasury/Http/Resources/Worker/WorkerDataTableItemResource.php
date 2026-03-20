@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Administrator\Barbershop\Http\Resources\Worker;
+namespace App\Modules\Administrator\Treasury\Http\Resources\Worker;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -11,7 +11,7 @@ class WorkerDataTableItemResource extends JsonResource
         return [
             'id' => $this->id,
             'position' => $this->position,
-            'monthlySalary' => $this->monthly_salary,
+            'monthlySalary' => (float) $this->monthly_salary,
             'paymentFrequency' => $this->payment_frequency,
             'isActive' => (bool) $this->is_active,
             'person' => [

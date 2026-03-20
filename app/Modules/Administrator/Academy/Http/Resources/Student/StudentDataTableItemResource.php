@@ -10,6 +10,7 @@ class StudentDataTableItemResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'isActive' => (bool) $this->is_active,
             'enrollmentsCount' => $this->enrollments_count ?? 0,
             'person' => [
                 'id' => $this->id,

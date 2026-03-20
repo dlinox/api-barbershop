@@ -3,6 +3,9 @@
 namespace App\Modules\Administrator\Barbershop\Repositories;
 
 use App\Models\Profile\Barber;
+use App\Models\Barbershop\Ticket;
+use App\Models\Treasury\EmployeeAdvance;
+use App\Models\Treasury\Income;
 use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Support\Facades\DB;
 
@@ -56,13 +59,37 @@ class BarberRepository
         return Barber::where('id', $personId)->first();
     }
 
+    public function paymentSummaryDataTable($request)
+    {
+        $items = Barber::select(
+            'profile_barbers.id as id',
+            DB::raw("CONCAT(core_persons.name, ' ', COALESCE(core_persons.paternal_surname, ''), ' ', COALESCE(core_persons.maternal_surname, '')) as full_name"),
+            'barbershop_branches.name as branch_name',
+            'profile_barbers.commission_percentage as commission_percentage',
+            DB::raw("(SELECT MAX(ep.payment_date) FROM treasury_employee_payments ep WHERE ep.employee_type = 'profile_barbers' AND ep.employee_id = profile_barbers.id AND ep.status = 'paid') as last_payment_date"),
+            DB::raw("(SELECT COALESCE(SUM(ep.total_amount), 0) FROM treasury_employee_payments ep WHERE ep.employee_type = 'profile_barbers' AND ep.employee_id = profile_barbers.id AND ep.status = 'paid') as total_paid"),
+        )
+            ->join('core_persons', 'profile_barbers.id', '=', 'core_persons.id')
+            ->join('barbershop_branches', 'profile_barbers.branch_id', '=', 'barbershop_branches.id')
+            ->where('profile_barbers.is_active', true);
+
+        $this->scopeByBranch($items, 'profile_barbers.branch_id');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $items->orderBy('core_persons.name', 'asc');
+        }
+
+        $items = $items->dataTable($request);
+        return $items;
+    }
+
     public function create(int $personId, array $data): Barber
     {
         return Barber::create([
             'id' => $personId,
             'branch_id' => $data['branch_id'],
             'commission_percentage' => $data['commission_percentage'],
-            // 'is_active' => $data['is_active'],
+            'is_active' => $data['is_active'] ?? true,
         ]);
     }
 
@@ -71,7 +98,7 @@ class BarberRepository
         Barber::where('id', $personId)->update([
             'branch_id' => $data['branch_id'],
             'commission_percentage' => $data['commission_percentage'],
-            'is_active' => $data['is_active'],
+            'is_active' => $data['is_active'] ?? true,
         ]);
     }
 
@@ -127,5 +154,61 @@ class BarberRepository
         }
 
         return $items;
+    }
+
+    public function paymentCalculation(int $barberId, string $periodStart, string $periodEnd): array
+    {
+        $tickets = Ticket::where('profile_barber_id', $barberId)
+            ->whereDate('ticket_date', '>=', $periodStart)
+            ->whereDate('ticket_date', '<=', $periodEnd)
+            ->where('status', 'confirmed')
+            ->orderBy('ticket_date', 'asc')
+            ->get();
+
+        $ticketsTotal = $tickets->sum('total');
+        $ticketsCount = $tickets->count();
+
+        $ticketIds = $tickets->pluck('id');
+        $incomes = Income::where('transactionable_type', 'barbershop_tickets')
+            ->whereIn('transactionable_id', $ticketIds)
+            ->get()
+            ->keyBy('transactionable_id');
+
+        $advances = EmployeeAdvance::where('employee_type', 'profile_barbers')
+            ->where('employee_id', $barberId)
+            ->where('status', 'pending')
+            ->whereBetween('advance_date', [$periodStart, $periodEnd])
+            ->get();
+
+        $advancesTotal = $advances->sum('amount');
+
+        return [
+            'tickets' => [
+                'count' => $ticketsCount,
+                'total' => (float) $ticketsTotal,
+                'items' => $tickets->map(function ($t) use ($incomes) {
+                    $income = $incomes->get($t->id);
+                    return [
+                        'id' => $t->id,
+                        'ticketDate' => $t->ticket_date->format('Y-m-d'),
+                        'amount' => (float) $t->amount,
+                        'discount' => (float) $t->discount,
+                        'total' => (float) $t->total,
+                        'status' => $t->status,
+                        'receiptSerie' => $income?->receipt_serie,
+                        'receiptNumber' => $income?->receipt_number,
+                    ];
+                }),
+            ],
+            'advances' => [
+                'total' => (float) $advancesTotal,
+                'items' => $advances->map(fn($a) => [
+                    'id' => $a->id,
+                    'amount' => (float) $a->amount,
+                    'date' => $a->advance_date->format('Y-m-d'),
+                    'reason' => $a->reason,
+                ]),
+            ],
+        ];
     }
 }

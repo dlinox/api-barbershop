@@ -20,6 +20,11 @@ class Student extends Model
 
     protected $fillable = [
         'core_person_id',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public static $searchColumns = [

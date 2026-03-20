@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\Administrator\Barbershop\Services;
+namespace App\Modules\Administrator\Treasury\Services;
 
-use App\Modules\Administrator\Barbershop\Repositories\WorkerRepository;
-use App\Modules\Administrator\Barbershop\Repositories\Actions\CreateOrUpdateWorkerAction;
-use App\Modules\Administrator\Barbershop\Repositories\Actions\DeleteWorkerAction;
+use App\Modules\Administrator\Treasury\Repositories\WorkerRepository;
+use App\Modules\Administrator\Treasury\Repositories\Actions\CreateOrUpdateWorkerAction;
+use App\Modules\Administrator\Treasury\Repositories\Actions\DeleteWorkerAction;
 
 class WorkerService
 {
@@ -17,6 +17,11 @@ class WorkerService
     public function dataTable($request)
     {
         return $this->workerRepository->dataTable($request);
+    }
+
+    public function paymentSummaryDataTable($request)
+    {
+        return $this->workerRepository->paymentSummaryDataTable($request);
     }
 
     public function save($data)
@@ -32,5 +37,10 @@ class WorkerService
     public function selectAsyncItems($request)
     {
         return $this->workerRepository->selectAsyncItems($request->search);
+    }
+
+    public function paymentCalculation(int $workerId, string $periodStart, string $periodEnd): array
+    {
+        return $this->workerRepository->paymentCalculation($workerId, $periodStart, $periodEnd);
     }
 }

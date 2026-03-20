@@ -8,6 +8,7 @@ use App\Modules\Administrator\Barbershop\Services\BarberService;
 use App\Modules\Administrator\Barbershop\Http\Requests\Barber\BarberRequest;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberDataTableItemResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberSelectItemResource;
+use App\Modules\Administrator\Treasury\Http\Resources\Barber\BarberPaymentSummaryItemResource;
 
 class BarberController
 {
@@ -19,6 +20,13 @@ class BarberController
     {
         $item = $this->barberService->dataTable($request);
         $item['data'] = BarberDataTableItemResource::collection($item['data']);
+        return ApiResponse::success($item);
+    }
+
+    public function paymentSummaryDataTable(Request $request)
+    {
+        $item = $this->barberService->paymentSummaryDataTable($request);
+        $item['data'] = BarberPaymentSummaryItemResource::collection($item['data']);
         return ApiResponse::success($item);
     }
 
@@ -34,5 +42,21 @@ class BarberController
         $item = $this->barberService->selectAsyncItems($request);
         $item = BarberSelectItemResource::collection($item);
         return ApiResponse::success($item);
+    }
+
+    public function paymentCalculation(Request $request, int $barberId)
+    {
+        $request->validate([
+            'period_start' => 'required|date',
+            'period_end' => 'required|date|after_or_equal:period_start',
+        ]);
+
+        $data = $this->barberService->paymentCalculation(
+            $barberId,
+            $request->period_start,
+            $request->period_end,
+        );
+
+        return ApiResponse::success($data);
     }
 }

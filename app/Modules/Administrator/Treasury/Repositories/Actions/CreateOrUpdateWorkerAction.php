@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Modules\Administrator\Barbershop\Repositories\Actions;
+namespace App\Modules\Administrator\Treasury\Repositories\Actions;
 
 use Illuminate\Support\Facades\DB;
 
 use App\Common\Exceptions\ApiException;
 
-use App\Modules\Administrator\Barbershop\Repositories\WorkerRepository;
+use App\Modules\Administrator\Treasury\Repositories\WorkerRepository;
 use App\Modules\Shared\Repositories\Actions\CreateOrUpdatePersonAction;
 
 class CreateOrUpdateWorkerAction

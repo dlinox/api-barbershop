@@ -3,9 +3,11 @@
 namespace App\Modules\Administrator\Treasury\Repositories;
 
 use App\Models\Treasury\EmployeePayment;
+use App\Models\Treasury\EmployeeAdvance;
 use App\Models\Profile\Barber;
 use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\DB;
 
 class EmployeePaymentRepository
 {
@@ -40,7 +42,30 @@ class EmployeePaymentRepository
             }
         }
 
-        return EmployeePayment::updateOrCreate(['id' => $data['id']], $data);
+        $calculationDetails = $data['calculation_details'] ?? null;
+        $advanceIds = $calculationDetails['advance_ids'] ?? [];
+
+        try {
+            DB::beginTransaction();
+
+            $payment = EmployeePayment::updateOrCreate(['id' => $data['id']], $data);
+
+            if (!empty($advanceIds)) {
+                EmployeeAdvance::whereIn('id', $advanceIds)
+                    ->where('status', 'pending')
+                    ->update([
+                        'status' => 'discounted',
+                        'discounted_in_payment_id' => $payment->id,
+                    ]);
+            }
+
+            DB::commit();
+
+            return $payment;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     public function delete(int $id)

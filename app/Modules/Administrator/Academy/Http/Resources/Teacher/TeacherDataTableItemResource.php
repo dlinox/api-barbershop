@@ -11,6 +11,8 @@ class TeacherDataTableItemResource extends JsonResource
         return [
             'id' => $this->id,
             'branchId' => $this->branch_id,
+            'paymentType' => $this->payment_type,
+            'monthlySalary' => $this->monthly_salary ? (float) $this->monthly_salary : null,
             'isActive' => (bool) $this->is_active,
             'branch' => $this->branch_id ? [
                 'id' => $this->branch_id,

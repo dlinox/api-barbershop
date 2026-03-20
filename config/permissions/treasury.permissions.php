@@ -56,6 +56,39 @@ return [
                     ],
                 ]
             ],
+            [
+                'name' => 'treasury.worker_attendance',
+                'display_name' => 'Asistencia de Trabajadores',
+                'type' => 'module',
+                'children' => [
+                    [
+                        'name' => 'treasury.worker_attendance.view',
+                        'display_name' => 'Ver Asistencia',
+                        'type' => 'view',
+                        'children' => [
+                            ['name' => 'treasury.worker_attendance.register', 'display_name' => 'Registrar', 'type' => 'action'],
+                            ['name' => 'treasury.worker_attendance.edit', 'display_name' => 'Editar', 'type' => 'action'],
+                        ]
+                    ],
+                ]
+            ],
+            [
+                'name' => 'treasury.worker',
+                'display_name' => 'Trabajadores',
+                'type' => 'module',
+                'children' => [
+                    [
+                        'name' => 'treasury.worker.view',
+                        'display_name' => 'Gestionar Trabajadores',
+                        'type' => 'view',
+                        'children' => [
+                            ['name' => 'treasury.worker.create', 'display_name' => 'Crear', 'type' => 'action'],
+                            ['name' => 'treasury.worker.edit', 'display_name' => 'Editar', 'type' => 'action'],
+                            ['name' => 'treasury.worker.delete', 'display_name' => 'Eliminar', 'type' => 'action'],
+                        ]
+                    ],
+                ]
+            ],
         ]
     ]
 ];

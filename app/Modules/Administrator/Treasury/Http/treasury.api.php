@@ -7,6 +7,8 @@ use App\Modules\Administrator\Treasury\Http\Controllers\ExpenseController;
 use App\Modules\Administrator\Treasury\Http\Controllers\IncomeController;
 use App\Modules\Administrator\Treasury\Http\Controllers\EmployeeAdvanceController;
 use App\Modules\Administrator\Treasury\Http\Controllers\EmployeePaymentController;
+use App\Modules\Administrator\Treasury\Http\Controllers\WorkerController;
+use App\Modules\Administrator\Treasury\Http\Controllers\WorkerAttendanceController;
 
 Route::middleware(['auth:api'])->prefix('/treasury-cash-registers')->group(function () {
     Route::post('/data-table/{infrastructureId}', [CashRegisterController::class, 'dataTable'])->name('treasury-cash-registers.dataTable')->middleware('permission:treasury.cash_register.view');
@@ -45,4 +47,22 @@ Route::middleware(['auth:api'])->prefix('/treasury-employee-payments')->group(fu
     Route::post('/data-table', [EmployeePaymentController::class, 'dataTable'])->name('treasury-employee-payments.dataTable')->middleware('permission:treasury.employee_payment.view');
     Route::post('/save', [EmployeePaymentController::class, 'save'])->name('treasury-employee-payments.save')->middleware('permission:treasury.employee_payment.create,treasury.employee_payment.edit');
     Route::delete('/delete/{id}', [EmployeePaymentController::class, 'delete'])->name('treasury-employee-payments.delete')->middleware('permission:treasury.employee_payment.delete');
+});
+
+Route::middleware(['auth:api'])->prefix('/workers')->group(function () {
+    Route::post('/data-table', [WorkerController::class, 'dataTable'])->name('treasury-workers.dataTable')->middleware('permission:treasury.worker.view');
+    Route::post('/payment-summary', [WorkerController::class, 'paymentSummaryDataTable'])->name('treasury-workers.paymentSummary')->middleware('permission:treasury.employee_payment.view');
+    Route::post('/payment-calculation/{workerId}', [WorkerController::class, 'paymentCalculation'])->name('treasury-workers.paymentCalculation')->middleware('permission:treasury.employee_payment.view');
+    Route::post('/save', [WorkerController::class, 'save'])->name('treasury-workers.save')->middleware('permission:treasury.worker.create,treasury.worker.edit');
+    Route::get('/select-async-items', [WorkerController::class, 'selectAsyncItems'])->name('treasury-workers.selectAsyncItems');
+    Route::delete('/delete/{id}', [WorkerController::class, 'delete'])->name('treasury-workers.delete')->middleware('permission:treasury.worker.delete');
+});
+
+Route::middleware(['auth:api'])->prefix('/worker-attendances')->group(function () {
+    Route::post('/data-table/{date?}', [WorkerAttendanceController::class, 'dataTable'])->name('worker-attendances.dataTable')->middleware('permission:treasury.worker_attendance.view');
+    Route::post('/register-check-in', [WorkerAttendanceController::class, 'registerCheckIn'])->name('worker-attendances.registerCheckIn')->middleware('permission:treasury.worker_attendance.register');
+    Route::post('/register-check-out', [WorkerAttendanceController::class, 'registerCheckOut'])->name('worker-attendances.registerCheckOut')->middleware('permission:treasury.worker_attendance.register');
+    Route::post('/register-absent', [WorkerAttendanceController::class, 'registerAbsent'])->name('worker-attendances.registerAbsent')->middleware('permission:treasury.worker_attendance.register');
+    Route::post('/update', [WorkerAttendanceController::class, 'update'])->name('worker-attendances.update')->middleware('permission:treasury.worker_attendance.edit');
+    Route::post('/generate-qr-code', [WorkerAttendanceController::class, 'generateQrCode'])->name('worker-attendances.generateQrCode')->middleware('permission:treasury.worker_attendance.register');
 });

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Administrator\Barbershop\Http\Resources\Worker;
+namespace App\Modules\Administrator\Treasury\Http\Resources\Worker;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 

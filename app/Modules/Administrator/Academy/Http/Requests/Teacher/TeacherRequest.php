@@ -11,7 +11,9 @@ class TeacherRequest extends ApiFormRequest
         return [
 
             'id' => ['nullable', 'integer'],
-            'branch_id' => ['nullable', 'integer', 'exists:academy_branches,id'],
+            'branch_id' => ['required', 'integer', 'exists:academy_branches,id'],
+            'payment_type' => ['required', 'in:hourly,monthly'],
+            'monthly_salary' => ['nullable', 'required_if:payment_type,monthly', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
 
             'person.id'  => ['nullable', 'integer'],
@@ -35,6 +37,9 @@ class TeacherRequest extends ApiFormRequest
     {
         return [
             'branch_id.exists' => 'La sede seleccionada no existe',
+            'branch_id.required' => 'La sede es requerida',
+            'payment_type.required' => 'El tipo de pago es requerido',
+            'monthly_salary.required_if' => 'El monto mensual es requerido cuando el tipo de pago es mensual',
             'is_active.required' => 'El estado del docente es requerido',
 
             'person.document_type.required' => 'Tipo de documento es requerido',
@@ -56,6 +61,8 @@ class TeacherRequest extends ApiFormRequest
     {
         return [
             'branch_id' => 'Sede',
+            'payment_type' => 'Tipo de pago',
+            'monthly_salary' => 'Monto mensual',
             'is_active' => 'Estado del docente',
 
             'person.document_type' => 'Tipo de documento',

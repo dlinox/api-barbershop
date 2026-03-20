@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Modules\Administrator\Barbershop\Repositories;
+namespace App\Modules\Administrator\Treasury\Repositories;
 
 use App\Models\Profile\Worker;
+use App\Models\Treasury\EmployeeAdvance;
+use App\Models\Treasury\WorkerAttendance;
 use Illuminate\Support\Facades\DB;
 
 class WorkerRepository
@@ -31,6 +33,27 @@ class WorkerRepository
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $items->orderBy('profile_workers.id', 'desc');
+        }
+
+        $items = $items->dataTable($request);
+        return $items;
+    }
+
+    public function paymentSummaryDataTable($request)
+    {
+        $items = Worker::select(
+            'profile_workers.id as id',
+            DB::raw("CONCAT(core_persons.name, ' ', COALESCE(core_persons.paternal_surname, ''), ' ', COALESCE(core_persons.maternal_surname, '')) as full_name"),
+            'profile_workers.position as position',
+            'profile_workers.monthly_salary as monthly_salary',
+            DB::raw("(SELECT MAX(ep.payment_date) FROM treasury_employee_payments ep WHERE ep.employee_type = 'profile_workers' AND ep.employee_id = profile_workers.id AND ep.status = 'paid') as last_payment_date"),
+            DB::raw("(SELECT COALESCE(SUM(ep.total_amount), 0) FROM treasury_employee_payments ep WHERE ep.employee_type = 'profile_workers' AND ep.employee_id = profile_workers.id AND ep.status = 'paid') as total_paid"),
+        )
+            ->join('core_persons', 'profile_workers.id', '=', 'core_persons.id')
+            ->where('profile_workers.is_active', true);
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $items->orderBy('core_persons.name', 'asc');
         }
 
         $items = $items->dataTable($request);
@@ -86,5 +109,48 @@ class WorkerRepository
         }
 
         return $items->limit(20)->get();
+    }
+
+    public function paymentCalculation(int $workerId, string $periodStart, string $periodEnd): array
+    {
+        $advances = EmployeeAdvance::where('employee_type', 'profile_workers')
+            ->where('employee_id', $workerId)
+            ->where('status', 'pending')
+            ->whereBetween('advance_date', [$periodStart, $periodEnd])
+            ->get();
+
+        $advancesTotal = $advances->sum('amount');
+
+        $attendances = WorkerAttendance::where('worker_id', $workerId)
+            ->whereBetween('date', [$periodStart, $periodEnd])
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $absencesCount = $attendances->where('status', 'absent')->count();
+
+        return [
+            'advances' => [
+                'total' => (float) $advancesTotal,
+                'items' => $advances->map(fn($a) => [
+                    'id' => $a->id,
+                    'amount' => (float) $a->amount,
+                    'date' => $a->advance_date->format('Y-m-d'),
+                    'reason' => $a->reason,
+                ]),
+            ],
+            'absences' => [
+                'count' => $absencesCount,
+            ],
+            'attendances' => [
+                'items' => $attendances->map(fn($a) => [
+                    'id' => $a->id,
+                    'date' => $a->date->format('Y-m-d'),
+                    'status' => $a->status,
+                    'checkIn' => $a->check_in,
+                    'checkOut' => $a->check_out,
+                    'observation' => $a->observation,
+                ]),
+            ],
+        ];
     }
 }

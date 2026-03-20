@@ -17,6 +17,11 @@ class BarberService
         return $this->barberRepository->dataTable($request);
     }
 
+    public function paymentSummaryDataTable($request)
+    {
+        return $this->barberRepository->paymentSummaryDataTable($request);
+    }
+
     public function save($data)
     {
         return $this->createOrUpdateBarberAction->execute($data);
@@ -25,5 +30,10 @@ class BarberService
     public function selectAsyncItems($request)
     {
         return $this->barberRepository->selectAsyncItems($request->search, $request->value, $request->infrastructureId);
+    }
+
+    public function paymentCalculation(int $barberId, string $periodStart, string $periodEnd): array
+    {
+        return $this->barberRepository->paymentCalculation($barberId, $periodStart, $periodEnd);
     }
 }

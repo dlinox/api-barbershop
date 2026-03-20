@@ -15,6 +15,8 @@ class TeacherRepository
 
             //teacher
             'profile_teachers.branch_id',
+            'profile_teachers.payment_type',
+            'profile_teachers.monthly_salary',
             'profile_teachers.is_active',
 
             //branch
@@ -56,25 +58,52 @@ class TeacherRepository
         return Teacher::where('core_person_id', $personId)->first();
     }
 
-    public function create(int $personId, ?int $branchId = null, bool $isActive = true): Teacher
+    public function paymentSummaryDataTable($request)
+    {
+        $items = Teacher::select(
+            'profile_teachers.core_person_id as id',
+            DB::raw("CONCAT(core_persons.name, ' ', COALESCE(core_persons.paternal_surname, ''), ' ', COALESCE(core_persons.maternal_surname, '')) as full_name"),
+            'academy_branches.name as branch_name',
+            'profile_teachers.payment_type',
+            DB::raw("(SELECT COUNT(*) FROM academy_group_teachers gt WHERE gt.teacher_id = profile_teachers.core_person_id AND gt.status = 'active') as total_groups"),
+            DB::raw("(SELECT MAX(ep.payment_date) FROM treasury_employee_payments ep WHERE ep.employee_type = 'profile_teachers' AND ep.employee_id = profile_teachers.core_person_id AND ep.status = 'paid') as last_payment_date"),
+            DB::raw("(SELECT COALESCE(SUM(ep.total_amount), 0) FROM treasury_employee_payments ep WHERE ep.employee_type = 'profile_teachers' AND ep.employee_id = profile_teachers.core_person_id AND ep.status = 'paid') as total_paid"),
+        )
+            ->join('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id')
+            ->leftJoin('academy_branches', 'profile_teachers.branch_id', '=', 'academy_branches.id')
+            ->where('profile_teachers.is_active', true);
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $items->orderBy('core_persons.name', 'asc');
+        }
+
+        $items = $items->dataTable($request);
+        return $items;
+    }
+
+    public function create(int $personId, ?int $branchId = null, ?string $paymentType = null, ?float $monthlySalary = null, bool $isActive = true): Teacher
     {
         return Teacher::create([
             'core_person_id' => $personId,
-            'branch_id' => $branchId,
-            'is_active' => $isActive,
+            'branch_id'      => $branchId,
+            'payment_type'   => $paymentType,
+            'monthly_salary' => $monthlySalary,
+            'is_active'      => $isActive,
         ]);
     }
 
-    public function update(Teacher $teacher, ?int $branchId, bool $isActive): Teacher
+    public function update(Teacher $teacher, ?int $branchId, ?string $paymentType, ?float $monthlySalary, bool $isActive): Teacher
     {
         $teacher->update([
-            'branch_id' => $branchId,
-            'is_active' => $isActive,
+            'branch_id'      => $branchId,
+            'payment_type'   => $paymentType,
+            'monthly_salary' => $monthlySalary,
+            'is_active'      => $isActive,
         ]);
         return $teacher;
     }
 
-    public function selectAsyncItems($search)
+    public function selectAsyncItems($search, $branchId = null)
     {
         $items = Teacher::select(
             'profile_teachers.core_person_id as id',
@@ -84,6 +113,10 @@ class TeacherRepository
             'core_persons.document_number as person_document_number',
         )
             ->join('core_persons', 'profile_teachers.core_person_id', '=', 'core_persons.id');
+
+        if (!empty($branchId)) {
+            $items->where('profile_teachers.branch_id', $branchId);
+        }
 
         if (!empty($search)) {
             $items->where(function ($query) use ($search) {

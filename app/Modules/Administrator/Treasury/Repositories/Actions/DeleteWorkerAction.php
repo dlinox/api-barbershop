@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Administrator\Barbershop\Repositories\Actions;
+namespace App\Modules\Administrator\Treasury\Repositories\Actions;
 
 use Illuminate\Support\Facades\DB;
 

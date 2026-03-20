@@ -24,11 +24,14 @@ class Teacher extends Model
     protected $fillable = [
         'core_person_id',
         'branch_id',
+        'payment_type',
+        'monthly_salary',
         'is_active',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'      => 'boolean',
+        'monthly_salary' => 'decimal:2',
     ];
 
     public function person(): BelongsTo
