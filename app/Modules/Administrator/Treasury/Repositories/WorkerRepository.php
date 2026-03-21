@@ -28,6 +28,9 @@ class WorkerRepository
             'core_persons.maternal_surname as person_maternal_surname',
             'core_persons.email as person_email',
             'core_persons.phone as person_phone',
+            'core_persons.date_birth as person_date_birth',
+            'core_persons.gender as person_gender',
+            'core_persons.address as person_address',
         )
             ->join('core_persons', 'profile_workers.id', '=', 'core_persons.id');
 

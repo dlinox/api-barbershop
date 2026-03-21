@@ -22,6 +22,9 @@ class AdminCreateRequest extends ApiFormRequest
             'person.maternal_surname' => ['nullable', 'string', 'max:80'],
             'person.email' => ['nullable', 'email', 'max:100'],
             'person.phone' => ['nullable', 'string', 'max:15'], //email personal
+            'person.date_birth' => ['nullable', 'date'],
+            'person.gender' => ['nullable', 'string', 'max:1'],
+            'person.address' => ['nullable', 'string', 'max:255'],
 
             'user.id' => ['nullable', 'integer'],
             'user.username' => ['required', 'string', 'max:50'],

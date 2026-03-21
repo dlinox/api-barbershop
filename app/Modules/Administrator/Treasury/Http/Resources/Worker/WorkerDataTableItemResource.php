@@ -23,6 +23,9 @@ class WorkerDataTableItemResource extends JsonResource
                 'maternalSurname' => $this->person_maternal_surname,
                 'email' => $this->person_email,
                 'phone' => $this->person_phone,
+                'dateBirth' => $this->person_date_birth,
+                'gender' => $this->person_gender,
+                'address' => $this->person_address,
             ],
         ];
     }

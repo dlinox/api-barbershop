@@ -21,8 +21,10 @@ class BarberRequest extends ApiFormRequest
             'person.paternal_surname' => ['required_without:person.maternal_surname', 'nullable', 'max:80'],
             'person.maternal_surname' => ['required_without:person.paternal_surname', 'nullable', 'max:80'],
             'person.phone' => ['nullable', 'max:15'],
-
-            'user.id' => ['nullable', 'integer'],
+            'person.email' => ['nullable', 'email', 'max:100'],
+            'person.date_birth' => ['nullable', 'date'],
+            'person.gender' => ['nullable', 'string', 'max:1'],
+            'person.address' => ['nullable', 'string', 'max:255'],
             'user.username' => ['required', 'max:50'],
             'user.email' => ['nullable', 'email', 'max:100'],
             'user.is_active' => ['required', 'boolean'],

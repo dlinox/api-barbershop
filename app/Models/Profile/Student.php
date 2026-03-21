@@ -9,6 +9,7 @@ use App\Models\Core\Person;
 use App\Models\Behavior\Profile;
 use App\Common\Traits\HasDataTable;
 use App\Models\Academy\Enrollment;
+use App\Models\Academy\StudentGuardian;
 
 class Student extends Model
 {
@@ -48,5 +49,10 @@ class Student extends Model
     public function enrollments()
     {
         return $this->hasMany(Enrollment::class, 'profile_student_id', 'core_person_id');
+    }
+
+    public function guardians()
+    {
+        return $this->hasMany(StudentGuardian::class, 'student_id', 'core_person_id');
     }
 }

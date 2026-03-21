@@ -21,6 +21,9 @@ class PersonSearchResource extends JsonResource
                 'maternalSurname' => $person->maternal_surname,
                 'email' => $person->email,
                 'phone' => $person->phone,
+                'dateBirth' => $person->date_birth?->format('Y-m-d'),
+                'gender' => $person->gender,
+                'address' => $person->address,
             ],
             'profiles' => $this->resource['profiles'],
             'user' => $user ? [

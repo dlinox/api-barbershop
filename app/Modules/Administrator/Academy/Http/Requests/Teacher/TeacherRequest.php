@@ -24,6 +24,10 @@ class TeacherRequest extends ApiFormRequest
             'person.maternal_surname' => ['required_without:person.paternal_surname', 'nullable', 'max:80'],
             // 'person.email' => ['nullable', 'email', 'max:100'],
             'person.phone' => ['nullable', 'max:15'],
+            'person.email' => ['nullable', 'email', 'max:100'],
+            'person.date_birth' => ['nullable', 'date'],
+            'person.gender' => ['nullable', 'string', 'max:1'],
+            'person.address' => ['nullable', 'string', 'max:255'],
 
             'user.id' => ['nullable', 'integer'],
             'user.username' => ['required', 'max:50'],

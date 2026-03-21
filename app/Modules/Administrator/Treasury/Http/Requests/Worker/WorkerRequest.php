@@ -24,6 +24,10 @@ class WorkerRequest extends ApiFormRequest
             'person.paternal_surname' => ['required_without:person.maternal_surname', 'nullable', 'max:80'],
             'person.maternal_surname' => ['required_without:person.paternal_surname', 'nullable', 'max:80'],
             'person.phone' => ['nullable', 'max:15'],
+            'person.email' => ['nullable', 'email', 'max:100'],
+            'person.date_birth' => ['nullable', 'date'],
+            'person.gender' => ['nullable', 'string', 'max:1'],
+            'person.address' => ['nullable', 'string', 'max:255'],
 
         ];
     }
@@ -45,6 +49,11 @@ class WorkerRequest extends ApiFormRequest
             'person.paternal_surname.required_without' => 'Debe ingresar al menos un apellido (paterno o materno)',
             'person.maternal_surname.required_without' => 'Debe ingresar al menos un apellido (paterno o materno)',
             'person.phone.max' => 'Teléfono debe tener máximo 15 caracteres',
+            'person.email.email' => 'Email es inválido',
+            'person.email.max' => 'Email debe tener máximo 100 caracteres',
+            'person.date_birth.date' => 'Fecha de nacimiento es inválida',
+            'person.gender.max' => 'Género debe tener máximo 1 carácter',
+            'person.address.max' => 'Dirección debe tener máximo 255 caracteres',
         ];
     }
 

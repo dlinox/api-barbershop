@@ -13,6 +13,7 @@ use App\Modules\Administrator\Academy\Http\Controllers\AttendanceController;
 use App\Modules\Administrator\Academy\Http\Controllers\EnrollmentPaymentController;
 use App\Modules\Administrator\Academy\Http\Controllers\MaterialController;
 use App\Modules\Administrator\Academy\Http\Controllers\TeacherAttendanceController;
+use App\Modules\Administrator\Academy\Http\Controllers\StudentGuardianController;
 
 Route::middleware(['auth:api'])->prefix('/branches')->group(function () {
     Route::post('/data-table', [BranchController::class, 'dataTable'])->name('branches.dataTable')->middleware('permission:academy.branch.view');
@@ -105,4 +106,10 @@ Route::middleware(['auth:api'])->prefix('/teacher-attendances')->group(function 
     Route::post('/register-absent', [TeacherAttendanceController::class, 'registerAbsent'])->name('teacher-attendances.registerAbsent')->middleware('permission:academy.teacher_attendance.register');
     Route::post('/update', [TeacherAttendanceController::class, 'update'])->name('teacher-attendances.update')->middleware('permission:academy.teacher_attendance.edit');
     Route::post('/generate-qr-code', [TeacherAttendanceController::class, 'generateQrCode'])->name('teacher-attendances.generateQrCode')->middleware('permission:academy.teacher_attendance.register');
+});
+
+Route::middleware(['auth:api'])->prefix('/student-guardians')->group(function () {
+    Route::get('/by-student/{studentId}', [StudentGuardianController::class, 'findByStudentId'])->name('student-guardians.byStudent')->middleware('permission:academy.student.view');
+    Route::post('/save', [StudentGuardianController::class, 'save'])->name('student-guardians.save')->middleware('permission:academy.student.create,academy.student.edit');
+    Route::delete('/delete/{id}', [StudentGuardianController::class, 'delete'])->name('student-guardians.delete')->middleware('permission:academy.student.edit');
 });
