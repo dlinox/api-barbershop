@@ -47,6 +47,42 @@ return [
             'report' => false,
         ],
 
+        'enrollment_files' => [
+            'driver' => 'local',
+            'root' => storage_path('app/enrollment_files'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/enrollment_files',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'payment_receipts' => [
+            'driver' => 'local',
+            'root' => storage_path('app/payment_receipts'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/payment_receipts',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'reports' => [
+            'driver' => 'local',
+            'root' => storage_path('app/reports'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/reports',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'company_logos' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/company_logos'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/company_logos',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

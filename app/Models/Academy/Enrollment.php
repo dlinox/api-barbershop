@@ -5,6 +5,7 @@ namespace App\Models\Academy;
 use Illuminate\Database\Eloquent\Model;
 use App\Common\Traits\HasDataTable;
 use App\Models\Profile\Student;
+use App\Models\Core\File;
 
 class Enrollment extends Model
 {
@@ -47,11 +48,16 @@ class Enrollment extends Model
 
     public function materials()
     {
-        return $this->belongsToMany(Material::class, 'academy_enrollment_materials');
+        return $this->belongsToMany(Material::class, 'academy_enrollment_materials')->withPivot('quantity');
     }
 
     public function student()
     {
         return $this->belongsTo(Student::class, 'profile_student_id');
+    }
+
+    public function files()
+    {
+        return $this->morphMany(File::class, 'fileable');
     }
 }

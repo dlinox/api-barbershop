@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Common\Http\Responses\ApiResponse;
 use App\Modules\Administrator\Inventory\Services\ProductService;
 use App\Modules\Administrator\Inventory\Http\Requests\Product\ProductRequest;
-use App\Modules\Administrator\Inventory\Http\Resources\Product\ProductDataTableItemResource;
+use App\Modules\Administrator\Inventory\Http\Resources\Stock\ProductDataTableItemResource;
 use App\Modules\Administrator\Inventory\Http\Resources\Product\ProductSelectItemResource;
 
 class ProductController

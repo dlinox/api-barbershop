@@ -8,14 +8,13 @@ use App\Modules\Administrator\Academy\Http\Requests\Enrollment\EnrollmentWithInc
 use App\Modules\Administrator\Academy\Http\Requests\Enrollment\EnrollmentUpdateRequest;
 use App\Modules\Administrator\Academy\Http\Requests\Enrollment\EnrollmentRegisterPaymentRequest;
 use App\Modules\Administrator\Academy\Http\Resources\Enrollment\EnrollmentDataTableItemResource;
+use App\Modules\Administrator\Academy\Http\Resources\Enrollment\EnrollmentDetailResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class EnrollmentController
 {
     public function __construct(
-        private EnrollmentService $enrollmentService
+        private EnrollmentService $enrollmentService,
     ) {}
 
     public function dataTable(Request $request)
@@ -55,5 +54,16 @@ class EnrollmentController
         $enrollment = $this->enrollmentService->getEnrollment($id);
         $enrollment = new EnrollmentDataTableItemResource($enrollment);
         return ApiResponse::success($enrollment);
+    }
+
+    public function generatePdf($id)
+    {
+        return $this->enrollmentService->generatePdf($id);
+    }
+
+    public function detail($id)
+    {
+        $enrollment = $this->enrollmentService->getDetail($id);
+        return ApiResponse::success(new EnrollmentDetailResource($enrollment));
     }
 }

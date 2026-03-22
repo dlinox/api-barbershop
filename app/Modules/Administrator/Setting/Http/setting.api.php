@@ -3,6 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use App\Modules\Administrator\Setting\Http\Controllers\PaymentMethodsController;
 use App\Modules\Administrator\Setting\Http\Controllers\DocumentTypeController;
+use App\Modules\Administrator\Setting\Http\Controllers\CompanyController;
+use App\Modules\Administrator\Setting\Http\Controllers\CompanyLogoController;
+
+Route::middleware(['auth:api'])->prefix('/company')->group(function () {
+    Route::get('/get', [CompanyController::class, 'get'])->name('company.get')->middleware('permission:setting.company.view');
+    Route::post('/save', [CompanyController::class, 'save'])->name('company.save')->middleware('permission:setting.company.edit');
+});
+
+Route::middleware(['auth:api'])->prefix('/company-logo')->group(function () {
+    Route::post('/upload', [CompanyLogoController::class, 'upload'])->name('company-logo.upload')->middleware('permission:setting.company.edit');
+    Route::delete('/delete', [CompanyLogoController::class, 'delete'])->name('company-logo.delete')->middleware('permission:setting.company.edit');
+});
 
 Route::middleware(['auth:api'])->prefix('/payment-methods')->group(function () {
     Route::post('/data-table', [PaymentMethodsController::class, 'dataTable'])->name('payment-methods.dataTable')->middleware('permission:setting.payment_method.view');

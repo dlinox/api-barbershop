@@ -71,8 +71,10 @@ Route::middleware(['auth:api'])->prefix('/enrollments')->group(function () {
     Route::post('/data-table', [EnrollmentController::class, 'dataTable'])->name('enrollments.dataTable')->middleware('permission:academy.enrollment.view');
     Route::post('/save', [EnrollmentController::class, 'save'])->name('enrollments.save')->middleware('permission:academy.enrollment.create');
     Route::post('/update', [EnrollmentController::class, 'update'])->name('enrollments.update')->middleware('permission:academy.enrollment.edit');
-    Route::get('/get/{id}', [EnrollmentController::class, 'getEnrollment'])->name('enrollments.getEnrollment')->middleware('permission:academy.enrollment.view'); // Detalle que carga de DB
+    Route::get('/get/{id}', [EnrollmentController::class, 'getEnrollment'])->name('enrollments.getEnrollment')->middleware('permission:academy.enrollment.view');
     Route::post('/register-payment', [EnrollmentController::class, 'registerPayment'])->name('enrollments.registerPayment')->middleware('permission:academy.enrollment.register_payment');
+    Route::get('/generate-pdf/{id}', [EnrollmentController::class, 'generatePdf'])->name('enrollments.generatePdf')->middleware('permission:academy.enrollment.view');
+    Route::get('/detail/{id}', [EnrollmentController::class, 'detail'])->name('enrollments.detail')->middleware('permission:academy.enrollment.view');
 });
 
 Route::middleware(['auth:api'])->prefix('/attendances')->group(function () {
