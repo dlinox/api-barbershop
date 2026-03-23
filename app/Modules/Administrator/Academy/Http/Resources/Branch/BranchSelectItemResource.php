@@ -11,6 +11,9 @@ class BranchSelectItemResource extends JsonResource
         return [
             'value' => $this->id,
             'title' => $this->name . ' (' . $this->address . ')',
+            'meta' => [
+                'infrastructureId' => $this->infrastructure?->id,
+            ],
         ];
     }
 }

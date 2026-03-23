@@ -139,7 +139,9 @@ class EnrollmentService
                 $this->generateIncomePdfAction->execute($income->id);
             }
 
-            return;
+            return [
+                'incomeId' => $income?->id,
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -187,7 +189,9 @@ class EnrollmentService
             // ─── Generar PDF del comprobante (fuera de la transacción) ───
             $this->generateIncomePdfAction->execute($income->id);
 
-            return;
+            return [
+                'incomeId' => $income->id,
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

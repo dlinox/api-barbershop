@@ -35,8 +35,8 @@ class TicketController
     public function save(TicketRequest $request)
     {
         $data = $request->validated();
-        $this->ticketService->save($data);
-        return ApiResponse::success(null, 'Ticket guardado correctamente');
+        $result = $this->ticketService->save($data);
+        return ApiResponse::success($result, 'Ticket guardado correctamente');
     }
 
     public function cancel(int $id)

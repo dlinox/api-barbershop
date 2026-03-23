@@ -46,11 +46,16 @@ class SaleRepository
             'core_persons.maternal_surname as person_maternal_surname',
             'core_persons.document_number as person_document_number',
             'auth_users.username as user_username',
+            'treasury_incomes.id as income_id',
         )
             ->join('treasury_cash_sessions', 'treasury_cash_sessions.id', 'inventory_sales.cash_session_id')
             ->join('treasury_cash_registers', 'treasury_cash_registers.id', 'treasury_cash_sessions.cash_register_id')
             ->leftJoin('core_persons', 'core_persons.id', 'inventory_sales.person_id')
-            ->leftJoin('auth_users', 'auth_users.id', 'inventory_sales.user_id');
+            ->leftJoin('auth_users', 'auth_users.id', 'inventory_sales.user_id')
+            ->leftJoin('treasury_incomes', function ($join) {
+                $join->on('treasury_incomes.transactionable_id', '=', 'inventory_sales.id')
+                    ->where('treasury_incomes.transactionable_type', '=', 'inventory_sales');
+            });
 
         $this->scopeByInfrastructure($query, 'treasury_cash_registers.infrastructure_id');
 

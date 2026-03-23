@@ -47,7 +47,7 @@ class BranchRepository
 
     public function getActiveBranches()
     {
-        $query = Branch::where('is_active', true);
+        $query = Branch::with('infrastructure')->where('is_active', true);
         $this->scopeByAcademyBranch($query, 'id');
         return $query->get();
     }

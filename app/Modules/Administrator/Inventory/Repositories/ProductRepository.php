@@ -28,9 +28,9 @@ class ProductRepository
         return $product;
     }
 
-    public function getActiveProducts()
+    public function getActiveProducts(?int $infrastructureId = null)
     {
-        return Product::select(
+        $query = Product::select(
             'inventory_products.id',
             'inventory_products.name',
 
@@ -43,8 +43,12 @@ class ProductRepository
         )
             ->join('inventory_product_presentations', 'inventory_products.id', '=', 'inventory_product_presentations.product_id')
             ->join('inventory_stocks', 'inventory_product_presentations.id', '=', 'inventory_stocks.presentation_id')
-            ->where('inventory_products.is_active', true)
-            ->distinct()
-            ->get();
+            ->where('inventory_products.is_active', true);
+
+        if ($infrastructureId) {
+            $query->where('inventory_stocks.infrastructure_id', $infrastructureId);
+        }
+
+        return $query->distinct()->get();
     }
 }

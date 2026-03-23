@@ -18,6 +18,7 @@ class TicketDataTableItemResource extends JsonResource
             'total'      => (float) $this->total,
             'ticketDate' => $this->ticket_date,
             'status'     => $this->status,
+            'incomeId'   => $this->income_id,
             'createdAt'  => $this->created_at?->format('Y-m-d H:i:s'),
         ];
     }

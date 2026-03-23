@@ -5,6 +5,7 @@ namespace App\Modules\Administrator\Academy\Repositories;
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\Group;
 use App\Models\Academy\GroupTeacher;
+use App\Common\Exceptions\ApiException;
 use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Support\Facades\DB;
 
@@ -50,20 +51,25 @@ class GroupRepository
             }
         }
 
-        $plansToDelete = $group->paymentPlans()->whereNotIn('id', $newPaymentPlanIds)->get();
+        $plansToDelete = $group->paymentPlans()
+            ->where('type', 'monthly')
+            ->whereNotIn('id', $newPaymentPlanIds)
+            ->get();
 
         $plansWithPayments = $plansToDelete->filter(function ($plan) {
-            return $plan->enrollmentPayments()->exists();
+            return $plan->enrollmentPaymentDetails()->exists();
         });
 
         if ($plansWithPayments->isNotEmpty()) {
-            throw new \Exception('No se pueden eliminar los planes de pago porque tienen pagos asociados');
+            throw new ApiException('No se pueden eliminar los planes de pago porque tienen pagos asociados', 422);
         }
 
-        $group->paymentPlans()->whereNotIn('id', $newPaymentPlanIds)->delete();
+        $group->paymentPlans()
+            ->where('type', 'monthly')
+            ->whereNotIn('id', $newPaymentPlanIds)
+            ->delete();
 
         if ($group->enrollment_price > 0) {
-
             $group->paymentPlans()->updateOrCreate(
                 [
                     'type' => 'enrollment',
@@ -107,7 +113,7 @@ class GroupRepository
 
         $enrollments = Enrollment::where('group_id', $id)->exists();
         if ($enrollments) {
-            throw new \Exception('No se puede eliminar el grupo porque tiene inscripciones asociadas');
+            throw new ApiException('No se puede eliminar el grupo porque tiene inscripciones asociadas', 422);
         }
 
         $group->paymentPlans()->delete();

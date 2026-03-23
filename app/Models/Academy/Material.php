@@ -13,6 +13,7 @@ class Material extends Model
     protected $table = 'academy_materials';
 
     protected $fillable = [
+        'branch_id',
         'presentation_id',
         'quantity',
         'is_active',
@@ -24,6 +25,7 @@ class Material extends Model
     ];
 
     protected $casts = [
+        'branch_id' => 'integer',
         'quantity' => 'integer',
         'presentation_id' => 'integer',
         'is_active' => 'boolean',
@@ -41,5 +43,10 @@ class Material extends Model
     public function presentation()
     {
         return $this->belongsTo(\App\Models\Inventory\ProductPresentation::class, 'presentation_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
     }
 }

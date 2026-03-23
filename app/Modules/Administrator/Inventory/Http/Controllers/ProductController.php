@@ -35,9 +35,10 @@ class ProductController
         return ApiResponse::success(null, 'Producto eliminado correctamente');
     }
 
-    public function selectItems()
+    public function selectItems(Request $request)
     {
-        $items = $this->productService->getActiveProducts();
+        $infrastructureId = $request->query('infrastructureId') ? (int) $request->query('infrastructureId') : null;
+        $items = $this->productService->getActiveProducts($infrastructureId);
         $items = ProductSelectItemResource::collection($items);
         return ApiResponse::success($items);
     }

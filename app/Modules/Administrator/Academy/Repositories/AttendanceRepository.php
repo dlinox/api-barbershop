@@ -43,7 +43,8 @@ class AttendanceRepository
             ->join('academy_attendance_deadlines', 'academy_attendances.attendance_deadline_id', '=', 'academy_attendance_deadlines.id')
             ->join('academy_groups', 'academy_attendance_deadlines.group_id', '=', 'academy_groups.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
-            ->join('academy_schedules', 'academy_groups.schedule_id', '=', 'academy_schedules.id');
+            ->join('academy_schedules', 'academy_groups.schedule_id', '=', 'academy_schedules.id')
+             ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id');
 
         $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');
 

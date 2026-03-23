@@ -34,8 +34,10 @@ class TicketService
      * Crea/actualiza un ticket.
      * Si se envía income, también lo confirma (completa venta, kardex/stock, income).
      */
-    public function save(array $data): void
+    public function save(array $data): array
     {
+        $income = null;
+
         DB::beginTransaction();
         try {
             // 0. Asegurar perfil de cliente si se indicó
@@ -51,7 +53,7 @@ class TicketService
                 $ticket->load(['services', 'sale.items']);
                 $infrastructureId = $ticket->branch->getInfrastructureId();
 
-                $this->confirmTicketAction->execute($ticket, $data, $infrastructureId);
+                [, $income] = $this->confirmTicketAction->execute($ticket, $data, $infrastructureId);
             }
 
             DB::commit();
@@ -59,6 +61,10 @@ class TicketService
             DB::rollBack();
             throw $e;
         }
+
+        return [
+            'incomeId' => $income?->id,
+        ];
     }
 
     public function cancel(int $ticketId): void

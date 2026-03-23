@@ -34,7 +34,8 @@ class EnrollmentRepository
 
         )->join('core_persons', 'academy_enrollments.profile_student_id', '=', 'core_persons.id')
             ->join('academy_groups', 'academy_enrollments.group_id', '=', 'academy_groups.id')
-            ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id');
+            ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
+            ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id');
 
         $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');
 

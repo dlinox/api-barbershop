@@ -39,8 +39,10 @@ class SaleService
         return $this->saleRepository->getById($id);
     }
 
-    public function save(array $data, int $infrastructureId): void
+    public function save(array $data, int $infrastructureId): array
     {
+        $income = null;
+
         DB::beginTransaction();
         try {
             $hasIncome = !empty($data['income']);
@@ -51,9 +53,9 @@ class SaleService
             }
 
             if ($isEdit) {
-                $sale = $this->editPendingSale($data, $infrastructureId, $hasIncome);
+                [$sale, $income] = $this->editPendingSale($data, $infrastructureId, $hasIncome);
             } else {
-                $sale = $this->createSale($data, $infrastructureId, $hasIncome);
+                [$sale, $income] = $this->createSale($data, $infrastructureId, $hasIncome);
             }
 
             DB::commit();
@@ -61,6 +63,10 @@ class SaleService
             DB::rollBack();
             throw $e;
         }
+
+        return [
+            'incomeId' => $income?->id,
+        ];
     }
 
     /**
@@ -68,17 +74,18 @@ class SaleService
      * - Sin income → status 'pending', sin kardex/stock.
      * - Con income → status 'completed', con kardex/stock/income.
      */
-    private function createSale(array $data, int $infrastructureId, bool $hasIncome): Sale
+    private function createSale(array $data, int $infrastructureId, bool $hasIncome): array
     {
         $status = $hasIncome ? 'completed' : 'pending';
+        $income = null;
 
         $sale = $this->createSaleAction->execute($data, $infrastructureId, $status);
 
         if ($hasIncome) {
-            $this->createIncome($data, $infrastructureId, $sale);
+            $income = $this->createIncome($data, $infrastructureId, $sale);
         }
 
-        return $sale;
+        return [$sale, $income];
     }
 
     /**
@@ -86,9 +93,10 @@ class SaleService
      * - Sin income → actualiza datos, sigue 'pending'.
      * - Con income → actualiza datos, crea kardex/stock/income, pasa a 'completed'.
      */
-    private function editPendingSale(array $data, int $infrastructureId, bool $hasIncome): Sale
+    private function editPendingSale(array $data, int $infrastructureId, bool $hasIncome): array
     {
         $sale = Sale::findOrFail($data['id']);
+        $income = null;
 
         if ($sale->status !== 'pending') {
             throw new ApiException('Solo se puede editar una venta en estado pendiente.');
@@ -100,10 +108,10 @@ class SaleService
             $sale->update(['status' => 'completed']);
 
             $this->createSaleAction->registerStockMovements($sale, $data['items'], $infrastructureId);
-            $this->createIncome($data, $infrastructureId, $sale);
+            $income = $this->createIncome($data, $infrastructureId, $sale);
         }
 
-        return $sale;
+        return [$sale, $income];
     }
 
     public function delete(int $id): void
@@ -160,12 +168,12 @@ class SaleService
         }
     }
 
-    private function createIncome(array $data, int $infrastructureId, Sale $sale): void
+    private function createIncome(array $data, int $infrastructureId, Sale $sale)
     {
         $incomeData = $data['income'];
         $incomeData['cash_session_id'] = $data['cash_session_id'];
 
-        $this->createIncomeAction->execute(
+        return $this->createIncomeAction->execute(
             data: $incomeData,
             infrastructureId: $infrastructureId,
             transactionableType: 'inventory_sales',

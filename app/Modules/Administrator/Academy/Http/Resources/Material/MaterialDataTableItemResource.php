@@ -12,6 +12,10 @@ class MaterialDataTableItemResource extends JsonResource
             'id' => $this->id,
             'quantity' => $this->quantity,
             'isActive' => $this->is_active,
+            'branch' => [
+                'id' => $this->branch_id,
+                'name' => $this->branch_name,
+            ],
             'product' => [
                 'id' => $this->product_id,
                 'name' => $this->product_name,

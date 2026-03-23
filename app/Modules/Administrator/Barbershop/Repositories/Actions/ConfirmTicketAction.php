@@ -19,7 +19,7 @@ class ConfirmTicketAction
     /**
      * Confirma un ticket ya creado: completa venta pendiente (kardex/stock), crea ingreso.
      */
-    public function execute(Ticket $ticket, array $data, int $infrastructureId): Ticket
+    public function execute(Ticket $ticket, array $data, int $infrastructureId): array
     {
         if ($ticket->status === 'confirmed') {
             throw new ApiException('El ticket ya fue confirmado.');
@@ -59,14 +59,14 @@ class ConfirmTicketAction
         $incomeData['cash_session_id'] = $data['cash_session_id'];
         $incomeData['client_id']       = $data['client_id'] ?? $ticket->profile_client_id;
 
-        $this->createIncomeAction->execute(
+        $income = $this->createIncomeAction->execute(
             data: $incomeData,
             infrastructureId: $infrastructureId,
             transactionableType: 'barbershop_tickets',
             transactionableId: $ticket->id,
         );
 
-        return $ticket;
+        return [$ticket, $income];
     }
 
     /**

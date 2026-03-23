@@ -7,6 +7,7 @@ use App\Models\Academy\GroupTeacher;
 use App\Common\Exceptions\ApiException;
 use App\Modules\Administrator\Academy\Repositories\GroupRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class GroupService
 {
@@ -21,15 +22,25 @@ class GroupService
 
     public function save(array $data)
     {
-        $branch = Branch::select(
-            'academy_branches.id',
-        )->join('academy_rooms', 'academy_rooms.branch_id', '=', 'academy_branches.id')
-            ->where('academy_rooms.id', $data['room_id'])
-            ->first();
+        try {
+            DB::beginTransaction();
 
-        $data['branch_id'] = $branch->id;
-        $data['days_of_week'] = implode(',', $data['days_of_week']);
-        return $this->groupRepository->createOrUpdate($data);
+            $branch = Branch::select(
+                'academy_branches.id',
+            )->join('academy_rooms', 'academy_rooms.branch_id', '=', 'academy_branches.id')
+                ->where('academy_rooms.id', $data['room_id'])
+                ->first();
+
+            $data['branch_id'] = $branch->id;
+            $data['days_of_week'] = implode(',', $data['days_of_week']);
+            $group = $this->groupRepository->createOrUpdate($data);
+
+            DB::commit();
+            return $group;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     public function delete(int $id)

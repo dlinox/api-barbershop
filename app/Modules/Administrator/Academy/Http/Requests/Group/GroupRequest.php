@@ -24,6 +24,7 @@ class GroupRequest extends ApiFormRequest
             'days_of_week.*' => 'string',
             'attendance_tolerance_minutes' => 'nullable|integer|min:0',
             'payment_plans' => 'array|required|min:1',
+            'payment_plans.*.id' => 'nullable',
             'payment_plans.*.start_date' => 'required|date',
             'payment_plans.*.end_date' => 'required|date|after_or_equal:payment_plans.*.start_date',
             'payment_plans.*.amount' => 'required|numeric|min:0',

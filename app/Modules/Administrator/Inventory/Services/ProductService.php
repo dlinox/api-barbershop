@@ -26,8 +26,8 @@ class ProductService
         return $this->productRepository->delete($id);
     }
 
-    public function getActiveProducts()
+    public function getActiveProducts(?int $infrastructureId = null)
     {
-        return $this->productRepository->getActiveProducts();
+        return $this->productRepository->getActiveProducts($infrastructureId);
     }
 }

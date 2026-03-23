@@ -22,6 +22,7 @@ class SaleDataTableItemResource extends JsonResource
             'discount' => (float) $this->discount,
             'total' => (float) $this->total,
             'status' => $this->status,
+            'incomeId' => $this->income_id,
             'createdAt' => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }

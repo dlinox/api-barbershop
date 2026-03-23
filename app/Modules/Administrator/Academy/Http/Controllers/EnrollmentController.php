@@ -29,9 +29,9 @@ class EnrollmentController
     {
         $req = $request->validated();
 
-        $this->enrollmentService->save($req);
+        $result = $this->enrollmentService->save($req);
 
-        return ApiResponse::success(null, 'Registro guardado correctamente');
+        return ApiResponse::success($result, 'Registro guardado correctamente');
     }
 
     public function saveWithoutPayment(EnrollmentRequest $request)
@@ -53,8 +53,8 @@ class EnrollmentController
     public function registerPayment(EnrollmentRegisterPaymentRequest $request)
     {
         $data = $request->validated();
-        $this->enrollmentService->registerPayment($data);
-        return ApiResponse::success(null, 'Registro guardado correctamente');
+        $result = $this->enrollmentService->registerPayment($data);
+        return ApiResponse::success($result, 'Registro guardado correctamente');
     }
 
     public function getEnrollment($id)

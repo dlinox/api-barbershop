@@ -237,10 +237,13 @@ return new class extends Migration
             $table->unsignedBigInteger('presentation_id');
             $table->integer('quantity')->default(1);
             $table->boolean('is_active')->default(true);
+            $table->unsignedBigInteger('branch_id');
             $table->timestamps();
             $table->foreign('presentation_id')->references('id')->on('inventory_product_presentations')->restrictOnDelete();
+            $table->foreign('branch_id')->references('id')->on('academy_branches')->restrictOnDelete();
             $table->index('presentation_id');
             $table->index('is_active');
+            $table->index('branch_id');
         });
 
         // ─── MATERIALES POR MATRÍCULA ───

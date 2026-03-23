@@ -41,9 +41,10 @@ class MaterialController
         return ApiResponse::success(null, 'Material eliminado correctamente');
     }
 
-    public function selectItems()
+    public function selectItems(Request $request)
     {
-        $items = $this->materialService->getActiveMaterials();
+        $branchId = $request->query('branchId') ? (int) $request->query('branchId') : null;
+        $items = $this->materialService->getActiveMaterials($branchId);
         $items = MaterialSelectItemResource::collection($items);
         return ApiResponse::success($items);
     }

@@ -21,9 +21,9 @@ class MaterialService
         return $this->materialRepository->createOrUpdate($data);
     }
 
-    public function getActiveMaterials()
+    public function getActiveMaterials(?int $branchId = null)
     {
-        return $this->materialRepository->getActiveMaterials();
+        return $this->materialRepository->getActiveMaterials($branchId);
     }
 
     public function delete(int $id)

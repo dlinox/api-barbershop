@@ -38,8 +38,8 @@ class SaleController
         $cashSession = \App\Models\Treasury\CashSession::findOrFail($data['cash_session_id']);
         $infrastructureId = $cashSession->cashRegister->infrastructure_id;
 
-        $this->saleService->save($data, $infrastructureId);
-        return ApiResponse::success(null, 'Venta registrada correctamente');
+        $result = $this->saleService->save($data, $infrastructureId);
+        return ApiResponse::success($result, 'Venta registrada correctamente');
     }
 
     public function delete(int $id)

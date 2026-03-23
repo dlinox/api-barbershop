@@ -16,11 +16,16 @@ class TicketRepository
             'barbershop_tickets.*',
             'core_persons.name as client_name',
             'core_persons.paternal_surname as client_paternal_surname',
+            'treasury_incomes.id as income_id',
             // 'barber_persons.name as worker_name',
             // 'barber_persons.paternal_surname as worker_paternal_surname'
         )->join('treasury_cash_sessions', 'treasury_cash_sessions.id', 'barbershop_tickets.cash_session_id')
             ->join('treasury_cash_registers', 'treasury_cash_registers.id', 'treasury_cash_sessions.cash_register_id')
-            ->leftJoin('core_persons', 'core_persons.id', 'barbershop_tickets.profile_client_id');
+            ->leftJoin('core_persons', 'core_persons.id', 'barbershop_tickets.profile_client_id')
+            ->leftJoin('treasury_incomes', function ($join) {
+                $join->on('treasury_incomes.transactionable_id', '=', 'barbershop_tickets.id')
+                    ->where('treasury_incomes.transactionable_type', '=', 'barbershop_tickets');
+            });
             // ->leftJoin('core_persons as barber_persons', 'barber_persons.id', 'barbershop_tickets.profile_barber_id');
 
         $this->scopeByBranch($query, 'barbershop_tickets.branch_id');
