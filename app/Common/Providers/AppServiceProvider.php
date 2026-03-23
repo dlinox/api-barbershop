@@ -14,6 +14,7 @@ use App\Models\Academy\Enrollment;
 use App\Models\Barbershop\Branch as BarbershopBranch;
 use App\Models\Treasury\CashRegister;
 use App\Models\Treasury\CashSession;
+use App\Models\Treasury\Income;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -46,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
             'barbershop_branches' => BarbershopBranch::class,
             'treasury_cash_registers' => CashRegister::class,
             'treasury_cash_sessions' => CashSession::class,
+            'treasury_incomes' => Income::class,
         ]);
     }
 }

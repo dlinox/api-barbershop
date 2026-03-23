@@ -42,16 +42,50 @@ return [
             ],
             [
                 'name' => 'treasury.expense',
-                'display_name' => 'Gastos',
+                'display_name' => 'Gastos de Caja',
                 'type' => 'module',
                 'children' => [
                     [
                         'name' => 'treasury.expense.view',
-                        'display_name' => 'Gestionar Gastos',
+                        'display_name' => 'Gestionar Gastos de Caja',
                         'type' => 'view',
                         'children' => [
                             ['name' => 'treasury.expense.create', 'display_name' => 'Crear', 'type' => 'action'],
                             ['name' => 'treasury.expense.delete', 'display_name' => 'Eliminar', 'type' => 'action'],
+                        ]
+                    ],
+                ]
+            ],
+            [
+                'name' => 'treasury.general_expense',
+                'display_name' => 'Gastos Generales',
+                'type' => 'module',
+                'children' => [
+                    [
+                        'name' => 'treasury.general_expense.view',
+                        'display_name' => 'Gestionar Gastos Generales',
+                        'type' => 'view',
+                        'children' => [
+                            ['name' => 'treasury.general_expense.create', 'display_name' => 'Crear', 'type' => 'action'],
+                            ['name' => 'treasury.general_expense.edit', 'display_name' => 'Editar', 'type' => 'action'],
+                            ['name' => 'treasury.general_expense.cancel', 'display_name' => 'Anular', 'type' => 'action'],
+                        ]
+                    ],
+                ]
+            ],
+            [
+                'name' => 'treasury.expense_type',
+                'display_name' => 'Tipos de Gasto',
+                'type' => 'module',
+                'children' => [
+                    [
+                        'name' => 'treasury.expense_type.view',
+                        'display_name' => 'Gestionar Tipos de Gasto',
+                        'type' => 'view',
+                        'children' => [
+                            ['name' => 'treasury.expense_type.create', 'display_name' => 'Crear', 'type' => 'action'],
+                            ['name' => 'treasury.expense_type.edit', 'display_name' => 'Editar', 'type' => 'action'],
+                            ['name' => 'treasury.expense_type.delete', 'display_name' => 'Eliminar', 'type' => 'action'],
                         ]
                     ],
                 ]

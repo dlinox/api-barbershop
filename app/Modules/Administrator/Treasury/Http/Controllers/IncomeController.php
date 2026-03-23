@@ -34,4 +34,9 @@ class IncomeController
         $this->service->annul($id);
         return ApiResponse::success(null, 'Ingreso anulado correctamente');
     }
+
+    public function generatePdf(int $id)
+    {
+        return $this->service->generatePdf($id);
+    }
 }

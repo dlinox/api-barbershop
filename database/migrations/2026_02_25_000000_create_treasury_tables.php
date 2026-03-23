@@ -51,21 +51,6 @@ return new class extends Migration
             $table->index('closed_at');
         });
 
-        Schema::create('treasury_cash_expenses', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('cash_session_id');
-            $table->unsignedBigInteger('user_id');
-            $table->decimal('amount', 12, 2);
-            $table->string('description')->nullable();
-            $table->timestamps();
-
-            $table->foreign('cash_session_id')->references('id')->on('treasury_cash_sessions')->cascadeOnDelete();
-            $table->foreign('user_id')->references('id')->on('auth_users')->restrictOnDelete();
-
-            $table->index('cash_session_id');
-            $table->index('user_id');
-        });
-
         // ─── INGRESOS (cabecera: comprobante de cobro/venta) ───
         Schema::create('treasury_incomes', function (Blueprint $table) {
             $table->id();
@@ -152,64 +137,6 @@ return new class extends Migration
             $table->index('payment_method_id');
         });
 
-
-        // ─── EGRESOS (pagos, gastos, adelantos, etc.) ───
-        // Schema::create('treasury_cash_expenses_full', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->unsignedBigInteger('cash_session_id')->nullable();       // nullable para egresos fuera de caja
-        //     $table->unsignedBigInteger('infrastructure_id');
-
-        //     $table->enum('reason', [
-        //         'salary',           // pago a docente/trabajador
-        //         'advance',          // adelanto a trabajador
-        //         'purchase_order',   // pago de orden de compra (proveedor)
-        //         'daily_expense',    // gasto del día
-        //         'utilities',        // servicios básicos (luz, agua, internet)
-        //         'rent',             // alquiler de local
-        //         'refund',           // devolución a cliente
-        //         'other',            // otros egresos
-        //     ]);
-
-        //     // Beneficiario (docente, trabajador, proveedor — via core_persons)
-        //     $table->unsignedBigInteger('person_id')->nullable();
-
-        //     // Referencia polimórfica al origen (purchase_order, etc.)
-        //     $table->string('transactionable_type')->nullable();
-        //     $table->unsignedBigInteger('transactionable_id')->nullable();
-
-        //     // Montos
-        //     $table->decimal('subtotal', 12, 2);
-        //     $table->decimal('discount', 12, 2)->default(0);
-        //     $table->decimal('tax', 12, 2)->default(0);
-        //     $table->decimal('total', 12, 2);
-
-        //     // Pago
-        //     $table->unsignedBigInteger('payment_method_id');
-        //     $table->string('payment_reference', 100)->nullable();
-
-        //     $table->string('reference_number', 100)->nullable();             // nro. documento externo (factura proveedor, recibo, etc.)
-        //     $table->string('description')->nullable();
-        //     $table->enum('status', ['completed', 'cancelled'])->default('completed');
-        //     $table->date('transaction_date');
-        //     $table->unsignedBigInteger('user_id');
-        //     $table->timestamps();
-
-        //     $table->foreign('cash_session_id')->references('id')->on('treasury_cash_sessions')->restrictOnDelete();
-        //     $table->foreign('infrastructure_id')->references('id')->on('core_infrastructures')->restrictOnDelete();
-        //     $table->foreign('person_id')->references('id')->on('core_persons')->nullOnDelete();
-        //     $table->foreign('payment_method_id')->references('id')->on('core_payment_methods')->restrictOnDelete();
-        //     $table->foreign('user_id')->references('id')->on('auth_users')->restrictOnDelete();
-
-        //     $table->index('cash_session_id');
-        //     $table->index('infrastructure_id');
-        //     $table->index('reason');
-        //     $table->index('person_id');
-        //     $table->index('payment_method_id');
-        //     $table->index('status');
-        //     $table->index('transaction_date');
-        //     $table->index('user_id');
-        //     $table->index(['transactionable_type', 'transactionable_id']);
-        // });
     }
 
     public function down(): void
@@ -217,7 +144,6 @@ return new class extends Migration
         Schema::dropIfExists('treasury_income_payment_methods');
         Schema::dropIfExists('treasury_income_details');
         Schema::dropIfExists('treasury_incomes');
-        Schema::dropIfExists('treasury_cash_expenses');
         Schema::dropIfExists('treasury_cash_sessions');
         Schema::dropIfExists('treasury_cash_registers');
     }

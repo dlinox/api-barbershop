@@ -35,7 +35,11 @@ class CashSessionRepository
                 ->where('status', 'completed')
                 ->sum('total');
 
-            $session->expected_closing_amount = (float) $session->opening_amount + (float) $totalIncomes;
+            $totalExpenses = \App\Models\Treasury\Expense::where('cash_session_id', $session->id)
+                ->where('status', 'approved')
+                ->sum('amount');
+
+            $session->expected_closing_amount = (float) $session->opening_amount + (float) $totalIncomes - (float) $totalExpenses;
         }
 
         return $session;

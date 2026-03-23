@@ -14,6 +14,8 @@ class ExpenseController
         private readonly ExpenseService $service,
     ) {}
 
+    // ─── Gastos de Caja (CashSessionTable → 'Gastos') ───
+
     public function list(int $cashSessionId): JsonResponse
     {
         $items = $this->service->listByCashSession($cashSessionId);
@@ -24,7 +26,7 @@ class ExpenseController
     public function save(ExpenseRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $this->service->save($data);
+        $this->service->saveCashExpense($data);
         return ApiResponse::success($data, 'Gasto guardado correctamente');
     }
 

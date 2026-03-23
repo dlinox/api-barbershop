@@ -5,6 +5,7 @@ namespace App\Modules\Administrator\Academy\Http\Controllers;
 use App\Common\Http\Responses\ApiResponse;
 use App\Modules\Administrator\Academy\Services\EnrollmentService;
 use App\Modules\Administrator\Academy\Http\Requests\Enrollment\EnrollmentWithIncomeRequest;
+use App\Modules\Administrator\Academy\Http\Requests\Enrollment\EnrollmentRequest;
 use App\Modules\Administrator\Academy\Http\Requests\Enrollment\EnrollmentUpdateRequest;
 use App\Modules\Administrator\Academy\Http\Requests\Enrollment\EnrollmentRegisterPaymentRequest;
 use App\Modules\Administrator\Academy\Http\Resources\Enrollment\EnrollmentDataTableItemResource;
@@ -31,6 +32,13 @@ class EnrollmentController
         $this->enrollmentService->save($req);
 
         return ApiResponse::success(null, 'Registro guardado correctamente');
+    }
+
+    public function saveWithoutPayment(EnrollmentRequest $request)
+    {
+        $data = $request->validated();
+        $this->enrollmentService->saveWithoutPayment($data);
+        return ApiResponse::success(null, 'Matricula registrada correctamente');
     }
 
     public function update(EnrollmentUpdateRequest $request)

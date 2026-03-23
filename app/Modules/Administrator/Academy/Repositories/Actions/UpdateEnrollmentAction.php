@@ -14,6 +14,7 @@ class UpdateEnrollmentAction
     public function __construct(
         private EnrollmentRepository $enrollmentRepository,
         private SyncEnrollmentMaterialsAction $syncEnrollmentMaterialsAction,
+        private GenerateEnrollmentPdfAction $generateEnrollmentPdfAction,
     ) {}
 
     public function execute(array $data): void
@@ -43,6 +44,9 @@ class UpdateEnrollmentAction
             );
 
             DB::commit();
+
+            // ─── Regenerar PDF de la ficha (fuera de la transacción) ───
+            $this->generateEnrollmentPdfAction->execute($enrollment->id);
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

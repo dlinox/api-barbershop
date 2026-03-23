@@ -3,11 +3,13 @@
 namespace App\Models\Treasury;
 
 use App\Common\Traits\HasDataTable;
+use App\Models\Core\File;
 use App\Models\Core\Infrastructure;
 use App\Models\Core\Person;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Auth;
 
@@ -95,5 +97,10 @@ class Income extends Model
     public function paymentMethods(): HasMany
     {
         return $this->hasMany(IncomePaymentMethod::class, 'income_id');
+    }
+
+    public function files(): MorphMany
+    {
+        return $this->morphMany(File::class, 'fileable');
     }
 }

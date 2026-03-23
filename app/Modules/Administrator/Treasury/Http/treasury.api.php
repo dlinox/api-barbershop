@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\Administrator\Treasury\Http\Controllers\CashRegisterController;
 use App\Modules\Administrator\Treasury\Http\Controllers\CashSessionController;
 use App\Modules\Administrator\Treasury\Http\Controllers\ExpenseController;
+use App\Modules\Administrator\Treasury\Http\Controllers\ExpenseTypeController;
+use App\Modules\Administrator\Treasury\Http\Controllers\GeneralExpenseController;
 use App\Modules\Administrator\Treasury\Http\Controllers\IncomeController;
 use App\Modules\Administrator\Treasury\Http\Controllers\EmployeeAdvanceController;
 use App\Modules\Administrator\Treasury\Http\Controllers\EmployeePaymentController;
@@ -31,9 +33,24 @@ Route::middleware(['auth:api'])->prefix('/treasury-expenses')->group(function ()
     Route::delete('/delete/{id}', [ExpenseController::class, 'delete'])->name('treasury-expenses.delete')->middleware('permission:treasury.expense.delete');
 });
 
+Route::middleware(['auth:api'])->prefix('/treasury-expense-types')->group(function () {
+    Route::post('/data-table', [ExpenseTypeController::class, 'dataTable'])->name('treasury-expense-types.dataTable')->middleware('permission:treasury.expense_type.view');
+    Route::post('/save', [ExpenseTypeController::class, 'save'])->name('treasury-expense-types.save')->middleware('permission:treasury.expense_type.create,treasury.expense_type.edit');
+    Route::get('/select-items', [ExpenseTypeController::class, 'selectItems'])->name('treasury-expense-types.selectItems');
+    Route::delete('/delete/{id}', [ExpenseTypeController::class, 'delete'])->name('treasury-expense-types.delete')->middleware('permission:treasury.expense_type.delete');
+});
+
+Route::middleware(['auth:api'])->prefix('/treasury-general-expenses')->group(function () {
+    Route::post('/data-table', [GeneralExpenseController::class, 'dataTable'])->name('treasury-general-expenses.dataTable')->middleware('permission:treasury.general_expense.view');
+    Route::post('/save', [GeneralExpenseController::class, 'save'])->name('treasury-general-expenses.save')->middleware('permission:treasury.general_expense.create,treasury.general_expense.edit');
+    Route::get('/get-by-id/{id}', [GeneralExpenseController::class, 'getById'])->name('treasury-general-expenses.getById')->middleware('permission:treasury.general_expense.view');
+    Route::post('/cancel/{id}', [GeneralExpenseController::class, 'cancel'])->name('treasury-general-expenses.cancel')->middleware('permission:treasury.general_expense.cancel');
+});
+
 Route::middleware(['auth:api'])->prefix('/treasury-incomes')->group(function () {
     Route::post('/data-table', [IncomeController::class, 'dataTable'])->name('treasury-incomes.dataTable')->middleware('permission:treasury.income.view');
     Route::get('/get-by-id/{id}', [IncomeController::class, 'getById'])->name('treasury-incomes.getById')->middleware('permission:treasury.income.view');
+    Route::get('/generate-pdf/{id}', [IncomeController::class, 'generatePdf'])->name('treasury-incomes.generatePdf')->middleware('permission:treasury.income.view');
     Route::post('/annul/{id}', [IncomeController::class, 'annul'])->name('treasury-incomes.annul')->middleware('permission:treasury.income.annul');
 });
 

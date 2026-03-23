@@ -194,9 +194,9 @@ class DashboardController
             ->orderBy('period')
             ->pluck('total', 'period');
 
-        $expenses = Expense::whereBetween('created_at', [$from, $to])
-            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as period"), DB::raw('SUM(amount) as total'))
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+        $expenses = Expense::approved()->whereBetween('transaction_date', [$from, $to])
+            ->select(DB::raw("DATE_FORMAT(transaction_date, '%Y-%m') as period"), DB::raw('SUM(amount) as total'))
+            ->groupBy(DB::raw("DATE_FORMAT(transaction_date, '%Y-%m')"))
             ->orderBy('period')
             ->pluck('total', 'period');
 
@@ -409,7 +409,7 @@ class DashboardController
     {
         $sessions = CashSession::where('status', 'open');
         $incomes = Income::where('status', 'completed')->whereBetween('transaction_date', [$from, $to]);
-        $expenses = Expense::whereBetween('created_at', [$from, $to]);
+        $expenses = Expense::approved()->whereBetween('transaction_date', [$from, $to]);
 
         return [
             'open_sessions' => $sessions->count(),

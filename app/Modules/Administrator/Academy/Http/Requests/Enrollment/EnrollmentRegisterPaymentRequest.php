@@ -23,6 +23,8 @@ class EnrollmentRegisterPaymentRequest extends ApiFormRequest
             'payments.*.subtotal' => 'required|numeric',
             'payments.*.discount' => 'required|numeric',
             'payments.*.total' => 'required|numeric',
+            'advance_ids' => 'nullable|array',
+            'advance_ids.*' => 'integer|exists:academy_enrollment_payment_advances,id',
         ];
 
         return array_merge($rules, $incomeRules);

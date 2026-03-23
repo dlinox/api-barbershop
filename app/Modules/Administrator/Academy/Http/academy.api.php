@@ -14,6 +14,7 @@ use App\Modules\Administrator\Academy\Http\Controllers\EnrollmentPaymentControll
 use App\Modules\Administrator\Academy\Http\Controllers\MaterialController;
 use App\Modules\Administrator\Academy\Http\Controllers\TeacherAttendanceController;
 use App\Modules\Administrator\Academy\Http\Controllers\StudentGuardianController;
+use App\Modules\Administrator\Academy\Http\Controllers\EnrollmentPaymentAdvanceController;
 
 Route::middleware(['auth:api'])->prefix('/branches')->group(function () {
     Route::post('/data-table', [BranchController::class, 'dataTable'])->name('branches.dataTable')->middleware('permission:academy.branch.view');
@@ -70,6 +71,7 @@ Route::middleware(['auth:api'])->prefix('/teachers')->group(function () {
 Route::middleware(['auth:api'])->prefix('/enrollments')->group(function () {
     Route::post('/data-table', [EnrollmentController::class, 'dataTable'])->name('enrollments.dataTable')->middleware('permission:academy.enrollment.view');
     Route::post('/save', [EnrollmentController::class, 'save'])->name('enrollments.save')->middleware('permission:academy.enrollment.create');
+    Route::post('/save-without-payment', [EnrollmentController::class, 'saveWithoutPayment'])->name('enrollments.saveWithoutPayment')->middleware('permission:academy.enrollment.create');
     Route::post('/update', [EnrollmentController::class, 'update'])->name('enrollments.update')->middleware('permission:academy.enrollment.edit');
     Route::get('/get/{id}', [EnrollmentController::class, 'getEnrollment'])->name('enrollments.getEnrollment')->middleware('permission:academy.enrollment.view');
     Route::post('/register-payment', [EnrollmentController::class, 'registerPayment'])->name('enrollments.registerPayment')->middleware('permission:academy.enrollment.register_payment');
@@ -114,4 +116,10 @@ Route::middleware(['auth:api'])->prefix('/student-guardians')->group(function ()
     Route::get('/by-student/{studentId}', [StudentGuardianController::class, 'findByStudentId'])->name('student-guardians.byStudent')->middleware('permission:academy.student.view');
     Route::post('/save', [StudentGuardianController::class, 'save'])->name('student-guardians.save')->middleware('permission:academy.student.create,academy.student.edit');
     Route::delete('/delete/{id}', [StudentGuardianController::class, 'delete'])->name('student-guardians.delete')->middleware('permission:academy.student.edit');
+});
+
+Route::middleware(['auth:api'])->prefix('/enrollment-payment-advances')->group(function () {
+    Route::get('/available-by-student/{studentId}', [EnrollmentPaymentAdvanceController::class, 'getAvailableByStudentId'])->name('enrollment-payment-advances.availableByStudent')->middleware('permission:academy.enrollment.view');
+    Route::post('/save', [EnrollmentPaymentAdvanceController::class, 'save'])->name('enrollment-payment-advances.save')->middleware('permission:academy.enrollment.create');
+    Route::delete('/delete/{id}', [EnrollmentPaymentAdvanceController::class, 'delete'])->name('enrollment-payment-advances.delete')->middleware('permission:academy.enrollment.create');
 });
