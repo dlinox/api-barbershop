@@ -9,6 +9,7 @@ use App\Modules\Administrator\Treasury\Http\Resources\CashSession\CashSessionDat
 use App\Modules\Administrator\Treasury\Services\CashSessionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CashSessionController
 {
@@ -51,6 +52,16 @@ class CashSessionController
             new CashSessionDataTableItemResource($session),
             'Caja cerrada correctamente.',
         );
+    }
+
+    public function closingPdf(int $cashSessionId): Response
+    {
+        $pdfContent = $this->service->generateClosingPdf($cashSessionId);
+
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="cierre-de-caja.pdf"',
+        ]);
     }
 
     public function currentSession(int $cashRegisterId): JsonResponse

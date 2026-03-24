@@ -47,6 +47,7 @@ class SaleRepository
             'core_persons.document_number as person_document_number',
             'auth_users.username as user_username',
             'treasury_incomes.id as income_id',
+            'treasury_cash_sessions.status as cash_session_status',
         )
             ->join('treasury_cash_sessions', 'treasury_cash_sessions.id', 'inventory_sales.cash_session_id')
             ->join('treasury_cash_registers', 'treasury_cash_registers.id', 'treasury_cash_sessions.cash_register_id')
@@ -55,7 +56,7 @@ class SaleRepository
             ->leftJoin('treasury_incomes', function ($join) {
                 $join->on('treasury_incomes.transactionable_id', '=', 'inventory_sales.id')
                     ->where('treasury_incomes.transactionable_type', '=', 'inventory_sales');
-            });
+            })->whereNull('inventory_sales.barbershop_ticket_id');
 
         $this->scopeByInfrastructure($query, 'treasury_cash_registers.infrastructure_id');
 
@@ -70,5 +71,37 @@ class SaleRepository
     {
         return Sale::with(['items.presentation.product'])
             ->findOrFail($id);
+    }
+
+    public function salesOverview(int $cashSessionId): array
+    {
+        $stats = Sale::selectRaw("
+            status,
+            COUNT(*) as count,
+            COALESCE(SUM(total), 0) as amount
+        ")
+            ->where('cash_session_id', $cashSessionId)
+            ->groupBy('status')
+            ->get()
+            ->keyBy('status');
+
+        return [
+            'completed' => [
+                'count'  => (int) ($stats['completed']->count ?? 0),
+                'amount' => (float) ($stats['completed']->amount ?? 0),
+            ],
+            'pending' => [
+                'count'  => (int) ($stats['pending']->count ?? 0),
+                'amount' => (float) ($stats['pending']->amount ?? 0),
+            ],
+            'cancelled' => [
+                'count'  => (int) ($stats['cancelled']->count ?? 0),
+                'amount' => (float) ($stats['cancelled']->amount ?? 0),
+            ],
+            'total' => [
+                'count'  => (int) $stats->sum('count'),
+                'amount' => (float) $stats->sum('amount'),
+            ],
+        ];
     }
 }

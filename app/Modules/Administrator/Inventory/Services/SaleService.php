@@ -39,6 +39,11 @@ class SaleService
         return $this->saleRepository->getById($id);
     }
 
+    public function salesOverview(int $cashSessionId): array
+    {
+        return $this->saleRepository->salesOverview($cashSessionId);
+    }
+
     public function save(array $data, int $infrastructureId): array
     {
         $income = null;
@@ -128,10 +133,14 @@ class SaleService
 
     public function annul(int $id): void
     {
-        $sale = Sale::with('items.presentation')->findOrFail($id);
+        $sale = Sale::with(['items.presentation', 'cashSession'])->findOrFail($id);
 
         if ($sale->status !== 'completed') {
             throw new ApiException('Solo se puede anular una venta completada.');
+        }
+
+        if ($sale->cashSession && $sale->cashSession->status === 'closed') {
+            throw new ApiException('No se puede anular una venta de una sesión de caja cerrada.');
         }
 
         DB::beginTransaction();

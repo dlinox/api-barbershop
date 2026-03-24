@@ -56,4 +56,6 @@ Route::middleware(['auth:api'])->prefix('/barbershop-tickets')->group(function (
     Route::get('/get/{id}', [TicketController::class, 'getById'])->name('barbershop-tickets.getById')->middleware('permission:barbershop.ticket.view');
     Route::post('/save', [TicketController::class, 'save'])->name('barbershop-tickets.save')->middleware('permission:barbershop.ticket.create');
     Route::post('/cancel/{id}', [TicketController::class, 'cancel'])->name('barbershop-tickets.cancel')->middleware('permission:barbershop.ticket.cancel');
+    Route::get('/tickets-overview/{cashSessionId}', [TicketController::class, 'ticketsOverview'])->name('barbershop-tickets.ticketsOverview')->middleware('permission:barbershop.ticket.view');
+    Route::get('/waiting-queue/{cashSessionId}', [TicketController::class, 'waitingQueue'])->name('barbershop-tickets.waitingQueue')->middleware('permission:barbershop.ticket.view');
 });

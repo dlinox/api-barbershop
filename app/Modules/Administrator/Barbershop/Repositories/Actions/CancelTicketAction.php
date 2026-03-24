@@ -20,10 +20,14 @@ class CancelTicketAction
      */
     public function execute(int $ticketId): Ticket
     {
-        $ticket = Ticket::with(['sale.items.presentation'])->findOrFail($ticketId);
+        $ticket = Ticket::with(['sale.items.presentation', 'cashSession'])->findOrFail($ticketId);
 
         if ($ticket->status === 'cancelled') {
             throw new ApiException('El ticket ya fue cancelado.');
+        }
+
+        if ($ticket->cashSession && $ticket->cashSession->status === 'closed') {
+            throw new ApiException('No se puede cancelar un ticket de una sesión de caja cerrada.');
         }
 
         $branch           = $ticket->branch;

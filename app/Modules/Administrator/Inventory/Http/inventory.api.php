@@ -73,4 +73,5 @@ Route::middleware(['auth:api'])->prefix('/inventory-sales')->group(function () {
     Route::delete('/delete/{id}', [SaleController::class, 'delete'])->name('inventory-sales.delete')->middleware('permission:inventory.sale.delete');
     Route::post('/annul/{id}', [SaleController::class, 'annul'])->name('inventory-sales.annul')->middleware('permission:inventory.sale.annul');
     Route::get('/get-by-id/{id}', [SaleController::class, 'getById'])->name('inventory-sales.getById')->middleware('permission:inventory.sale.view');
+    Route::get('/sales-overview/{cashSessionId}', [SaleController::class, 'salesOverview'])->name('inventory-sales.salesOverview')->middleware('permission:inventory.sale.view');
 });

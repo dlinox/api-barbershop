@@ -2,6 +2,7 @@
 
 namespace App\Modules\Administrator\Barbershop\Services;
 
+use App\Common\Exceptions\ApiException;
 use App\Modules\Administrator\Barbershop\Repositories\TicketRepository;
 use App\Modules\Administrator\Barbershop\Repositories\Actions\CreateTicketAction;
 use App\Modules\Administrator\Barbershop\Repositories\Actions\ConfirmTicketAction;
@@ -30,6 +31,16 @@ class TicketService
         return $this->ticketRepository->findById($id);
     }
 
+    public function ticketsOverview(int $cashSessionId): array
+    {
+        return $this->ticketRepository->ticketsOverview($cashSessionId);
+    }
+
+    public function waitingQueue(int $cashSessionId)
+    {
+        return $this->ticketRepository->waitingQueue($cashSessionId);
+    }
+
     /**
      * Crea/actualiza un ticket.
      * Si se envía income, también lo confirma (completa venta, kardex/stock, income).
@@ -50,6 +61,10 @@ class TicketService
 
             // 2. Si se envía income → confirmar
             if (!empty($data['income'])) {
+                if (empty($data['barber_id'])) {
+                    throw new ApiException('Debe asignar un barbero antes de confirmar el ticket.');
+                }
+
                 $ticket->load(['services', 'sale.items']);
                 $infrastructureId = $ticket->branch->getInfrastructureId();
 

@@ -60,10 +60,20 @@ class CashSessionRepository
 
     public function closeSession(CashSession $session, float $actualClosingAmount, int $userId, ?string $notes): CashSession
     {
-        $difference = $actualClosingAmount - (float) $session->expected_closing_amount;
+        $totalIncomes = \App\Models\Treasury\Income::where('cash_session_id', $session->id)
+            ->where('status', 'completed')
+            ->sum('total');
+
+        $totalExpenses = \App\Models\Treasury\Expense::where('cash_session_id', $session->id)
+            ->where('status', 'approved')
+            ->sum('amount');
+
+        $expectedClosingAmount = (float) $session->opening_amount + (float) $totalIncomes - (float) $totalExpenses;
+        $difference = $actualClosingAmount - $expectedClosingAmount;
 
         $session->update([
             'closed_by'              => $userId,
+            'expected_closing_amount' => $expectedClosingAmount,
             'actual_closing_amount'  => $actualClosingAmount,
             'difference'             => $difference,
             'status'                 => 'closed',

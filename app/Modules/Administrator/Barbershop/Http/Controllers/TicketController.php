@@ -11,6 +11,7 @@ use App\Modules\Administrator\Barbershop\Services\TicketService;
 use App\Modules\Administrator\Barbershop\Http\Requests\Ticket\TicketRequest;
 use App\Modules\Administrator\Barbershop\Http\Resources\Ticket\TicketDataTableItemResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Ticket\TicketResource;
+use App\Modules\Administrator\Barbershop\Http\Resources\Ticket\WaitingQueueTicketResource;
 
 class TicketController
 {
@@ -43,5 +44,17 @@ class TicketController
     {
         $this->ticketService->cancel($id);
         return ApiResponse::success(null, 'Ticket cancelado correctamente');
+    }
+
+    public function ticketsOverview(int $cashSessionId)
+    {
+        $overview = $this->ticketService->ticketsOverview($cashSessionId);
+        return ApiResponse::success($overview);
+    }
+
+    public function waitingQueue(int $cashSessionId)
+    {
+        $items = $this->ticketService->waitingQueue($cashSessionId);
+        return ApiResponse::success(WaitingQueueTicketResource::collection($items));
     }
 }

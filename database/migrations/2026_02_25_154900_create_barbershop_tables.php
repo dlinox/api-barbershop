@@ -88,6 +88,7 @@ return new class extends Migration
             $table->unsignedBigInteger('profile_barber_id')->nullable();
             $table->unsignedBigInteger('profile_client_id')->nullable();
             $table->unsignedBigInteger('auth_user_id')->nullable();
+            $table->unsignedInteger('ticket_number')->nullable();
 
             //el monto que se pago
             $table->decimal('amount', 12, 2)->default(0); //el monto que se pago
@@ -110,6 +111,7 @@ return new class extends Migration
             $table->index('profile_barber_id');
             $table->index('profile_client_id');
             $table->index('status');
+            $table->unique(['cash_session_id', 'ticket_number']);
         });
 
         ////ticket de atencion detalle

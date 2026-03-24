@@ -13,18 +13,27 @@ class CreateTicketAction
      */
     public function execute(array $data): Ticket
     {
+        $isNew = empty($data['id']);
+
         // ─── Crear o actualizar cabecera del ticket ───
+        $attributes = [
+            'branch_id'         => $data['branch_id'],
+            'cash_session_id'   => $data['cash_session_id'] ?? null,
+            'reservation_id'    => $data['reservation_id'] ?? null,
+            'profile_barber_id' => $data['barber_id'] ?? null,
+            'profile_client_id' => $data['client_id'] ?? null,
+            'ticket_date'       => now(),
+            'status'            => 'pending',
+        ];
+
+        if ($isNew && !empty($data['cash_session_id'])) {
+            $attributes['ticket_number'] = Ticket::where('cash_session_id', $data['cash_session_id'])
+                ->max('ticket_number') + 1;
+        }
+
         $ticket = Ticket::updateOrCreate(
             ['id' => $data['id'] ?? null],
-            [
-                'branch_id'         => $data['branch_id'],
-                'cash_session_id'   => $data['cash_session_id'] ?? null,
-                'reservation_id'    => $data['reservation_id'] ?? null,
-                'profile_barber_id' => $data['barber_id'] ?? null,
-                'profile_client_id' => $data['client_id'] ?? null,
-                'ticket_date'       => now(),
-                'status'            => 'pending',
-            ]
+            $attributes,
         );
 
         // ─── Sincronizar servicios ───

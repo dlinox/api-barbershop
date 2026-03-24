@@ -60,4 +60,10 @@ class SaleController
         $sale = new SaleDetailResource($sale);
         return ApiResponse::success($sale);
     }
+
+    public function salesOverview(int $cashSessionId)
+    {
+        $overview = $this->saleService->salesOverview($cashSessionId);
+        return ApiResponse::success($overview);
+    }
 }

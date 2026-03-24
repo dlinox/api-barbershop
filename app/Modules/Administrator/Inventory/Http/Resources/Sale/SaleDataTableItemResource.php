@@ -23,6 +23,7 @@ class SaleDataTableItemResource extends JsonResource
             'total' => (float) $this->total,
             'status' => $this->status,
             'incomeId' => $this->income_id,
+            'cashSessionStatus' => $this->cash_session_status,
             'createdAt' => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }

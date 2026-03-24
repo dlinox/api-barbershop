@@ -25,6 +25,7 @@ Route::middleware(['auth:api'])->prefix('/treasury-cash-sessions')->group(functi
     Route::post('/close', [CashSessionController::class, 'closeSession'])->name('treasury-cash-sessions.close')->middleware('permission:treasury.cash_session.close');
     Route::get('/current/{cashRegisterId}', [CashSessionController::class, 'currentSession'])->name('treasury-cash-sessions.current');
     Route::get('/current-id/{cashRegisterId}', [CashSessionController::class, 'currentSessionId'])->name('treasury-cash-sessions.current-id');
+    Route::get('/closing-pdf/{cashSessionId}', [CashSessionController::class, 'closingPdf'])->name('treasury-cash-sessions.closingPdf')->middleware('permission:treasury.cash_session.view');
 });
 
 Route::middleware(['auth:api'])->prefix('/treasury-expenses')->group(function () {

@@ -8,11 +8,11 @@
     <table class="receipt-header">
         <tr>
             <td class="company-block">
-                <div class="company-name">{{ $company->trade_name ?? $company->name }}</div>
+                <div class="company-name">{{ $company->trade_name ?? $company->name ?? 'Mi Empresa' }}</div>
                 <div class="company-detail">
-                    @if($company->ruc)<strong>RUC:</strong> {{ $company->ruc }}<br>@endif
-                    @if($company->address){{ $company->address }}<br>@endif
-                    @if($company->phone)Tel: {{ $company->phone }}@endif
+                    @if($company?->ruc)<strong>RUC:</strong> {{ $company->ruc }}<br>@endif
+                    @if($company?->address){{ $company->address }}<br>@endif
+                    @if($company?->phone)Tel: {{ $company->phone }}@endif
                 </div>
             </td>
             <td style="text-align: right;">

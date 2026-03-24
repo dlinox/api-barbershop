@@ -36,6 +36,7 @@ class Ticket extends Model
         'profile_barber_id',
         'profile_client_id',
         'auth_user_id',
+        'ticket_number',
         'amount',
         'discount',
         'total',
