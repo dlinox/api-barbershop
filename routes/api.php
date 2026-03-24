@@ -72,4 +72,49 @@ Route::get('/test-ficha-matricula', function () {
     return PdfHelper::inline($mpdf, 'ficha-matricula.pdf');
 });
 
+// Test Comprobante de Ingreso (mock data)
+Route::get('/test-receipt', function () {
+    $data = [
+        'company' => (object) [
+            'trade_name' => 'BarberShop Pro',
+            'name'       => 'BarberShop Pro S.A.C.',
+            'ruc'        => '20612345678',
+            'address'    => 'Av. Los Héroes 456, Lima',
+            'phone'      => '(01) 234-5678',
+        ],
+
+        'receipt_full_number' => 'B001-00000042',
+        'transaction_date'    => now()->format('d/m/Y'),
+        'status'              => 'Completado',
+
+        'client_name'     => 'Juan Carlos Pérez López',
+        'client_document' => '72345678',
+
+        'details' => [
+            ['description' => 'Corte de cabello clásico',   'quantity' => 1, 'unit_price' => 35.00, 'discount' => 0,    'subtotal' => 35.00],
+            ['description' => 'Afeitado con navaja',         'quantity' => 1, 'unit_price' => 25.00, 'discount' => 5.00, 'subtotal' => 20.00],
+            ['description' => 'Tinte de barba',              'quantity' => 1, 'unit_price' => 40.00, 'discount' => 0,    'subtotal' => 40.00],
+        ],
+
+        'subtotal' => 100.00,
+        'discount' => 5.00,
+        'tax'      => 0,
+        'total'    => 95.00,
+
+        'payment_methods' => [
+            ['method' => 'Efectivo', 'amount' => 50.00, 'reference' => null],
+            ['method' => 'Yape',     'amount' => 45.00, 'reference' => '987654321'],
+        ],
+
+        'observations'  => 'Cliente frecuente — aplicar descuento preferencial.',
+        'generated_by'  => 'admin',
+        'generated_at'  => now()->format('d/m/Y H:i'),
+    ];
+
+    $html = view('incomes.receipt', $data)->render();
+    $mpdf = PdfHelper::createFromHtml($html);
+
+    return PdfHelper::inline($mpdf, 'test-receipt.pdf');
+});
+
 // Module routes are now registered in AppServiceProvider
