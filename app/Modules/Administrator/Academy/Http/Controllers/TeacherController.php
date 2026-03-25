@@ -6,6 +6,7 @@ use App\Common\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 use App\Modules\Administrator\Academy\Services\TeacherService;
 use App\Modules\Administrator\Academy\Http\Requests\Teacher\TeacherRequest;
+use App\Modules\Administrator\Academy\Http\Requests\Teacher\TeacherUserRequest;
 use App\Modules\Administrator\Academy\Http\Resources\Teacher\TeacherDataTableItemResource;
 use App\Modules\Administrator\Academy\Http\Resources\Teacher\TeacherSelectItemResource;
 use App\Modules\Administrator\Treasury\Http\Resources\Teacher\TeacherPaymentSummaryItemResource;
@@ -35,6 +36,13 @@ class TeacherController
         $data = $request->validated();
         $this->teacherService->save($data);
         return ApiResponse::success(null, 'Docente creado correctamente');
+    }
+
+    public function saveUser(TeacherUserRequest $request)
+    {
+        $data = $request->validated();
+        $this->teacherService->saveUser($data);
+        return ApiResponse::success(null, 'Usuario actualizado correctamente');
     }
 
     public function selectAsyncItems(Request $request)

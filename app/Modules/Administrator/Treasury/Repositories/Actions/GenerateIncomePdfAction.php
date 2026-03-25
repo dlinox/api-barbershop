@@ -40,8 +40,16 @@ class GenerateIncomePdfAction
             $this->incomeDetailQuery->toBladeData($incomeLoaded),
         );
 
+        $headerHtml = View::make('incomes.common.header', $data)->render();
+        $footerHtml = View::make('incomes.common.footer', $data)->render();
         $html = View::make('incomes.receipt', $data)->render();
-        $mpdf = PdfHelper::createFromHtml($html);
+
+        $mpdf = PdfHelper::createFromHtml($html, config: [
+            'margin_top'    => 35,
+            'margin_header' => 8,
+            'margin_bottom' => 18,
+            'margin_footer' => 8,
+        ], headerHtml: $headerHtml, footerHtml: $footerHtml);
 
         $pdfContent = $mpdf->Output('', 'S');
         $receiptNumber = $income->receipt_serie . '-' . str_pad($income->receipt_number, 8, '0', STR_PAD_LEFT);

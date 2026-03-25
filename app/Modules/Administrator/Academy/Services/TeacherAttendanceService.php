@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Modules\Administrator\Academy\Repositories\TeacherAttendanceRepository;
 use App\Models\Academy\TeacherAttendance;
+use App\Models\Academy\Group;
 use App\Common\Exceptions\ApiException;
+use Carbon\Carbon;
 
 class TeacherAttendanceService
 {
@@ -36,7 +38,7 @@ class TeacherAttendanceService
             }
             $attendance->update([
                 'check_in' => date('H:i:s'),
-                'status' => 'present'
+                'status' => $this->resolveCheckInStatus($groupId),
             ]);
         } else {
             TeacherAttendance::create([
@@ -44,9 +46,23 @@ class TeacherAttendanceService
                 'group_id' => $groupId,
                 'date' => $date,
                 'check_in' => date('H:i:s'),
-                'status' => 'present'
+                'status' => $this->resolveCheckInStatus($groupId),
             ]);
         }
+    }
+
+    private function resolveCheckInStatus(int $groupId): string
+    {
+        $group = Group::with('schedule')->find($groupId);
+
+        if (!$group || !$group->schedule || !$group->schedule->start_time) {
+            return 'present';
+        }
+
+        $now = Carbon::now();
+        $tolerance = Carbon::parse($group->schedule->start_time)->addMinutes(15);
+
+        return $now->greaterThan($tolerance) ? 'late' : 'present';
     }
 
     public function registerCheckOut(array $data)

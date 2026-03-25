@@ -30,6 +30,9 @@ class AdminDataTableItemResource extends JsonResource
                 'email' => $this->user_email,
                 'isActive' => (bool) $this->user_is_active,
             ],
+            'role' => [
+                'id' => $this->role_id,
+            ],
         ];
     }
 }

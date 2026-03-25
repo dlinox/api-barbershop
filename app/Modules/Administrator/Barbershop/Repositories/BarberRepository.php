@@ -4,6 +4,7 @@ namespace App\Modules\Administrator\Barbershop\Repositories;
 
 use App\Models\Profile\Barber;
 use App\Models\Barbershop\Ticket;
+use App\Models\Barbershop\BarberAttendance;
 use App\Models\Treasury\EmployeeAdvance;
 use App\Models\Treasury\Income;
 use App\Common\Traits\HasInfrastructureScope;
@@ -185,6 +186,13 @@ class BarberRepository
 
         $advancesTotal = $advances->sum('amount');
 
+        $attendances = BarberAttendance::where('barber_id', $barberId)
+            ->whereBetween('date', [$periodStart, $periodEnd])
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $absencesCount = $attendances->where('status', 'absent')->count();
+
         return [
             'tickets' => [
                 'count' => $ticketsCount,
@@ -210,6 +218,19 @@ class BarberRepository
                     'amount' => (float) $a->amount,
                     'date' => $a->advance_date->format('Y-m-d'),
                     'reason' => $a->reason,
+                ]),
+            ],
+            'absences' => [
+                'count' => $absencesCount,
+            ],
+            'attendances' => [
+                'items' => $attendances->map(fn($a) => [
+                    'id' => $a->id,
+                    'date' => $a->date->format('Y-m-d'),
+                    'status' => $a->status,
+                    'checkIn' => $a->check_in,
+                    'checkOut' => $a->check_out,
+                    'observation' => $a->observation,
                 ]),
             ],
         ];

@@ -6,6 +6,7 @@ use App\Common\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 use App\Modules\Administrator\Barbershop\Services\BarberService;
 use App\Modules\Administrator\Barbershop\Http\Requests\Barber\BarberRequest;
+use App\Modules\Administrator\Barbershop\Http\Requests\Barber\BarberUserRequest;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberDataTableItemResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberSelectItemResource;
 use App\Modules\Administrator\Treasury\Http\Resources\Barber\BarberPaymentSummaryItemResource;
@@ -35,6 +36,13 @@ class BarberController
         $data = $request->validated();
         $this->barberService->save($data);
         return ApiResponse::success(null, 'Barbero guardado correctamente');
+    }
+
+    public function saveUser(BarberUserRequest $request)
+    {
+        $data = $request->validated();
+        $this->barberService->saveUser($data);
+        return ApiResponse::success(null, 'Usuario actualizado correctamente');
     }
 
     public function selectAsyncItems(Request $request)

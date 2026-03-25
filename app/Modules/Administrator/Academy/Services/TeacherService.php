@@ -5,6 +5,7 @@ namespace App\Modules\Administrator\Academy\Services;
 use App\Modules\Administrator\Academy\Repositories\TeacherRepository;
 use App\Modules\Administrator\Academy\Repositories\Actions\CreateOrUpdateTeacherAction;
 use App\Modules\Administrator\Academy\Repositories\Queries\TeacherPaymentCalculationQuery;
+use App\Modules\Auth\Repositories\Actions\CreateOrUpdateUserAction;
 
 class TeacherService
 {
@@ -32,6 +33,21 @@ class TeacherService
     public function save($data)
     {
         return $this->createOrUpdateTeacherAction->execute($data);
+    }
+
+    public function saveUser(array $data): void
+    {
+        $teacher = $this->teacherRepository->findByPersonId($data['id']);
+        if (!$teacher) throw new \App\Common\Exceptions\ApiException('Docente no encontrado');
+
+        $createOrUpdateUserAction = app(CreateOrUpdateUserAction::class);
+        $createOrUpdateUserAction->execute($data['user']);
+
+        $profileRepository = app(\App\Modules\Shared\Repositories\ProfileRepository::class);
+        $teacherProfile = $profileRepository->findUserIdAndType($data['user']['id'], 'teachers');
+        if ($teacherProfile) {
+            $teacherProfile->update(['is_active' => $data['user']['is_active']]);
+        }
     }
 
     public function selectAsyncItems($request)

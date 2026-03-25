@@ -26,4 +26,19 @@ class StudentService
     {
         return $this->studentRepository->selectAsyncItems($request->search);
     }
+
+    public function saveUser(array $data): void
+    {
+        $student = $this->studentRepository->findByPersonId($data['id']);
+        if (!$student) throw new \App\Common\Exceptions\ApiException('Estudiante no encontrado');
+
+        $createOrUpdateUserAction = app(\App\Modules\Auth\Repositories\Actions\CreateOrUpdateUserAction::class);
+        $createOrUpdateUserAction->execute($data['user']);
+
+        $profileRepository = app(\App\Modules\Shared\Repositories\ProfileRepository::class);
+        $studentProfile = $profileRepository->findUserIdAndType($data['user']['id'], 'students');
+        if ($studentProfile) {
+            $studentProfile->update(['is_active' => $data['user']['is_active']]);
+        }
+    }
 }

@@ -1,38 +1,6 @@
-<html>
-<head>
-    @include('incomes.common.head')
-</head>
-<body>
+@include('incomes.common.head')
 
-    {{-- ═══ ENCABEZADO: EMPRESA + CAJA COMPROBANTE ═══ --}}
-    <table class="receipt-header">
-        <tr>
-            <td class="company-block">
-                <div class="company-name">{{ $company->trade_name ?? $company->name ?? 'Mi Empresa' }}</div>
-                <div class="company-detail">
-                    @if($company?->ruc)<strong>RUC:</strong> {{ $company->ruc }}<br>@endif
-                    @if($company?->address){{ $company->address }}<br>@endif
-                    @if($company?->phone)Tel: {{ $company->phone }}@endif
-                </div>
-            </td>
-            <td style="text-align: right;">
-                <table style="margin-left: auto;">
-                    <tr>
-                        <td>
-                            <div class="receipt-box">
-                                <div class="doc-title">Comprobante de Ingreso</div>
-                                <div class="doc-number">{{ $receipt_full_number }}</div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-
-    <hr class="divider-bold">
-
-    {{-- ═══ DATOS DEL COMPROBANTE Y CLIENTE ═══ --}}
+{{-- ═══ DATOS DEL COMPROBANTE Y CLIENTE ═══ --}}
     <table class="info-row">
         <tr>
             <td class="info-label">Fecha de emisión</td>
@@ -147,8 +115,3 @@
         <strong>Observaciones:</strong> {{ $observations }}
     </div>
     @endif
-
-    @include('incomes.common.footer')
-
-</body>
-</html>

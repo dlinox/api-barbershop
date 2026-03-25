@@ -8,6 +8,7 @@ use App\Modules\Administrator\Barbershop\Http\Controllers\CategoryController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\ServiceController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\ReservationController;
 use App\Modules\Administrator\Barbershop\Http\Controllers\TicketController;
+use App\Modules\Administrator\Barbershop\Http\Controllers\BarberAttendanceController;
 
 Route::middleware(['auth:api'])->prefix('/clients')->group(function () {
     Route::post('/data-table', [ClientController::class, 'dataTable'])->name('clients.dataTable')->middleware('permission:barbershop.client.view');
@@ -20,6 +21,7 @@ Route::middleware(['auth:api'])->prefix('/barbers')->group(function () {
     Route::post('/payment-summary', [BarberController::class, 'paymentSummaryDataTable'])->name('barbers.paymentSummary')->middleware('permission:treasury.employee_payment.view');
     Route::post('/payment-calculation/{barberId}', [BarberController::class, 'paymentCalculation'])->name('barbers.paymentCalculation')->middleware('permission:treasury.employee_payment.view');
     Route::post('/save', [BarberController::class, 'save'])->name('barbers.save')->middleware('permission:barbershop.barber.create,barbershop.barber.edit');
+    Route::post('/save-user', [BarberController::class, 'saveUser'])->name('barbers.saveUser')->middleware('permission:barbershop.barber.edit');
     Route::get('/select-async-items', [BarberController::class, 'selectAsyncItems'])->name('barbers.selectAsyncItems');
 });
 
@@ -58,4 +60,13 @@ Route::middleware(['auth:api'])->prefix('/barbershop-tickets')->group(function (
     Route::post('/cancel/{id}', [TicketController::class, 'cancel'])->name('barbershop-tickets.cancel')->middleware('permission:barbershop.ticket.cancel');
     Route::get('/tickets-overview/{cashSessionId}', [TicketController::class, 'ticketsOverview'])->name('barbershop-tickets.ticketsOverview')->middleware('permission:barbershop.ticket.view');
     Route::get('/waiting-queue/{cashSessionId}', [TicketController::class, 'waitingQueue'])->name('barbershop-tickets.waitingQueue')->middleware('permission:barbershop.ticket.view');
+});
+
+Route::middleware(['auth:api'])->prefix('/barber-attendances')->group(function () {
+    Route::post('/data-table/{date?}',    [BarberAttendanceController::class, 'dataTable'])       ->name('barber-attendances.dataTable')       ->middleware('permission:barbershop.barber_attendance.view');
+    Route::post('/register-check-in',     [BarberAttendanceController::class, 'registerCheckIn']) ->name('barber-attendances.registerCheckIn') ->middleware('permission:barbershop.barber_attendance.register');
+    Route::post('/register-check-out',    [BarberAttendanceController::class, 'registerCheckOut'])->name('barber-attendances.registerCheckOut')->middleware('permission:barbershop.barber_attendance.register');
+    Route::post('/register-absent',       [BarberAttendanceController::class, 'registerAbsent'])  ->name('barber-attendances.registerAbsent')  ->middleware('permission:barbershop.barber_attendance.register');
+    Route::post('/update',                [BarberAttendanceController::class, 'update'])           ->name('barber-attendances.update')           ->middleware('permission:barbershop.barber_attendance.edit');
+    Route::post('/generate-qr-code',      [BarberAttendanceController::class, 'generateQrCode'])  ->name('barber-attendances.generateQrCode')  ->middleware('permission:barbershop.barber_attendance.register');
 });

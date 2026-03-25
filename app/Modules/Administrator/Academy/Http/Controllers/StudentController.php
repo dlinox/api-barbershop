@@ -6,6 +6,7 @@ use App\Common\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 use App\Modules\Administrator\Academy\Services\StudentService;
 use App\Modules\Administrator\Academy\Http\Requests\Student\StudentRequest;
+use App\Modules\Administrator\Academy\Http\Requests\Student\StudentUserRequest;
 use App\Modules\Administrator\Academy\Http\Resources\Student\StudentDataTableItemResource;
 use App\Modules\Administrator\Academy\Http\Resources\Student\StudentSelectItemResource;
 
@@ -27,6 +28,13 @@ class StudentController
         $data = $request->validated();
         $this->studentService->save($data);
         return ApiResponse::success($data, 'Estudiante creado correctamente');
+    }
+
+    public function saveUser(StudentUserRequest $request)
+    {
+        $data = $request->validated();
+        $this->studentService->saveUser($data);
+        return ApiResponse::success(null, 'Usuario actualizado correctamente');
     }
 
     public function selectAsyncItems(Request $request)

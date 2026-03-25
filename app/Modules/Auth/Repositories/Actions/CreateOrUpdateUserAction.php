@@ -14,6 +14,9 @@ class CreateOrUpdateUserAction
         if ($id) {
             $user = User::where('id', $id)->first();
             self::validate($data, $user->id);
+            if (empty($data['password'])) {
+                unset($data['password']);
+            }
             $user->update($data);
             return $user;
         }

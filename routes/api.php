@@ -110,11 +110,49 @@ Route::get('/test-receipt', function () {
         'generated_by'  => 'admin',
         'generated_at'  => now()->format('d/m/Y H:i'),
     ];
+    
+
+    $headerHtml = view('incomes.common.header', $data)->render();
+    $footerHtml = view('incomes.common.footer', $data)->render();
 
     $html = view('incomes.receipt', $data)->render();
-    $mpdf = PdfHelper::createFromHtml($html);
+    $mpdf = PdfHelper::createFromHtml($html, config: [
+        'margin_top'    => 35,
+        'margin_header' => 8,
+        'margin_bottom' => 18,
+        'margin_footer' => 8,
+    ], headerHtml: $headerHtml, footerHtml: $footerHtml);
 
     return PdfHelper::inline($mpdf, 'test-receipt.pdf');
 });
 
-// Module routes are now registered in AppServiceProvider
+// Test Reporte Ingresos por Día (mock data)
+Route::get('/test-income-per-day', function () {
+    $data = [
+        'company' => (object) [
+            'trade_name' => 'BarberShop Pro',
+            'name'       => 'BarberShop Pro S.A.C.',
+            'ruc'        => '20612345678',
+            'address'    => 'Av. Los Héroes 456, Lima',
+            'phone'      => '(01) 234-5678',
+            'logo'       => null,
+        ],
+        'report_date'  => now()->format('d/m/Y'),
+        'report_day'   => now()->locale('es')->isoFormat('dddd'),
+        'generated_by' => 'admin',
+        'generated_at' => now()->format('d/m/Y H:i'),
+    ];
+
+    $headerHtml = view('reports.common.header', $data)->render();
+    $footerHtml = view('reports.common.footer', $data)->render();
+
+    $html = view('reports.academy.income-per-day', $data)->render();
+    $mpdf = PdfHelper::createFromHtml($html, config: [
+        'margin_top'    => 25,
+        'margin_header' => 8,
+        'margin_bottom' => 18,
+        'margin_footer' => 8,
+    ], headerHtml: $headerHtml, footerHtml: $footerHtml);
+
+    return PdfHelper::inline($mpdf, 'income-per-day.pdf');
+});
