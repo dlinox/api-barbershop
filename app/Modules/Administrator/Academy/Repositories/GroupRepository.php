@@ -120,6 +120,16 @@ class GroupRepository
         return $group->delete();
     }
 
+    public function getActiveGroups()
+    {
+        $query = $this->getGroupsQuery()
+            ->where('academy_groups.start_date', '<=', now())
+            ->where('academy_groups.end_date', '>', now())
+            ->where('academy_groups.is_active', true);
+
+        return $query->get();
+    }
+
     //obyener grupos activos y proximos
     public function getActiveAndUpcoming()
     {
