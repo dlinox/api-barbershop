@@ -2,12 +2,12 @@
 
 namespace App\Modules\TeacherPanel\Group\Repositories;
 
+use App\Common\Exceptions\ApiException;
 use App\Models\Academy\Attendance;
 use App\Models\Academy\AttendanceDeadline;
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\Group;
 use App\Models\Academy\GroupTeacher;
-use App\Common\Http\Responses\ApiException;
 use Illuminate\Support\Facades\DB;
 
 class GroupRepository
@@ -33,7 +33,6 @@ class GroupRepository
             'academy_schedules.shift as group_schedule_shift',
             'academy_schedules.start_time as group_schedule_start_time',
             'academy_schedules.end_time as group_schedule_end_time',
-
             // room & branch
             'academy_rooms.number as group_room_name',
             'academy_branches.name as group_branch_name',

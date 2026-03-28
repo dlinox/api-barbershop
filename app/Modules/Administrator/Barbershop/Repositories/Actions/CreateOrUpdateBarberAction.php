@@ -63,9 +63,9 @@ class CreateOrUpdateBarberAction
 
                 if (!$barber) throw new ApiException('Error al crear el perfil de barbero');
 
-                $profileExists = $this->profileRepository->findUserIdAndType($user->id, 'profile_barbers');
+                $profileExists = $this->profileRepository->findUserIdAndType($user->id, 'barbers');
                 if ($profileExists) throw new ApiException('El usuario ya tiene un perfil de barbero');
-                $behaviorProfile = $this->profileRepository->create($user->id, 'profile_barbers', $barber->id, $role->id);
+                $behaviorProfile = $this->profileRepository->create($user->id, 'barbers', $barber->id, $role->id);
                 $behaviorProfile->update(['is_active' => $isActive]);
             } else {
                 // Actualizar barbero
@@ -87,7 +87,7 @@ class CreateOrUpdateBarberAction
 
                 $barberProfile = $this->profileRepository->findUserIdAndType(
                     $data['user']['id'],
-                    'profile_barbers'
+                    'barbers'
                 );
                 if ($barberProfile) {
                     $barberProfile->update(['is_active' => $isActive]);
