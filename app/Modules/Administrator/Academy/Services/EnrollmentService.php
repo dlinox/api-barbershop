@@ -4,14 +4,16 @@ namespace App\Modules\Administrator\Academy\Services;
 
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\Group;
-use App\Common\Helpers\FileHelper;
+use App\Models\Core\Company;
+use App\Common\Helpers\PdfHelper;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 use App\Modules\Administrator\Academy\Repositories\EnrollmentRepository;
 use App\Modules\Administrator\Academy\Repositories\EnrollmentPaymentRepository;
 use App\Modules\Administrator\Treasury\Repositories\Actions\CreateIncomeAction;
 use App\Modules\Administrator\Academy\Repositories\Actions\UpdateEnrollmentAction;
 use App\Modules\Administrator\Academy\Repositories\Actions\SyncEnrollmentMaterialsAction;
-use App\Modules\Administrator\Academy\Repositories\Actions\GenerateEnrollmentPdfAction;
 use App\Modules\Administrator\Academy\Repositories\Queries\EnrollmentDetailQuery;
 use App\Modules\Administrator\Treasury\Repositories\Actions\GenerateIncomePdfAction;
 use App\Modules\Administrator\Academy\Repositories\EnrollmentPaymentAdvanceRepository;
@@ -25,7 +27,6 @@ class EnrollmentService
         private UpdateEnrollmentAction $updateEnrollmentAction,
         private SyncEnrollmentMaterialsAction $syncEnrollmentMaterialsAction,
         private EnrollmentDetailQuery $enrollmentDetailQuery,
-        private GenerateEnrollmentPdfAction $generateEnrollmentPdfAction,
         private GenerateIncomePdfAction $generateIncomePdfAction,
         private EnrollmentPaymentAdvanceRepository $advanceRepository,
     ) {}
@@ -59,10 +60,6 @@ class EnrollmentService
             );
 
             DB::commit();
-
-            $this->generateEnrollmentPdfAction->execute($enrollment->id);
-
-            return;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -132,9 +129,7 @@ class EnrollmentService
 
             DB::commit();
 
-            // ─── Generar PDFs (fuera de la transacción) ───
-            $this->generateEnrollmentPdfAction->execute($enrollment->id);
-
+            // ─── Generar PDF del comprobante (fuera de la transacción) ───
             if ($income) {
                 $this->generateIncomePdfAction->execute($income->id);
             }
@@ -208,28 +203,35 @@ class EnrollmentService
         $this->updateEnrollmentAction->execute($data);
     }
 
-    private const PDF_TYPE = 'registration_certificate';
-
     public function generatePdf($id)
     {
-        $enrollment = Enrollment::findOrFail($id);
+        $enrollmentLoaded = ($this->enrollmentDetailQuery)($id);
 
-        // ─── Buscar archivo existente ───
-        $existingFile = $enrollment->files()
-            ->where('type', self::PDF_TYPE)
-            ->first();
+        $data = array_merge(
+            [
+                'company' => Company::first(),
+                'generated_by' => Auth::user()?->username ?? 'Sistema',
+                'generated_at' => now()->format('d/m/Y H:i'),
+            ],
+            $this->enrollmentDetailQuery->toBladeData($enrollmentLoaded),
+        );
 
-        // ─── Si no existe, generar con el action ───
-        if (!$existingFile || !FileHelper::fileExists($existingFile->disk, $existingFile->path)) {
-            $this->generateEnrollmentPdfAction->execute($id);
-            $existingFile = $enrollment->files()->where('type', self::PDF_TYPE)->first();
-        }
+        $html = View::make('enrollments.registration-certificate', $data)->render();
+        $headerHtml = View::make('enrollments.common.header', $data)->render();
+        $footerHtml = View::make('enrollments.common.footer', $data)->render();
 
-        $content = file_get_contents(FileHelper::getFilePath($existingFile->disk, $existingFile->path));
+        $mpdf = PdfHelper::createFromHtml($html, config: [
+            'margin_top'    => 35,
+            'margin_header' => 8,
+            'margin_bottom' => 18,
+            'margin_footer' => 8,
+        ], headerHtml: $headerHtml, footerHtml: $footerHtml);
 
-        return response($content, 200, [
+        $pdfContent = $mpdf->Output('', 'S');
+
+        return response($pdfContent, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => "inline; filename=\"{$existingFile->name}\"",
+            'Content-Disposition' => "inline; filename=\"ficha-matricula-{$id}.pdf\"",
         ]);
     }
 

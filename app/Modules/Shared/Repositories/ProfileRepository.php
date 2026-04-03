@@ -21,6 +21,14 @@ class ProfileRepository
         return Profile::where('profileable_id', $profileableId)->first();
     }
 
+    public function findByProfileableIdAndType(int $profileableId, string $type): ?Profile
+    {
+        $typeTable = 'profile_' . $type;
+        return Profile::where('profileable_id', $profileableId)
+            ->where('profileable_type', $typeTable)
+            ->first();
+    }
+
     public function findUserIdAndType(int $userId, string $type): ?Profile
     {
         $typeTable = 'profile_' . $type;

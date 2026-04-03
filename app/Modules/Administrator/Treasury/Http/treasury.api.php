@@ -13,7 +13,7 @@ use App\Modules\Administrator\Treasury\Http\Controllers\WorkerController;
 use App\Modules\Administrator\Treasury\Http\Controllers\WorkerAttendanceController;
 
 Route::middleware(['auth:api'])->prefix('/treasury-cash-registers')->group(function () {
-    Route::post('/data-table/{infrastructureId}', [CashRegisterController::class, 'dataTable'])->name('treasury-cash-registers.dataTable')->middleware('permission:treasury.cash_register.view');
+    Route::post('/data-table', [CashRegisterController::class, 'dataTable'])->name('treasury-cash-registers.dataTable')->middleware('permission:treasury.cash_register.view');
     Route::post('/save', [CashRegisterController::class, 'save'])->name('treasury-cash-registers.save')->middleware('permission:treasury.cash_register.create,treasury.cash_register.edit');
     Route::get('/select-items/{infrastructureId}', [CashRegisterController::class, 'selectItems'])->name('treasury-cash-registers.selectItems');
     Route::delete('/delete/{id}', [CashRegisterController::class, 'delete'])->name('treasury-cash-registers.delete')->middleware('permission:treasury.cash_register.delete');

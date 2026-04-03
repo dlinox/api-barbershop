@@ -6,6 +6,7 @@ use App\Modules\Administrator\Academy\Repositories\TeacherRepository;
 use App\Modules\Administrator\Academy\Repositories\Actions\CreateOrUpdateTeacherAction;
 use App\Modules\Administrator\Academy\Repositories\Queries\TeacherPaymentCalculationQuery;
 use App\Modules\Auth\Repositories\Actions\CreateOrUpdateUserAction;
+use App\Modules\Shared\Repositories\ProfileRepository;
 
 class TeacherService
 {
@@ -13,11 +14,18 @@ class TeacherService
         private TeacherRepository $teacherRepository,
         private CreateOrUpdateTeacherAction $createOrUpdateTeacherAction,
         private TeacherPaymentCalculationQuery $teacherPaymentCalculationQuery,
+        private CreateOrUpdateUserAction $createOrUpdateUserAction,
+        private ProfileRepository $profileRepository,
     ) {}
 
     public function dataTable($request)
     {
         return $this->teacherRepository->dataTable($request);
+    }
+
+    public function userDataTable($request)
+    {
+        return $this->teacherRepository->userDataTable($request);
     }
 
     public function paymentSummaryDataTable($request)
@@ -37,16 +45,11 @@ class TeacherService
 
     public function saveUser(array $data): void
     {
-        $teacher = $this->teacherRepository->findByPersonId($data['id']);
-        if (!$teacher) throw new \App\Common\Exceptions\ApiException('Docente no encontrado');
+        $this->createOrUpdateUserAction->execute($data['user']);
 
-        $createOrUpdateUserAction = app(CreateOrUpdateUserAction::class);
-        $createOrUpdateUserAction->execute($data['user']);
-
-        $profileRepository = app(\App\Modules\Shared\Repositories\ProfileRepository::class);
-        $teacherProfile = $profileRepository->findUserIdAndType($data['user']['id'], 'teachers');
-        if ($teacherProfile) {
-            $teacherProfile->update(['is_active' => $data['user']['is_active']]);
+        $profile = $this->profileRepository->findByProfileableIdAndType($data['id'], 'teachers');
+        if ($profile) {
+            $profile->update(['is_active' => $data['user']['is_active']]);
         }
     }
 

@@ -15,9 +15,9 @@ class CashRegisterController
         private CashRegisterService $cashRegisterService
     ) {}
 
-    public function dataTable(Request $request, $infrastructureId)
+    public function dataTable(Request $request)
     {
-        $items = $this->cashRegisterService->dataTable($request, $infrastructureId);
+        $items = $this->cashRegisterService->dataTable($request);
         $items['data'] = CashRegisterDataTableItemResource::collection($items['data']);
         return ApiResponse::success($items);
     }

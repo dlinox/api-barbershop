@@ -21,6 +21,7 @@ Route::middleware(['auth:api'])->prefix('/barbers')->group(function () {
     Route::post('/payment-summary', [BarberController::class, 'paymentSummaryDataTable'])->name('barbers.paymentSummary')->middleware('permission:treasury.employee_payment.view');
     Route::post('/payment-calculation/{barberId}', [BarberController::class, 'paymentCalculation'])->name('barbers.paymentCalculation')->middleware('permission:treasury.employee_payment.view');
     Route::post('/save', [BarberController::class, 'save'])->name('barbers.save')->middleware('permission:barbershop.barber.create,barbershop.barber.edit');
+    Route::post('/user-data-table', [BarberController::class, 'userDataTable'])->name('barbers.userDataTable')->middleware('permission:barbershop.barber.view');
     Route::post('/save-user', [BarberController::class, 'saveUser'])->name('barbers.saveUser')->middleware('permission:barbershop.barber.edit');
     Route::get('/select-async-items', [BarberController::class, 'selectAsyncItems'])->name('barbers.selectAsyncItems');
 });

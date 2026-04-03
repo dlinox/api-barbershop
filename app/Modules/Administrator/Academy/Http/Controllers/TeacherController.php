@@ -8,6 +8,7 @@ use App\Modules\Administrator\Academy\Services\TeacherService;
 use App\Modules\Administrator\Academy\Http\Requests\Teacher\TeacherRequest;
 use App\Modules\Administrator\Academy\Http\Requests\Teacher\TeacherUserRequest;
 use App\Modules\Administrator\Academy\Http\Resources\Teacher\TeacherDataTableItemResource;
+use App\Modules\Administrator\Academy\Http\Resources\Teacher\TeacherUserDataTableItemResource;
 use App\Modules\Administrator\Academy\Http\Resources\Teacher\TeacherSelectItemResource;
 use App\Modules\Administrator\Treasury\Http\Resources\Teacher\TeacherPaymentSummaryItemResource;
 
@@ -21,6 +22,13 @@ class TeacherController
     {
         $item = $this->teacherService->dataTable($request);
         $item['data'] = TeacherDataTableItemResource::collection($item['data']);
+        return ApiResponse::success($item);
+    }
+
+    public function userDataTable(Request $request)
+    {
+        $item = $this->teacherService->userDataTable($request);
+        $item['data'] = TeacherUserDataTableItemResource::collection($item['data']);
         return ApiResponse::success($item);
     }
 

@@ -21,6 +21,12 @@ class EnrollmentDetailResource extends JsonResource
             ->map(fn($d) => DayOfWeek::tryFrom(trim($d))?->label() ?? trim($d))
             ->implode(', ');
 
+        $paidPlanIds = $this->payments
+            ->where('status', 'active')
+            ->flatMap(fn($payment) => $payment->details)
+            ->pluck('group_payment_plan_id')
+            ->unique();
+
         return [
             'enrollmentId' => (int) $this->id,
             'enrollmentDate' => Carbon::parse($this->date)->format('d/m/Y'),
@@ -50,12 +56,15 @@ class EnrollmentDetailResource extends JsonResource
             'startDate' => Carbon::parse($group->start_date)->format('d/m/Y'),
             'endDate' => Carbon::parse($group->end_date)->format('d/m/Y'),
 
-            'paymentPlans' => $group->paymentPlans->map(fn($p) => [
-                'type' => PaymentPlanType::tryFrom($p->type)?->label() ?? $p->type,
-                'startDate' => Carbon::parse($p->start_date)->format('d/m/Y'),
-                'endDate' => Carbon::parse($p->end_date)->format('d/m/Y'),
-                'amount' => (float) $p->amount,
-            ])->toArray(),
+            'paymentPlans' => $group->paymentPlans->map(function ($p) use ($paidPlanIds) {
+                return [
+                    'type' => PaymentPlanType::tryFrom($p->type)?->label() ?? $p->type,
+                    'startDate' => Carbon::parse($p->start_date)->format('d/m/Y'),
+                    'endDate' => Carbon::parse($p->end_date)->format('d/m/Y'),
+                    'amount' => (float) $p->amount,
+                    'isPaid' => $paidPlanIds->contains($p->id),
+                ];
+            })->toArray(),
 
             'materials' => $this->materials->map(fn($m) => [
                 'name' => $m->presentation?->name ?? "Material #{$m->id}",

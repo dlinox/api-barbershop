@@ -25,9 +25,6 @@ class BarberRequest extends ApiFormRequest
             'person.date_birth' => ['nullable', 'date'],
             'person.gender' => ['nullable', 'string', 'max:1'],
             'person.address' => ['nullable', 'string', 'max:255'],
-            'user.username' => ['required', 'max:50'],
-            'user.email' => ['nullable', 'email', 'max:100'],
-            'user.is_active' => ['required', 'boolean'],
         ];
     }
 
@@ -40,12 +37,6 @@ class BarberRequest extends ApiFormRequest
             'person.paternal_surname.required_without' => 'Debe ingresar al menos un apellido (paterno o materno)',
             'person.maternal_surname.required_without' => 'Debe ingresar al menos un apellido (paterno o materno)',
             'person.phone.max' => 'Teléfono debe tener máximo 15 caracteres',
-
-            'user.username.required' => 'Usuario es requerido',
-            'user.username.max' => 'Usuario debe tener máximo 50 caracteres',
-            'user.email.email' => 'Email es inválido',
-            'user.email.max' => 'Email debe tener máximo 100 caracteres',
-            'user.is_active.required' => 'Estado es requerido',
         ];
     }
 
@@ -58,10 +49,6 @@ class BarberRequest extends ApiFormRequest
             'person.paternal_surname' => 'Apellido paterno',
             'person.maternal_surname' => 'Apellido materno',
             'person.phone' => 'Teléfono',
-
-            'user.username' => 'Usuario',
-            'user.email' => 'Email',
-            'user.is_active' => 'Estado',
         ];
     }
 }

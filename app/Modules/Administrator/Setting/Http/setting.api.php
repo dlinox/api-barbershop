@@ -5,6 +5,7 @@ use App\Modules\Administrator\Setting\Http\Controllers\PaymentMethodsController;
 use App\Modules\Administrator\Setting\Http\Controllers\DocumentTypeController;
 use App\Modules\Administrator\Setting\Http\Controllers\CompanyController;
 use App\Modules\Administrator\Setting\Http\Controllers\CompanyLogoController;
+use App\Modules\Administrator\Setting\Http\Controllers\EmployeeScheduleController;
 
 Route::middleware(['auth:api'])->prefix('/company')->group(function () {
     Route::get('/get', [CompanyController::class, 'get'])->name('company.get')->middleware('permission:setting.company.view');
@@ -28,4 +29,9 @@ Route::middleware(['auth:api'])->prefix('/document-types')->group(function () {
     Route::post('/save', [DocumentTypeController::class, 'save'])->name('document-types.save')->middleware('permission:setting.document_type.create,setting.document_type.edit');
     Route::get('/select-items', [DocumentTypeController::class, 'selectItems'])->name('document-types.selectItems');
     Route::delete('/delete/{code}', [DocumentTypeController::class, 'delete'])->name('document-types.delete')->middleware('permission:setting.document_type.delete');
+});
+
+Route::middleware(['auth:api'])->prefix('/employee-schedules')->group(function () {
+    Route::get('/get', [EmployeeScheduleController::class, 'get'])->name('employee-schedules.get')->middleware('permission:setting.employee_schedule.view');
+    Route::post('/save', [EmployeeScheduleController::class, 'save'])->name('employee-schedules.save')->middleware('permission:setting.employee_schedule.edit');
 });

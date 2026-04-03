@@ -8,6 +8,7 @@ use App\Modules\Administrator\Barbershop\Services\BarberService;
 use App\Modules\Administrator\Barbershop\Http\Requests\Barber\BarberRequest;
 use App\Modules\Administrator\Barbershop\Http\Requests\Barber\BarberUserRequest;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberDataTableItemResource;
+use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberUserDataTableItemResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberSelectItemResource;
 use App\Modules\Administrator\Treasury\Http\Resources\Barber\BarberPaymentSummaryItemResource;
 
@@ -36,6 +37,13 @@ class BarberController
         $data = $request->validated();
         $this->barberService->save($data);
         return ApiResponse::success(null, 'Barbero guardado correctamente');
+    }
+
+    public function userDataTable(Request $request)
+    {
+        $item = $this->barberService->userDataTable($request);
+        $item['data'] = BarberUserDataTableItemResource::collection($item['data']);
+        return ApiResponse::success($item);
     }
 
     public function saveUser(BarberUserRequest $request)

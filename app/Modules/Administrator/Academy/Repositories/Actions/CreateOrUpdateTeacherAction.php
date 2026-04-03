@@ -34,15 +34,14 @@ class CreateOrUpdateTeacherAction
 
             $person = $this->createOrUpdatePersonAction->execute($data['person'], $data['id']);
 
-            $existingProfile = $this->profileRepository->findByProfileableId($person->id);
-
-            $isActive = $data['is_active'] ?? $data['user']['is_active'] ?? false;
-            $data['user']['is_active'] = $isActive;
+            $isActive = $data['is_active'] ?? true;
 
             if (!$data['id']) {
                 // Crear docente
                 $teacher = $this->teacherRepository->findByPersonId($person->id);
                 if ($teacher) throw new ApiException('La persona ya tiene un perfil de docente');
+
+                $existingProfile = $this->profileRepository->findByProfileableId($person->id);
 
                 if ($existingProfile) {
                     // La persona ya tiene un usuario (otro perfil), reutilizar
@@ -50,8 +49,12 @@ class CreateOrUpdateTeacherAction
                     if (!$user) throw new ApiException('Error al encontrar el usuario asociado');
                 } else {
                     // Crear nuevo usuario
-                    $data['user']['password'] = $person->document_number;
-                    $user = $this->createOrUpdateUserAction->execute($data['user']);
+                    $user = $this->createOrUpdateUserAction->execute([
+                        'username' => $person->document_number,
+                        'email' => $person->email,
+                        'password' => $person->document_number,
+                        'is_active' => $isActive,
+                    ]);
                 }
 
                 $teacher = $this->teacherRepository->create(
@@ -68,16 +71,10 @@ class CreateOrUpdateTeacherAction
                 $behaviorProfile = $this->profileRepository->create($user->id, 'teachers', $teacher->core_person_id, $role->id);
                 $behaviorProfile->update(['is_active' => $isActive]);
             } else {
-                // Actualizar docente
+                // Actualizar docente (solo datos de persona y docente, no usuario)
                 $teacher = $this->teacherRepository->findByPersonId($data['id']);
                 if (!$teacher) throw new ApiException('Error al encontrar el perfil de docente');
                 if ($data['id'] != $person->id) throw new ApiException('El perfil de docente no coincide con la persona');
-
-                if ($existingProfile && isset($data['user']['id'])) {
-                    if ($existingProfile->auth_user_id !== $data['user']['id']) throw new ApiException('El usuario no coincide con la persona');
-                }
-
-                $this->createOrUpdateUserAction->execute($data['user']);
 
                 $this->teacherRepository->update(
                     $teacher,
@@ -87,12 +84,9 @@ class CreateOrUpdateTeacherAction
                     $isActive
                 );
 
-                $teacherProfile = $this->profileRepository->findUserIdAndType(
-                    $data['user']['id'],
-                    'teachers'
-                );
-                if ($teacherProfile) {
-                    $teacherProfile->update(['is_active' => $isActive]);
+                $existingProfile = $this->profileRepository->findByProfileableIdAndType($person->id, 'teachers');
+                if ($existingProfile) {
+                    $existingProfile->update(['is_active' => $isActive]);
                 }
             }
 

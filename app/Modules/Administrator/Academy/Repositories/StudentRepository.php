@@ -25,6 +25,27 @@ class StudentRepository
             'core_persons.date_birth as person_date_birth',
             'core_persons.gender as person_gender',
             'core_persons.address as person_address',
+        )
+            ->join('core_persons', 'profile_students.core_person_id', '=', 'core_persons.id')
+            ->withCount('enrollments');
+
+        if (empty($request->sortBy) || !isset($request->sortBy)) {
+            $items->orderBy('profile_students.core_person_id', 'desc');
+        }
+
+        $items = $items->dataTable($request);
+        return $items;
+    }
+
+    public function userDataTable($request)
+    {
+        $items = Student::select(
+            'profile_students.core_person_id as id',
+
+            //person
+            'core_persons.name as person_name',
+            'core_persons.paternal_surname as person_paternal_surname',
+            'core_persons.maternal_surname as person_maternal_surname',
 
             //user
             'auth_users.id as user_id',
@@ -35,13 +56,12 @@ class StudentRepository
             ->join('core_persons', 'profile_students.core_person_id', '=', 'core_persons.id')
             ->join('behavior_profiles', function ($join) {
                 $join->on('behavior_profiles.profileable_id', '=', 'profile_students.core_person_id')
-                    ->where('behavior_profiles.profileable_type', '=', 'profile_students');
+                    ->where('behavior_profiles.profileable_type', 'profile_students');
             })
-            ->join('auth_users', 'behavior_profiles.auth_user_id', '=', 'auth_users.id')
-            ->withCount('enrollments');
+            ->join('auth_users', 'behavior_profiles.auth_user_id', '=', 'auth_users.id');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
-            $items->orderBy('profile_students.core_person_id', 'desc');
+            $items->orderBy('core_persons.name', 'asc');
         }
 
         $items = $items->dataTable($request);

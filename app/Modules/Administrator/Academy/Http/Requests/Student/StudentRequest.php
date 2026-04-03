@@ -25,11 +25,6 @@ class StudentRequest extends ApiFormRequest
             'person.gender' => ['nullable', 'string', 'max:1'],
             'person.address' => ['nullable', 'string', 'max:255'],
 
-            'user.id' => ['nullable', 'integer'],
-            'user.username' => ['required', 'max:50'],
-            'user.email' => ['nullable', 'email', 'max:100'],
-            'user.is_active' => ['required', 'boolean'],
-
         ];
     }
 
@@ -44,13 +39,6 @@ class StudentRequest extends ApiFormRequest
             // 'person.email.email' => 'Email es inválido',
             // 'person.email.max' => 'Email debe tener máximo 100 caracteres',
             'person.phone.max' => 'Teléfono debe tener máximo 15 caracteres',
-
-
-            'user.username.required' => 'Usuario es requerido',
-            'user.username.max' => 'Usuario debe tener máximo 50 caracteres',
-            'user.email.email' => 'Email es inválido',
-            'user.email.max' => 'Email debe tener máximo 100 caracteres',
-            'user.is_active.required' => 'Estado es requerido',
         ];
     }
 
@@ -64,10 +52,6 @@ class StudentRequest extends ApiFormRequest
             'person.maternal_surname' => 'Apellido materno',
             'person.email' => 'Email personal',
             'person.phone' => 'Teléfono',
-
-            'user.username' => 'Usuario',
-            'user.email' => 'Email',
-            'user.is_active' => 'Estado',
         ];
     }
 }

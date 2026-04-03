@@ -34,14 +34,14 @@ class CreateOrUpdateStudentAction
 
             $person = $this->createOrUpdatePersonAction->execute($data['person'], $data['person']['id']);
 
-            $existingProfile = $this->profileRepository->findByProfileableId($person->id);
-
-            $isActive = $data['user']['is_active'] ?? false;
+            $isActive = $data['is_active'] ?? true;
 
             if (!$data['id']) {
                 // Crear estudiante
                 $student = $this->studentRepository->findByPersonId($person->id);
                 if ($student) throw new ApiException('La persona ya tiene un perfil de estudiante');
+
+                $existingProfile = $this->profileRepository->findByProfileableId($person->id);
 
                 if ($existingProfile) {
                     // La persona ya tiene un usuario (otro perfil), reutilizar
@@ -49,8 +49,12 @@ class CreateOrUpdateStudentAction
                     if (!$user) throw new ApiException('Error al encontrar el usuario asociado');
                 } else {
                     // Crear nuevo usuario
-                    $data['user']['password'] = $person->document_number;
-                    $user = $this->createOrUpdateUserAction->execute($data['user']);
+                    $user = $this->createOrUpdateUserAction->execute([
+                        'username' => $person->document_number,
+                        'email' => $person->email,
+                        'password' => $person->document_number,
+                        'is_active' => $isActive,
+                    ]);
                 }
 
                 $student = $this->studentRepository->create($person->id);
@@ -63,25 +67,16 @@ class CreateOrUpdateStudentAction
                 $behaviorProfile = $this->profileRepository->create($user->id, 'students', $student->core_person_id, $role->id);
                 $behaviorProfile->update(['is_active' => $isActive]);
             } else {
-                // Actualizar estudiante
+                // Actualizar estudiante (solo datos de persona y estudiante, no usuario)
                 $student = $this->studentRepository->findByPersonId($data['id']);
                 if (!$student) throw new ApiException('Error al encontrar el perfil de estudiante');
                 if ($data['id'] != $person->id) throw new ApiException('El perfil de estudiante no coincide con la persona');
 
-                if ($existingProfile && isset($data['user']['id'])) {
-                    if ($existingProfile->auth_user_id !== $data['user']['id']) throw new ApiException('El usuario no coincide con la persona');
-                }
-
-                $this->createOrUpdateUserAction->execute($data['user']);
-
                 $student->update(['is_active' => $isActive]);
 
-                $studentProfile = $this->profileRepository->findUserIdAndType(
-                    $data['user']['id'],
-                    'students'
-                );
-                if ($studentProfile) {
-                    $studentProfile->update(['is_active' => $isActive]);
+                $existingProfile = $this->profileRepository->findByProfileableIdAndType($person->id, 'students');
+                if ($existingProfile) {
+                    $existingProfile->update(['is_active' => $isActive]);
                 }
             }
 

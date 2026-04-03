@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Modules\Administrator\Barbershop\Repositories\BarberAttendanceRepository;
 use App\Models\Barbershop\BarberAttendance;
 use App\Models\Profile\Barber;
+use App\Models\Treasury\EmployeeSchedule;
 use App\Common\Exceptions\ApiException;
 
 class BarberAttendanceService
@@ -24,6 +25,8 @@ class BarberAttendanceService
         $barberId = $data['barber_id'];
         $date = $data['date'] ?? date('Y-m-d');
         $barber = Barber::findOrFail($barberId);
+        $checkIn = date('H:i:s');
+        $status = $this->resolveCheckInStatus($checkIn);
 
         $attendance = BarberAttendance::where('barber_id', $barberId)
             ->where('date', $date)
@@ -34,16 +37,16 @@ class BarberAttendanceService
                 throw new ApiException('El barbero ya tiene entrada registrada para este día', 400);
             }
             $attendance->update([
-                'check_in' => date('H:i:s'),
-                'status' => 'present',
+                'check_in' => $checkIn,
+                'status' => $status,
             ]);
         } else {
             BarberAttendance::create([
                 'branch_id' => $barber->branch_id,
                 'barber_id' => $barberId,
                 'date' => $date,
-                'check_in' => date('H:i:s'),
-                'status' => 'present',
+                'check_in' => $checkIn,
+                'status' => $status,
             ]);
         }
     }
@@ -136,5 +139,18 @@ class BarberAttendanceService
             'timestamp' => $timestamp,
             'expires_at' => date('Y-m-d H:i:s', $timestamp + 300),
         ];
+    }
+
+    private function resolveCheckInStatus(string $checkIn): string
+    {
+        $schedule = EmployeeSchedule::where('type', 'barber')
+            ->where('is_active', true)
+            ->first();
+
+        if (!$schedule) {
+            return 'present';
+        }
+
+        return $checkIn > $schedule->start_time ? 'late' : 'present';
     }
 }

@@ -5,6 +5,7 @@ namespace App\Modules\Administrator\Treasury\Services;
 use Illuminate\Http\Request;
 use App\Modules\Administrator\Treasury\Repositories\WorkerAttendanceRepository;
 use App\Models\Treasury\WorkerAttendance;
+use App\Models\Treasury\EmployeeSchedule;
 use App\Common\Exceptions\ApiException;
 
 class WorkerAttendanceService
@@ -22,6 +23,8 @@ class WorkerAttendanceService
     {
         $workerId = $data['worker_id'];
         $date = $data['date'] ?? date('Y-m-d');
+        $checkIn = date('H:i:s');
+        $status = $this->resolveCheckInStatus($checkIn, 'worker');
 
         $attendance = WorkerAttendance::where('worker_id', $workerId)
             ->where('date', $date)
@@ -32,15 +35,15 @@ class WorkerAttendanceService
                 throw new ApiException('El trabajador ya tiene entrada registrada para este día', 400);
             }
             $attendance->update([
-                'check_in' => date('H:i:s'),
-                'status' => 'present',
+                'check_in' => $checkIn,
+                'status' => $status,
             ]);
         } else {
             WorkerAttendance::create([
                 'worker_id' => $workerId,
                 'date' => $date,
-                'check_in' => date('H:i:s'),
-                'status' => 'present',
+                'check_in' => $checkIn,
+                'status' => $status,
             ]);
         }
     }
@@ -129,5 +132,18 @@ class WorkerAttendanceService
             'timestamp' => $timestamp,
             'expires_at' => date('Y-m-d H:i:s', $timestamp + 300),
         ];
+    }
+
+    private function resolveCheckInStatus(string $checkIn, string $type): string
+    {
+        $schedule = EmployeeSchedule::where('type', $type)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$schedule) {
+            return 'present';
+        }
+
+        return $checkIn > $schedule->start_time ? 'late' : 'present';
     }
 }

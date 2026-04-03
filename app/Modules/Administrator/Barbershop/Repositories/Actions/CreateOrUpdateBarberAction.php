@@ -35,24 +35,27 @@ class CreateOrUpdateBarberAction
 
             $person = $this->createOrUpdatePersonAction->execute($data['person'], $data['id']);
 
-            $existingProfile = $this->profileRepository->findByProfileableId($person->id);
-
-            $isActive = $data['is_active'] ?? $data['user']['is_active'] ?? false;
-            $data['user']['is_active'] = $isActive;
+            $isActive = $data['is_active'] ?? true;
 
             if (!$data['id']) {
                 // Crear barbero
                 $barber = $this->barberRepository->findByPersonId($person->id);
                 if ($barber) throw new ApiException('La persona ya tiene un perfil de barbero');
 
+                $existingProfile = $this->profileRepository->findByProfileableId($person->id);
+
                 if ($existingProfile) {
                     // La persona ya tiene un usuario (otro perfil), reutilizar
                     $user = User::find($existingProfile->auth_user_id);
                     if (!$user) throw new ApiException('Error al encontrar el usuario asociado');
                 } else {
-                    // Crear nuevo usuario
-                    $data['user']['password'] = $person->document_number;
-                    $user = $this->createOrUpdateUserAction->execute($data['user']);
+                    // Crear nuevo usuario automáticamente
+                    $user = $this->createOrUpdateUserAction->execute([
+                        'username' => $person->document_number,
+                        'email' => $person->email,
+                        'password' => $person->document_number,
+                        'is_active' => $isActive,
+                    ]);
                 }
 
                 $barber = $this->barberRepository->create($person->id, [
@@ -68,16 +71,10 @@ class CreateOrUpdateBarberAction
                 $behaviorProfile = $this->profileRepository->create($user->id, 'barbers', $barber->id, $role->id);
                 $behaviorProfile->update(['is_active' => $isActive]);
             } else {
-                // Actualizar barbero
+                // Actualizar barbero (solo datos de persona y barbero, no usuario)
                 $barber = $this->barberRepository->findByPersonId($data['id']);
                 if (!$barber) throw new ApiException('Error al encontrar el perfil de barbero');
                 if ($data['id'] != $person->id) throw new ApiException('El perfil de barbero no coincide con la persona');
-
-                if ($existingProfile && isset($data['user']['id'])) {
-                    if ($existingProfile->auth_user_id !== $data['user']['id']) throw new ApiException('El usuario no coincide con la persona');
-                }
-
-                $this->createOrUpdateUserAction->execute($data['user']);
 
                 $this->barberRepository->update($data['id'], [
                     'branch_id' => $data['branch_id'],
@@ -85,12 +82,9 @@ class CreateOrUpdateBarberAction
                     'is_active' => $isActive,
                 ]);
 
-                $barberProfile = $this->profileRepository->findUserIdAndType(
-                    $data['user']['id'],
-                    'barbers'
-                );
-                if ($barberProfile) {
-                    $barberProfile->update(['is_active' => $isActive]);
+                $existingProfile = $this->profileRepository->findByProfileableIdAndType($person->id, 'barbers');
+                if ($existingProfile) {
+                    $existingProfile->update(['is_active' => $isActive]);
                 }
             }
 

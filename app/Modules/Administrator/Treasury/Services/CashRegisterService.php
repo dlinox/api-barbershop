@@ -11,9 +11,9 @@ class CashRegisterService
         private CashRegisterRepository $cashRegisterRepository
     ) {}
 
-    public function dataTable(Request $request, int $infrastructureId)
+    public function dataTable(Request $request)
     {
-        return $this->cashRegisterRepository->dataTable($request, $infrastructureId);
+        return $this->cashRegisterRepository->dataTable($request);
     }
 
     public function save(array $data)

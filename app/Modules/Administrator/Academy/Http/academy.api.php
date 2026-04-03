@@ -56,6 +56,7 @@ Route::middleware(['auth:api'])->prefix('/groups')->group(function () {
 
 Route::middleware(['auth:api'])->prefix('/students')->group(function () {
     Route::post('/data-table', [StudentController::class, 'dataTable'])->name('students.dataTable')->middleware('permission:academy.student.view');
+    Route::post('/user-data-table', [StudentController::class, 'userDataTable'])->name('students.userDataTable')->middleware('permission:academy.student.view');
     Route::post('/save', [StudentController::class, 'save'])->name('students.save')->middleware('permission:academy.student.create,academy.student.edit');
     Route::post('/save-user', [StudentController::class, 'saveUser'])->name('students.saveUser')->middleware('permission:academy.student.edit');
     Route::get('/select-async-items', [StudentController::class, 'selectAsyncItems'])->name('students.selectAsyncItems');
@@ -63,6 +64,7 @@ Route::middleware(['auth:api'])->prefix('/students')->group(function () {
 
 Route::middleware(['auth:api'])->prefix('/teachers')->group(function () {
     Route::post('/data-table', [TeacherController::class, 'dataTable'])->name('teachers.dataTable')->middleware('permission:academy.teacher.view');
+    Route::post('/user-data-table', [TeacherController::class, 'userDataTable'])->name('teachers.userDataTable')->middleware('permission:academy.teacher.view');
     Route::post('/payment-summary', [TeacherController::class, 'paymentSummaryDataTable'])->name('teachers.paymentSummary')->middleware('permission:treasury.employee_payment.view');
     Route::post('/payment-calculation/{teacherId}', [TeacherController::class, 'paymentCalculation'])->name('teachers.paymentCalculation')->middleware('permission:treasury.employee_payment.view');
     Route::post('/save', [TeacherController::class, 'save'])->name('teachers.save')->middleware('permission:academy.teacher.create,academy.teacher.edit');

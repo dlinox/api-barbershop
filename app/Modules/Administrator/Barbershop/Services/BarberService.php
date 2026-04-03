@@ -5,12 +5,15 @@ namespace App\Modules\Administrator\Barbershop\Services;
 use App\Modules\Administrator\Barbershop\Repositories\BarberRepository;
 use App\Modules\Administrator\Barbershop\Repositories\Actions\CreateOrUpdateBarberAction;
 use App\Modules\Auth\Repositories\Actions\CreateOrUpdateUserAction;
+use App\Modules\Shared\Repositories\ProfileRepository;
 
 class BarberService
 {
     public function __construct(
         private BarberRepository $barberRepository,
         private CreateOrUpdateBarberAction $createOrUpdateBarberAction,
+        private CreateOrUpdateUserAction $createOrUpdateUserAction,
+        private ProfileRepository $profileRepository,
     ) {}
 
     public function dataTable($request)
@@ -28,6 +31,21 @@ class BarberService
         return $this->createOrUpdateBarberAction->execute($data);
     }
 
+    public function userDataTable($request)
+    {
+        return $this->barberRepository->userDataTable($request);
+    }
+
+    public function saveUser(array $data)
+    {
+        $this->createOrUpdateUserAction->execute($data['user']);
+
+        $profile = $this->profileRepository->findByProfileableIdAndType($data['id'], 'barbers');
+        if ($profile) {
+            $profile->update(['is_active' => $data['user']['is_active']]);
+        }
+    }
+
     public function selectAsyncItems($request)
     {
         return $this->barberRepository->selectAsyncItems($request->search, $request->value, $request->infrastructureId);
@@ -38,18 +56,4 @@ class BarberService
         return $this->barberRepository->paymentCalculation($barberId, $periodStart, $periodEnd);
     }
 
-    public function saveUser(array $data): void
-    {
-        $barber = $this->barberRepository->findByPersonId($data['id']);
-        if (!$barber) throw new \App\Common\Exceptions\ApiException('Barbero no encontrado');
-
-        $createOrUpdateUserAction = app(CreateOrUpdateUserAction::class);
-        $createOrUpdateUserAction->execute($data['user']);
-
-        $profileRepository = app(\App\Modules\Shared\Repositories\ProfileRepository::class);
-        $barberProfile = $profileRepository->findUserIdAndType($data['user']['id'], 'barbers');
-        if ($barberProfile) {
-            $barberProfile->update(['is_active' => $data['user']['is_active']]);
-        }
-    }
 }

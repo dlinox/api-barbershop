@@ -1,15 +1,10 @@
 <html>
+
 <head>
     @include('enrollments.common.head')
 </head>
-<body>
 
-    {{-- ═══ ENCABEZADO ═══ --}}
-    <div class="header">
-        <span class="enrollment-code">N° {{ str_pad($enrollment_id, 6, '0', STR_PAD_LEFT) }}</span>
-        <h1>Ficha de Matrícula</h1>
-        <h2>{{ $branch_name }}</h2>
-    </div>
+<body>
 
     {{-- ═══ DATOS DEL ESTUDIANTE ═══ --}}
     <div class="section-title">Datos del Estudiante</div>
@@ -102,11 +97,12 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th style="width: 10%;">#</th>
-                <th style="width: 25%;">Concepto</th>
-                <th style="width: 25%;">Desde</th>
-                <th style="width: 25%;">Hasta</th>
+                <th style="width: 8%;">#</th>
+                <th style="width: 20%;">Concepto</th>
+                <th style="width: 20%;">Desde</th>
+                <th style="width: 20%;">Hasta</th>
                 <th style="width: 15%;" class="text-right">Monto</th>
+                <th style="width: 17%;" class="text-center">Estado</th>
             </tr>
         </thead>
         <tbody>
@@ -119,11 +115,17 @@
                 <td>{{ $plan['start_date'] }}</td>
                 <td>{{ $plan['end_date'] }}</td>
                 <td class="text-right">S/ {{ number_format($plan['amount'], 2) }}</td>
+                <td class="text-center">
+                    <span style="color: {{ $plan['is_paid'] ? '#27ae60' : '#c0392b' }}; font-weight: bold;">
+                        {{ $plan['is_paid'] ? 'Pagado' : 'Pendiente' }}
+                    </span>
+                </td>
             </tr>
             @endforeach
             <tr>
                 <td colspan="4" class="text-right" style="font-weight: bold;">Total</td>
                 <td class="text-right" style="font-weight: bold;">S/ {{ number_format($total, 2) }}</td>
+                <td></td>
             </tr>
         </tbody>
     </table>
@@ -164,7 +166,6 @@
         </tr>
     </table>
 
-    @include('enrollments.common.footer')
-
 </body>
+
 </html>

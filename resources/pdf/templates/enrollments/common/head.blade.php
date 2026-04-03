@@ -2,9 +2,6 @@
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; font-size: 11px; color: #333; line-height: 1.4; }
-    .header { text-align: center; border-bottom: 2px solid #1a1a2e; padding-bottom: 8px; margin-bottom: 12px; }
-    .header h1 { font-size: 18px; color: #1a1a2e; text-transform: uppercase; letter-spacing: 1px; }
-    .header h2 { font-size: 13px; color: #555; font-weight: normal; margin-top: 2px; }
     .section-title { background-color: #1a1a2e; color: #fff; padding: 4px 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; margin: 10px 0 6px 0; letter-spacing: 0.5px; }
     table.info-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
     table.info-table td { padding: 3px 6px; vertical-align: top; }

@@ -21,6 +21,8 @@ class EnrollmentDetailQuery
             'group.level',
             'group.schedule',
             'group.paymentPlans',
+            'payments' => fn($q) => $q->where('status', 'active'),
+            'payments.details',
             'materials.presentation',
         ])->findOrFail($id);
     }
@@ -34,6 +36,11 @@ class EnrollmentDetailQuery
         $daysFormatted = collect(explode(',', $group->days_of_week))
             ->map(fn($d) => DayOfWeek::tryFrom(trim($d))?->label() ?? trim($d))
             ->implode(', ');
+
+        $paidPlanIds = $enrollment->payments
+            ->flatMap(fn($payment) => $payment->details)
+            ->pluck('group_payment_plan_id')
+            ->unique();
 
         return [
             'enrollment_id' => $enrollment->id,
@@ -64,12 +71,15 @@ class EnrollmentDetailQuery
             'start_date' => Carbon::parse($group->start_date)->format('d/m/Y'),
             'end_date' => Carbon::parse($group->end_date)->format('d/m/Y'),
 
-            'payment_plans' => $group->paymentPlans->map(fn($p) => [
-                'type' => PaymentPlanType::tryFrom($p->type)?->label() ?? $p->type,
-                'start_date' => Carbon::parse($p->start_date)->format('d/m/Y'),
-                'end_date' => Carbon::parse($p->end_date)->format('d/m/Y'),
-                'amount' => $p->amount,
-            ])->toArray(),
+            'payment_plans' => $group->paymentPlans->map(function ($p) use ($paidPlanIds) {
+                return [
+                    'type' => PaymentPlanType::tryFrom($p->type)?->label() ?? $p->type,
+                    'start_date' => Carbon::parse($p->start_date)->format('d/m/Y'),
+                    'end_date' => Carbon::parse($p->end_date)->format('d/m/Y'),
+                    'amount' => $p->amount,
+                    'is_paid' => $paidPlanIds->contains($p->id),
+                ];
+            })->toArray(),
 
             'materials' => $enrollment->materials->map(fn($m) => [
                 'name' => $m->presentation?->name ?? "Material #{$m->id}",

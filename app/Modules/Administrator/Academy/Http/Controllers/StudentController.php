@@ -8,6 +8,7 @@ use App\Modules\Administrator\Academy\Services\StudentService;
 use App\Modules\Administrator\Academy\Http\Requests\Student\StudentRequest;
 use App\Modules\Administrator\Academy\Http\Requests\Student\StudentUserRequest;
 use App\Modules\Administrator\Academy\Http\Resources\Student\StudentDataTableItemResource;
+use App\Modules\Administrator\Academy\Http\Resources\Student\StudentUserDataTableItemResource;
 use App\Modules\Administrator\Academy\Http\Resources\Student\StudentSelectItemResource;
 
 class StudentController
@@ -20,6 +21,13 @@ class StudentController
     {
         $item = $this->studentService->dataTable($request);
         $item['data'] = StudentDataTableItemResource::collection($item['data']);
+        return ApiResponse::success($item);
+    }
+
+    public function userDataTable(Request $request)
+    {
+        $item = $this->studentService->userDataTable($request);
+        $item['data'] = StudentUserDataTableItemResource::collection($item['data']);
         return ApiResponse::success($item);
     }
 

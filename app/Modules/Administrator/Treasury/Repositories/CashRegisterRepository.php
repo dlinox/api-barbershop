@@ -9,11 +9,11 @@ class CashRegisterRepository
 {
     use HasInfrastructureScope;
 
-    public function dataTable($request, int $infrastructureId)
+    public function dataTable($request)
     {
-        $this->validateInfrastructureAccess($infrastructureId);
+        $query = CashRegister::query()->with('infrastructure.infrastructurable');
 
-        $query = CashRegister::where('infrastructure_id', $infrastructureId);
+        $this->scopeByInfrastructure($query);
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $query->orderBy('id', 'desc');

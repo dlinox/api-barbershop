@@ -25,12 +25,6 @@ class StudentDataTableItemResource extends JsonResource
                 'gender' => $this->person_gender,
                 'address' => $this->person_address,
             ],
-            'user' => [
-                'id' => $this->user_id,
-                'username' => $this->user_username,
-                'email' => $this->user_email,
-                'isActive' => (bool) $this->user_is_active,
-            ],
         ];
     }
 }
