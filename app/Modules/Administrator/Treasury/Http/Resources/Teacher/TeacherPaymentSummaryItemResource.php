@@ -13,6 +13,7 @@ class TeacherPaymentSummaryItemResource extends JsonResource
             'fullName' => trim($this->full_name),
             'branchName' => $this->branch_name,
             'paymentType' => $this->payment_type,
+            'monthlySalary' => (float) $this->monthly_salary,
             'totalGroups' => (int) $this->total_groups,
             'lastPaymentDate' => $this->last_payment_date,
             'totalPaid' => (float) $this->total_paid,

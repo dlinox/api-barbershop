@@ -6,9 +6,10 @@ use App\Modules\Administrator\Setting\Http\Controllers\DocumentTypeController;
 use App\Modules\Administrator\Setting\Http\Controllers\CompanyController;
 use App\Modules\Administrator\Setting\Http\Controllers\CompanyLogoController;
 use App\Modules\Administrator\Setting\Http\Controllers\EmployeeScheduleController;
+use App\Modules\Administrator\Setting\Http\Controllers\CalendarHolidayController;
 
+Route::get('company/get', [CompanyController::class, 'get'])->name('company.get');
 Route::middleware(['auth:api'])->prefix('/company')->group(function () {
-    Route::get('/get', [CompanyController::class, 'get'])->name('company.get')->middleware('permission:setting.company.view');
     Route::post('/save', [CompanyController::class, 'save'])->name('company.save')->middleware('permission:setting.company.edit');
 });
 
@@ -34,4 +35,10 @@ Route::middleware(['auth:api'])->prefix('/document-types')->group(function () {
 Route::middleware(['auth:api'])->prefix('/employee-schedules')->group(function () {
     Route::get('/get', [EmployeeScheduleController::class, 'get'])->name('employee-schedules.get')->middleware('permission:setting.employee_schedule.view');
     Route::post('/save', [EmployeeScheduleController::class, 'save'])->name('employee-schedules.save')->middleware('permission:setting.employee_schedule.edit');
+});
+
+Route::middleware(['auth:api'])->prefix('/calendar-holidays')->group(function () {
+    Route::post('/get-by-month', [CalendarHolidayController::class, 'getByMonth'])->name('calendar-holidays.getByMonth')->middleware('permission:setting.calendar_holiday.view');
+    Route::post('/save', [CalendarHolidayController::class, 'save'])->name('calendar-holidays.save')->middleware('permission:setting.calendar_holiday.create,setting.calendar_holiday.edit');
+    Route::delete('/delete/{id}', [CalendarHolidayController::class, 'delete'])->name('calendar-holidays.delete')->middleware('permission:setting.calendar_holiday.delete');
 });

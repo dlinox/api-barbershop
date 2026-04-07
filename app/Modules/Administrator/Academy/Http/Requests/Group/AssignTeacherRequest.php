@@ -14,8 +14,6 @@ class AssignTeacherRequest extends ApiFormRequest
             'teacher_id' => 'required|exists:profile_teachers,core_person_id',
             'hourly_rate' => 'required|numeric|min:0',
             'holiday_hourly_rate' => 'required|numeric|min:0',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'nullable|in:active,withdrawn,replaced',
             'observation' => 'nullable|string|max:500',
         ];
@@ -32,8 +30,6 @@ class AssignTeacherRequest extends ApiFormRequest
             'hourly_rate.numeric' => 'El sueldo por hora debe ser numérico',
             'holiday_hourly_rate.required' => 'El sueldo por hora festivo es requerido',
             'holiday_hourly_rate.numeric' => 'El sueldo por hora festivo debe ser numérico',
-            'start_date.required' => 'La fecha de inicio es requerida',
-            'end_date.after_or_equal' => 'La fecha de fin debe ser posterior a la fecha de inicio',
             'observation.max' => 'La observación no debe exceder 500 caracteres',
         ];
     }

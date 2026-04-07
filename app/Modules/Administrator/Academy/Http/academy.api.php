@@ -49,6 +49,7 @@ Route::middleware(['auth:api'])->prefix('/groups')->group(function () {
     Route::post('/save', [GroupController::class, 'save'])->name('groups.save')->middleware('permission:academy.group.create,academy.group.edit');
     Route::delete('/delete/{id}', [GroupController::class, 'delete'])->name('groups.delete')->middleware('permission:academy.group.delete');
     Route::post('/assign-teacher', [GroupController::class, 'assignTeacher'])->name('groups.assignTeacher')->middleware('permission:academy.group.assign_teacher');
+    Route::get('/check-teacher/{groupId}/{teacherId}', [GroupController::class, 'checkTeacher'])->name('groups.checkTeacher')->middleware('permission:academy.group.assign_teacher');
     Route::get('/select-items', [GroupController::class, 'selectItems'])->name('groups.selectItems');
     Route::get('/enrollment/get-availables/{studentId}', [GroupController::class, 'getAvailableEnrollmentGroups'])->name('groups.getAvailableEnrollmentGroups'); // Dejado sin protección para que los clientes puedan acceder a la lista disponible de grupos al enrolar. Revisar si aplica permission adicional.
     Route::get('/get-active-and-upcoming', [GroupController::class, 'getActiveAndUpcoming'])->name('groups.getActiveAndUpcoming')->middleware('permission:academy.group.view'); // Exponer listados completos se protege

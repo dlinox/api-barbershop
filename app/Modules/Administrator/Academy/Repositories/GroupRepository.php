@@ -206,6 +206,10 @@ class GroupRepository
 
     public function assignTeacher(array $data): GroupTeacher
     {
+        if (empty($data['id'])) {
+            $data['start_date'] = now()->toDateString();
+        }
+
         return GroupTeacher::updateOrCreate(
             ['id' => $data['id'] ?? null],
             $data

@@ -6,6 +6,7 @@ use App\Models\Profile\Teacher;
 use App\Models\Academy\GroupTeacher;
 use App\Models\Academy\TeacherAttendance;
 use App\Models\Treasury\EmployeeAdvance;
+use App\Models\Core\CalendarHoliday;
 use Carbon\Carbon;
 
 class TeacherPaymentCalculationQuery
@@ -16,7 +17,10 @@ class TeacherPaymentCalculationQuery
     {
         $teacher = Teacher::where('core_person_id', $teacherId)->firstOrFail();
 
-        $groups = $this->getGroupsDetail($teacherId, $periodStart, $periodEnd);
+        // Obtener días festivos del período
+        $holidays = $this->getHolidays($periodStart, $periodEnd);
+
+        $groups = $this->getGroupsDetail($teacherId, $periodStart, $periodEnd, $holidays);
         $hourlyTotal = collect($groups)->sum('subtotal');
         $advances = $this->getAdvances($teacherId, $periodStart, $periodEnd);
 
@@ -62,14 +66,14 @@ class TeacherPaymentCalculationQuery
         ];
     }
 
-    private function getGroupsDetail(int $teacherId, string $periodStart, string $periodEnd): array
+    private function getGroupsDetail(int $teacherId, string $periodStart, string $periodEnd, array $holidays): array
     {
         $groupTeachers = GroupTeacher::with(['group.schedule'])
             ->where('teacher_id', $teacherId)
             ->where('status', 'active')
             ->get();
 
-        return $groupTeachers->map(function ($gt) use ($periodStart, $periodEnd) {
+        return $groupTeachers->map(function ($gt) use ($periodStart, $periodEnd, $holidays) {
             $group = $gt->group;
             $schedule = $group->schedule;
 
@@ -89,8 +93,30 @@ class TeacherPaymentCalculationQuery
                 ->get();
 
             $totalDays = $attendances->count();
-            $attendedDays = $attendances->whereIn('status', ['present', 'late', 'late_justified'])->count();
-            $subtotal = $attendedDays * $hoursPerDay * (float) $gt->hourly_rate;
+            $attendedAttendances = $attendances->whereIn('status', ['present', 'late', 'late_justified']);
+            
+            // Separar días regulares y festivos
+            $regularDays = 0;
+            $holidayDays = 0;
+            
+            foreach ($attendedAttendances as $attendance) {
+                $dateStr = $attendance->date->format('Y-m-d');
+                if (in_array($dateStr, $holidays)) {
+                    $holidayDays++;
+                } else {
+                    $regularDays++;
+                }
+            }
+
+            $attendedDays = $attendedAttendances->count();
+            
+            // Calcular subtotales
+            $regularRate = (float) $gt->hourly_rate;
+            $holidayRate = (float) $gt->holiday_hourly_rate;
+            
+            $regularSubtotal = $regularDays * $hoursPerDay * $regularRate;
+            $holidaySubtotal = $holidayDays * $hoursPerDay * $holidayRate;
+            $subtotal = $regularSubtotal + $holidaySubtotal;
 
             return [
                 'groupTeacherId' => $gt->id,
@@ -99,9 +125,14 @@ class TeacherPaymentCalculationQuery
                 'days' => $days,
                 'schedule' => $scheduleLabel,
                 'hoursPerDay' => $hoursPerDay,
-                'hourlyRate' => (float) $gt->hourly_rate,
+                'hourlyRate' => $regularRate,
+                'holidayHourlyRate' => $holidayRate,
                 'attendedDays' => $attendedDays,
+                'regularDays' => $regularDays,
+                'holidayDays' => $holidayDays,
                 'totalDays' => $totalDays,
+                'regularSubtotal' => round($regularSubtotal, 2),
+                'holidaySubtotal' => round($holidaySubtotal, 2),
                 'subtotal' => round($subtotal, 2),
             ];
         })->values()->toArray();
@@ -114,5 +145,14 @@ class TeacherPaymentCalculationQuery
             ->where('status', 'pending')
             ->whereBetween('advance_date', [$periodStart, $periodEnd])
             ->get();
+    }
+
+    private function getHolidays(string $periodStart, string $periodEnd): array
+    {
+        return CalendarHoliday::where('is_active', true)
+            ->whereBetween('date', [$periodStart, $periodEnd])
+            ->pluck('date')
+            ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->toArray();
     }
 }

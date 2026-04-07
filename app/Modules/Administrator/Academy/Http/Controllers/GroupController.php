@@ -59,6 +59,12 @@ class GroupController
         return ApiResponse::success(null, 'Docente asignado correctamente');
     }
 
+    public function checkTeacher(int $groupId, int $teacherId)
+    {
+        $data = $this->groupService->checkTeacherForGroup($groupId, $teacherId);
+        return ApiResponse::success($data);
+    }
+
     public function selectItems()
     {
         $items = $this->groupService->selectItems();

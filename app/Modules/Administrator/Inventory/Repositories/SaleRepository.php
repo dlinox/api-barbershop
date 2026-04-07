@@ -6,6 +6,7 @@ use App\Models\Inventory\ProductPresentation;
 use App\Models\Inventory\Sale;
 use App\Common\Traits\HasInfrastructureScope;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SaleRepository
 {
@@ -85,6 +86,29 @@ class SaleRepository
             ->get()
             ->keyBy('status');
 
+        $paymentSummary = DB::table('treasury_income_payment_methods as ipm')
+            ->join('treasury_incomes as i', 'i.id', '=', 'ipm.income_id')
+            ->join('core_payment_methods as pm', 'pm.id', '=', 'ipm.payment_method_id')
+            ->where('i.cash_session_id', $cashSessionId)
+            ->where('i.status', 'completed')
+            ->select(
+                'pm.name as method_name',
+                'pm.type as method_type',
+                DB::raw('COUNT(DISTINCT i.id) as income_count'),
+                DB::raw('COALESCE(SUM(ipm.amount), 0) as total'),
+            )
+            ->groupBy('pm.name', 'pm.type')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($row) => [
+                'methodName'  => $row->method_name,
+                'methodType'  => $row->method_type,
+                'incomeCount' => (int) $row->income_count,
+                'total'       => (float) $row->total,
+            ])
+            ->values()
+            ->toArray();
+
         return [
             'completed' => [
                 'count'  => (int) ($stats['completed']->count ?? 0),
@@ -102,6 +126,7 @@ class SaleRepository
                 'count'  => (int) $stats->sum('count'),
                 'amount' => (float) $stats->sum('amount'),
             ],
+            'paymentSummary' => $paymentSummary,
         ];
     }
 }

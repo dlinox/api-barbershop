@@ -6,13 +6,15 @@ use App\Models\Academy\Branch;
 use App\Models\Academy\GroupTeacher;
 use App\Common\Exceptions\ApiException;
 use App\Modules\Administrator\Academy\Repositories\GroupRepository;
+use App\Modules\Administrator\Academy\Repositories\TeacherRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class GroupService
 {
     public function __construct(
-        private GroupRepository $groupRepository
+        private GroupRepository $groupRepository,
+        private TeacherRepository $teacherRepository,
     ) {}
 
     public function dataTable(Request $request)
@@ -76,5 +78,24 @@ class GroupService
         }
 
         return $this->groupRepository->assignTeacher($data);
+    }
+
+    public function checkTeacherForGroup(int $groupId, int $teacherId): array
+    {
+        $exists = GroupTeacher::where('group_id', $groupId)
+            ->where('teacher_id', $teacherId)
+            ->where('status', 'active')
+            ->exists();
+
+        if ($exists) {
+            throw new ApiException('Este docente ya está asignado como activo en este grupo', 422);
+        }
+
+        $teacher = $this->teacherRepository->findByPersonId($teacherId);
+
+        return [
+            'paymentType' => $teacher?->payment_type,
+            'monthlySalary' => (float) ($teacher?->monthly_salary ?? 0),
+        ];
     }
 }
