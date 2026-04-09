@@ -88,8 +88,8 @@ Route::middleware(['auth:api'])->prefix('/attendances')->group(function () {
     Route::post('/data-table', [AttendanceController::class, 'dataTable'])->name('attendances.dataTable')->middleware('permission:academy.attendance.view');
     Route::post('/save', [AttendanceController::class, 'save'])->name('attendances.save')->middleware('permission:academy.attendance.create,academy.attendance.edit');
     Route::get('/get-groups-by-attendance', [AttendanceController::class, 'getGroupsByAttendance'])->name('attendances.getGroupsByAttendance')->middleware('permission:academy.attendance.view');
-    Route::post('/start-attendance-deadline', [AttendanceController::class, 'startAttendanceDeadline'])->name('attendances.startAttendanceDeadline');
-    Route::post('/update-attendance-deadline', [AttendanceController::class, 'updateAttendanceDeadline'])->name('attendances.updateAttendanceDeadline');
+    Route::post('/start-attendance-deadline', [AttendanceController::class, 'startAttendanceDeadline'])->name('attendances.startAttendanceDeadline')->middleware('permission:academy.attendance.create');
+    Route::post('/update-attendance-deadline', [AttendanceController::class, 'updateAttendanceDeadline'])->name('attendances.updateAttendanceDeadline')->middleware('permission:academy.attendance.edit');
     Route::post('/register-attendance-by-document', [AttendanceController::class, 'registerAttendanceByDocument'])->name('attendances.registerAttendanceByDocument')->middleware('permission:academy.attendance.register');
     Route::post('/register-attendance-by-code', [AttendanceController::class, 'registerAttendanceByCode'])->name('attendances.registerAttendanceByCode')->middleware('permission:academy.attendance.register');
 });

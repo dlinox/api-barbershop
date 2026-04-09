@@ -15,10 +15,4 @@ Route::middleware('auth:api')->group(function () {
     Route::post('auth/select-profile/{profileId}', [AuthController::class, 'selectProfile']);
     Route::post('auth/refresh', [AuthController::class, 'refresh']);
     Route::post('auth/sign-out', [AuthController::class, 'signOut']);
-
-    Route::get('auth/test-permissions', function () {
-        return response()->json([
-            'message' => 'Test',
-        ]);
-    })->middleware('permission:view_users,manage_users');
 });

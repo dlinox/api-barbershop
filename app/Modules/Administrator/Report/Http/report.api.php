@@ -6,7 +6,7 @@ use App\Modules\Administrator\Report\Http\Controllers\ReportInventoryController;
 use App\Modules\Administrator\Report\Http\Controllers\ReportTreasuryController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:api'])->prefix('/report-academy')->group(function () {
+Route::middleware(['auth:api', 'permission:report.academy.view'])->prefix('/report-academy')->group(function () {
     Route::post('/data-table', [ReportAcademyController::class, 'dataTable']);
     Route::post('/data-table-attendance-by-group', [ReportAcademyController::class, 'dataTableAttendanceByGroup']);
     Route::post('/data-table-student-list-by-group', [ReportAcademyController::class, 'dataTableStudentListByGroup']);
@@ -22,7 +22,7 @@ Route::middleware(['auth:api'])->prefix('/report-academy')->group(function () {
     Route::get('/view-pdf/{id}', [ReportAcademyController::class, 'viewPdf']);
 });
 
-Route::middleware(['auth:api'])->prefix('/report-barbershop')->group(function () {
+Route::middleware(['auth:api', 'permission:report.barbershop.view'])->prefix('/report-barbershop')->group(function () {
     Route::get('/summary', [ReportBarbershopController::class, 'summary']);
     Route::get('/revenue-trend', [ReportBarbershopController::class, 'revenueTrend']);
     Route::get('/top-barbers', [ReportBarbershopController::class, 'topBarbers']);
@@ -39,7 +39,7 @@ Route::middleware(['auth:api'])->prefix('/report-barbershop')->group(function ()
     Route::get('/view-pdf/{id}', [ReportBarbershopController::class, 'viewPdf']);
 });
 
-Route::middleware(['auth:api'])->prefix('/report-treasury')->group(function () {
+Route::middleware(['auth:api', 'permission:report.treasury.view'])->prefix('/report-treasury')->group(function () {
     // Dashboard
     Route::get('/summary', [ReportTreasuryController::class, 'summary']);
     Route::get('/income-vs-expenses', [ReportTreasuryController::class, 'incomeVsExpenses']);
@@ -61,7 +61,7 @@ Route::middleware(['auth:api'])->prefix('/report-treasury')->group(function () {
     Route::get('/view-pdf/{id}', [ReportTreasuryController::class, 'viewPdf']);
 });
 
-Route::middleware(['auth:api'])->prefix('/report-inventory')->group(function () {
+Route::middleware(['auth:api', 'permission:report.inventory.view'])->prefix('/report-inventory')->group(function () {
     // Dashboard
     Route::get('/summary', [ReportInventoryController::class, 'summary']);
     Route::get('/sales-trend', [ReportInventoryController::class, 'salesTrend']);

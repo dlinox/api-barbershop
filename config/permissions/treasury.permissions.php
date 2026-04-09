@@ -123,6 +123,55 @@ return [
                     ],
                 ]
             ],
+            [
+                'name' => 'treasury.income',
+                'display_name' => 'Ingresos',
+                'type' => 'module',
+                'children' => [
+                    [
+                        'name' => 'treasury.income.view',
+                        'display_name' => 'Gestionar Ingresos',
+                        'type' => 'view',
+                        'children' => [
+                            ['name' => 'treasury.income.annul', 'display_name' => 'Anular', 'type' => 'action'],
+                        ]
+                    ],
+                ]
+            ],
+            [
+                'name' => 'treasury.employee_advance',
+                'display_name' => 'Adelantos de Empleados',
+                'type' => 'module',
+                'children' => [
+                    [
+                        'name' => 'treasury.employee_advance.view',
+                        'display_name' => 'Gestionar Adelantos',
+                        'type' => 'view',
+                        'children' => [
+                            ['name' => 'treasury.employee_advance.create', 'display_name' => 'Crear', 'type' => 'action'],
+                            ['name' => 'treasury.employee_advance.edit', 'display_name' => 'Editar', 'type' => 'action'],
+                            ['name' => 'treasury.employee_advance.delete', 'display_name' => 'Eliminar', 'type' => 'action'],
+                        ]
+                    ],
+                ]
+            ],
+            [
+                'name' => 'treasury.employee_payment',
+                'display_name' => 'Pagos a Empleados',
+                'type' => 'module',
+                'children' => [
+                    [
+                        'name' => 'treasury.employee_payment.view',
+                        'display_name' => 'Gestionar Pagos',
+                        'type' => 'view',
+                        'children' => [
+                            ['name' => 'treasury.employee_payment.create', 'display_name' => 'Crear', 'type' => 'action'],
+                            ['name' => 'treasury.employee_payment.edit', 'display_name' => 'Editar', 'type' => 'action'],
+                            ['name' => 'treasury.employee_payment.delete', 'display_name' => 'Eliminar', 'type' => 'action'],
+                        ]
+                    ],
+                ]
+            ],
         ]
     ]
 ];

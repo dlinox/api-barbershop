@@ -122,6 +122,22 @@ return [
                     ],
                 ]
             ],
+            [
+                'name' => 'barbershop.barber_attendance',
+                'display_name' => 'Asistencia de Barberos',
+                'type' => 'module',
+                'children' => [
+                    [
+                        'name' => 'barbershop.barber_attendance.view',
+                        'display_name' => 'Gestionar Asistencia',
+                        'type' => 'view',
+                        'children' => [
+                            ['name' => 'barbershop.barber_attendance.register', 'display_name' => 'Registrar', 'type' => 'action'],
+                            ['name' => 'barbershop.barber_attendance.edit', 'display_name' => 'Editar', 'type' => 'action'],
+                        ]
+                    ],
+                ]
+            ],
         ]
     ]
 ];
