@@ -78,6 +78,7 @@ class MeQuery
             'id'   => $infra->id,
             'name' => $infra->infrastructurable?->name ?? $infra->id,
             'type' => str_contains($infra->infrastructurable_type, 'barbershop') ? 'barbershop' : 'academy',
+            'logo' => $infra->infrastructurable?->logo ?? null,
         ];
     }
 
