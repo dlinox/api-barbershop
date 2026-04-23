@@ -15,6 +15,7 @@ class WorkerRepository
             'profile_workers.id as id',
 
             //worker
+            'profile_workers.infrastructure_id as infrastructure_id',
             'profile_workers.position as position',
             'profile_workers.monthly_salary as monthly_salary',
             'profile_workers.payment_frequency as payment_frequency',
@@ -68,10 +69,11 @@ class WorkerRepository
         return Worker::where('id', $personId)->first();
     }
 
-    public function create(int $personId, string $position = 'barber', ?float $monthlySalary = null, ?string $paymentFrequency = null, bool $isActive = true): Worker
+    public function create(int $personId, int $infrastructureId, string $position = 'barber', ?float $monthlySalary = null, ?string $paymentFrequency = null, bool $isActive = true): Worker
     {
         return Worker::create([
             'id' => $personId,
+            'infrastructure_id' => $infrastructureId,
             'position' => $position,
             'monthly_salary' => $monthlySalary,
             'payment_frequency' => $paymentFrequency,
@@ -79,9 +81,10 @@ class WorkerRepository
         ]);
     }
 
-    public function update(Worker $worker, string $position, ?float $monthlySalary, ?string $paymentFrequency, bool $isActive): Worker
+    public function update(Worker $worker, int $infrastructureId, string $position, ?float $monthlySalary, ?string $paymentFrequency, bool $isActive): Worker
     {
         $worker->update([
+            'infrastructure_id' => $infrastructureId,
             'position' => $position,
             'monthly_salary' => $monthlySalary,
             'payment_frequency' => $paymentFrequency,

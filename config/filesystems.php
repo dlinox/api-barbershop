@@ -83,6 +83,15 @@ return [
             'report' => false,
         ],
 
+        'branch_logos' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/branch_logos'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/branch_logos',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

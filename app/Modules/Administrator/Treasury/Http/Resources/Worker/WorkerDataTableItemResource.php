@@ -10,6 +10,7 @@ class WorkerDataTableItemResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'infrastructureId' => (int) $this->infrastructure_id,
             'position' => $this->position,
             'monthlySalary' => (float) $this->monthly_salary,
             'paymentFrequency' => $this->payment_frequency,

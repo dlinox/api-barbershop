@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 use App\Common\Exceptions\ApiException;
+use App\Models\Behavior\Profile;
 
 use App\Modules\Auth\Repositories\SessionRepository;
 use App\Modules\Auth\Repositories\UserRepository;
@@ -27,7 +28,6 @@ class AuthService
 
     /**
      * Authenticate user by username or email
-     * Returns [token, profilesCount, hasProfile]
      */
     public function signIn(string $identifier, string $password, Request $request): ?object
     {
@@ -37,20 +37,27 @@ class AuthService
         if (!$this->userRepository->isActive($user))  throw new ApiException("El usuario no esta activo", 401);
         if (!Hash::check($password, $user->password)) throw new ApiException("Credenciales invalidas", 401);
 
-
         // Check active profiles
         $profilesCount = $this->profileRepository->countByUserId($user->id);
 
-        // If only one profile, auto-select it
         $profileId = null;
+        $infId = null;
         $me = null;
+
         if ($profilesCount === 1) {
-            $me = ($this->meQuery)($user, null);
-            $profileId = $me['profile']['id'];
+            $singleProfile = $this->profileRepository->firstActiveByUserId($user->id);
+
+            if ($singleProfile) {
+                $profileId = $singleProfile->id;
+                $infId = $this->resolveSingleInfrastructureId($singleProfile);
+            }
+
+            $me = ($this->meQuery)($user, $profileId, $infId);
         }
 
         $token = JWTAuth::claims([
             'prf' => $profileId,
+            'inf' => $infId,
         ])->fromUser($user);
 
         // Create session
@@ -89,12 +96,74 @@ class AuthService
 
         $user = JWTAuth::user();
 
-        $me = ($this->meQuery)($user, $profileId);
+        $infId = $this->resolveSingleInfrastructureId($profile);
+
+        $me = ($this->meQuery)($user, $profileId, $infId);
 
         JWTAuth::invalidate(JWTAuth::getToken());
 
         $token = JWTAuth::claims([
             'prf' => $profileId,
+            'inf' => $infId,
+        ])->fromUser($user);
+
+        $this->sessionRepository->updateProfile($user->id, $profileId);
+
+        return (object)[
+            'token' => $token,
+            'user' => $me
+        ];
+    }
+
+    /**
+     * Get admin infrastructures (sedes) for the authenticated profile
+     */
+    public function getAdminInfrastructures(): Collection
+    {
+        $profileId = $this->getProfileIdFromToken();
+        if (!$profileId) throw new ApiException("Perfil no encontrado", 401);
+
+        $profile = $this->profileRepository->findById($profileId);
+        if (!$profile) throw new ApiException("Perfil no encontrado", 404);
+
+        if ($profile->profileable_type !== 'profile_admins') {
+            throw new ApiException("Solo los administradores pueden listar sedes", 403);
+        }
+
+        return $this->profileRepository->getAdminInfrastructures($profile->profileable_id);
+    }
+
+    /**
+     * Select an infrastructure (sede) and generate new token with inf claim
+     */
+    public function selectInfrastructure(int $infrastructureId): object
+    {
+        $profileId = $this->getProfileIdFromToken();
+        if (!$profileId) throw new ApiException("Perfil no encontrado", 401);
+
+        $profile = $this->profileRepository->findById($profileId);
+        if (!$profile) throw new ApiException("Perfil no encontrado", 404);
+
+        if ($profile->profileable_type !== 'profile_admins') {
+            throw new ApiException("Acceso no permitido", 403);
+        }
+
+        // Validate this infrastructure is assigned to the admin
+        $infras = $this->profileRepository->getAdminInfrastructures($profile->profileable_id);
+        $validIds = $infras->pluck('id')->toArray();
+
+        if (!in_array($infrastructureId, $validIds)) {
+            throw new ApiException("La sede no está asignada a este perfil", 403);
+        }
+
+        $user = JWTAuth::user();
+        $me = ($this->meQuery)($user, $profileId, $infrastructureId);
+
+        JWTAuth::invalidate(JWTAuth::getToken());
+
+        $token = JWTAuth::claims([
+            'prf' => $profileId,
+            'inf' => $infrastructureId,
         ])->fromUser($user);
 
         $this->sessionRepository->updateProfile($user->id, $profileId);
@@ -135,6 +204,7 @@ class AuthService
         $user = JWTAuth::user();
         $profileId = $this->getProfileIdFromToken();
         if (!$profileId) throw new ApiException("No se encontro el perfil", 401);
+        // infrastructureId = null: MeQuery will read 'inf' from JWT itself
         return ($this->meQuery)($user, $profileId);
     }
 
@@ -157,21 +227,28 @@ class AuthService
         if (!$user) throw new ApiException("No existe cuenta con este email", 401);
         if (!$this->userRepository->isActive($user)) throw new ApiException("El usuario no esta activo", 401);
 
-        // Check active profiles (same as signIn)
         $profilesCount = $this->profileRepository->countByUserId($user->id);
 
         $profileId = null;
+        $infId = null;
         $me = null;
+
         if ($profilesCount === 1) {
-            $me = ($this->meQuery)($user, null);
-            $profileId = $me['profile']['id'];
+            $singleProfile = $this->profileRepository->firstActiveByUserId($user->id);
+
+            if ($singleProfile) {
+                $profileId = $singleProfile->id;
+                $infId = $this->resolveSingleInfrastructureId($singleProfile);
+            }
+
+            $me = ($this->meQuery)($user, $profileId, $infId);
         }
 
         $token = JWTAuth::claims([
             'prf' => $profileId,
+            'inf' => $infId,
         ])->fromUser($user);
 
-        // Create session
         $this->userRepository->updateLastSignIn($user);
         $this->sessionRepository->create(
             $user->id,
@@ -184,5 +261,31 @@ class AuthService
             'token' => $token,
             'user' => $me
         ];
+    }
+
+    /**
+     * For level 1 admins with exactly 1 infrastructure assigned:
+     * returns that infrastructure ID so it can be embedded in the JWT.
+     * Returns null for all other profiles or admins with 0 or 2+ infrastructures.
+     */
+    private function resolveSingleInfrastructureId(Profile $profile): ?int
+    {
+        $profile->loadMissing('role');
+
+        if ((int) $profile->role->level !== 1) {
+            return null;
+        }
+
+        if ($profile->profileable_type !== 'profile_admins') {
+            return null;
+        }
+
+        $infras = $this->profileRepository->getAdminInfrastructures($profile->profileable_id);
+
+        if ($infras->count() === 1) {
+            return $infras->first()->id;
+        }
+
+        return null;
     }
 }

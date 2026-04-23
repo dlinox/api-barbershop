@@ -4,6 +4,8 @@ namespace App\Modules\Auth\Repositories;
 
 use Illuminate\Support\Collection;
 use App\Models\Behavior\Profile;
+use App\Models\Core\Infrastructure;
+use App\Models\Profile\AdminInfrastructure;
 
 class ProfileRepository
 {
@@ -46,5 +48,15 @@ class ProfileRepository
         return Profile::where('id', $profileId)
             ->where('is_active', true)
             ->first();
+    }
+
+    public function getAdminInfrastructures(int $personId): Collection
+    {
+        $infraIds = AdminInfrastructure::where('profile_admin_id', $personId)
+            ->pluck('core_infrastructure_id');
+
+        return Infrastructure::whereIn('id', $infraIds)
+            ->with('infrastructurable')
+            ->get();
     }
 }

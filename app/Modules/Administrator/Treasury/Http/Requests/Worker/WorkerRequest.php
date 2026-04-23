@@ -11,6 +11,7 @@ class WorkerRequest extends ApiFormRequest
         return [
 
             'id' => ['nullable', 'integer'],
+            'infrastructure_id' => ['required', 'integer'],
 
             'position' => ['required', 'string', 'max:50'],
             'monthly_salary' => ['required', 'numeric', 'min:0'],

@@ -20,6 +20,7 @@ class Worker extends Model
 
     protected $fillable = [
         'id',
+        'infrastructure_id',
         'position',
         'monthly_salary',
         'payment_frequency',

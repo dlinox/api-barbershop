@@ -1,0 +1,101 @@
+<?php
+
+namespace App\Modules\AcademyPanel\Profile\Repositories\Actions;
+
+use App\Common\Http\Context\AdminContext;
+use App\Common\Exceptions\ApiException;
+use App\Models\Auth\User;
+use App\Models\Behavior\Role;
+use Illuminate\Support\Facades\DB;
+
+use App\Modules\AcademyPanel\Profile\Repositories\WorkerRepository;
+use App\Modules\Shared\Repositories\ProfileRepository;
+use App\Modules\Shared\Repositories\Actions\CreateOrUpdatePersonAction;
+use App\Modules\Auth\Repositories\Actions\CreateOrUpdateUserAction;
+
+class CreateOrUpdateWorkerAction
+{
+    public function __construct(
+        private WorkerRepository $workerRepository,
+        private ProfileRepository $profileRepository,
+        private CreateOrUpdatePersonAction $createOrUpdatePersonAction,
+        private CreateOrUpdateUserAction $createOrUpdateUserAction,
+    ) {}
+
+    public function execute(array $data): void
+    {
+        $role = Role::where('name', 'trabajador')->where('is_active', true)->first();
+        if (!$role) {
+            throw new ApiException('El rol trabajador no existe, comuníquese con el administrador');
+        }
+
+        $infrastructureId = AdminContext::infrastructureId();
+
+        try {
+            DB::beginTransaction();
+
+            $person = $this->createOrUpdatePersonAction->execute($data['person'], $data['id']);
+
+            $isActive = $data['is_active'] ?? true;
+
+            if (!$data['id']) {
+                $worker = $this->workerRepository->findByPersonId($person->id);
+                if ($worker) throw new ApiException('La persona ya tiene un perfil de trabajador');
+
+                $existingProfile = $this->profileRepository->findByProfileableId($person->id);
+
+                if ($existingProfile) {
+                    $user = User::find($existingProfile->auth_user_id);
+                    if (!$user) throw new ApiException('Error al encontrar el usuario asociado');
+                } else {
+                    $user = $this->createOrUpdateUserAction->execute([
+                        'username' => $person->document_number,
+                        'email'    => $person->email,
+                        'password' => $person->document_number,
+                        'is_active' => $isActive,
+                    ]);
+                }
+
+                $worker = $this->workerRepository->create($person->id, [
+                    'infrastructure_id' => $infrastructureId,
+                    'position'          => $data['position'] ?? null,
+                    'monthly_salary'    => $data['monthly_salary'] ?? null,
+                    'payment_frequency' => $data['payment_frequency'] ?? null,
+                    'is_active'         => $isActive,
+                ]);
+
+                if (!$worker) throw new ApiException('Error al crear el perfil de trabajador');
+
+                $profileExists = $this->profileRepository->findUserIdAndType($user->id, 'profile_workers');
+                if ($profileExists) throw new ApiException('El usuario ya tiene un perfil de trabajador');
+                $behaviorProfile = $this->profileRepository->create($user->id, 'profile_workers', $worker->id, $role->id);
+                $behaviorProfile->update(['is_active' => $isActive]);
+            } else {
+                $worker = $this->workerRepository->findByPersonId($data['id']);
+                if (!$worker) throw new ApiException('Error al encontrar el perfil de trabajador');
+                if ($data['id'] != $person->id) throw new ApiException('El perfil de trabajador no coincide con la persona');
+
+                $this->workerRepository->update($data['id'], [
+                    'infrastructure_id' => $infrastructureId,
+                    'position'          => $data['position'] ?? null,
+                    'monthly_salary'    => $data['monthly_salary'] ?? null,
+                    'payment_frequency' => $data['payment_frequency'] ?? null,
+                    'is_active'         => $isActive,
+                ]);
+
+                $existingProfile = $this->profileRepository->findByProfileableIdAndType($person->id, 'profile_workers');
+                if ($existingProfile) {
+                    $existingProfile->update(['is_active' => $isActive]);
+                }
+            }
+
+            DB::commit();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new ApiException($e->getMessage());
+        }
+    }
+}

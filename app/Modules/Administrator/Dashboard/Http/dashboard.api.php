@@ -3,7 +3,7 @@
 use App\Modules\Administrator\Dashboard\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:api'])->prefix('/dashboard')->group(function () {
+Route::middleware(['auth:api', 'super_admin'])->prefix('/dashboard')->group(function () {
     Route::get('/summary', [DashboardController::class, 'summary']);
     Route::get('/revenue-chart', [DashboardController::class, 'revenueChart']);
     Route::get('/tickets-by-barber', [DashboardController::class, 'ticketsByBarber']);

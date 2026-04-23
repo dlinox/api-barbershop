@@ -12,6 +12,7 @@ class BranchDataTableItemResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'address' => $this->address,
+            'logoUrl' => $this->logo,
             'isActive' => $this->is_active,
         ];
     }

@@ -28,6 +28,7 @@ class CreateOrUpdateWorkerAction
                 if ($worker) throw new ApiException('La persona ya tiene un perfil de trabajador');
                 $worker = $this->workerRepository->create(
                     $person->id,
+                    $data['infrastructure_id'],
                     $data['position'] ?? 'barber',
                     $data['monthly_salary'] ?? null,
                     $data['payment_frequency'] ?? null,
@@ -40,6 +41,7 @@ class CreateOrUpdateWorkerAction
                 if ($data['id'] != $person->id) throw new ApiException('El perfil de trabajador no coincide con la persona');
                 $this->workerRepository->update(
                     $worker,
+                    $data['infrastructure_id'] ?? $worker->infrastructure_id,
                     $data['position'] ?? $worker->position,
                     $data['monthly_salary'] ?? $worker->monthly_salary,
                     $data['payment_frequency'] ?? $worker->payment_frequency,

@@ -17,6 +17,7 @@ class BranchRequest extends ApiFormRequest
             'phone' => 'nullable|string|max:20',
             'location_lat' => 'nullable|numeric',
             'location_lng' => 'nullable|numeric',
+            'logo' => 'nullable|string',
             'is_active' => 'required|boolean',
         ];
     }

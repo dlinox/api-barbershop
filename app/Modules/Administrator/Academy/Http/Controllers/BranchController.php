@@ -41,6 +41,12 @@ class BranchController
         return ApiResponse::success(null, 'Sucursal eliminada correctamente');
     }
 
+    public function deleteLogo(int $id)
+    {
+        $this->branchService->deleteLogo($id);
+        return ApiResponse::success(null, 'Logo eliminado correctamente');
+    }
+
     public function selectItems()
     {
         $items = $this->branchService->getActiveBranches();

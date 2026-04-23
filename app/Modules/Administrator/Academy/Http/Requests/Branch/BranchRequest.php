@@ -13,6 +13,7 @@ class BranchRequest extends ApiFormRequest
             'id' => $id ? 'exists:academy_branches,id' : 'nullable',
             'name' => 'required|string|max:255|unique:academy_branches,name,' . $id,
             'address' => 'required|string|max:255',
+            'logo' => 'nullable|string',
             'is_active' => 'required|boolean',
         ];
     }

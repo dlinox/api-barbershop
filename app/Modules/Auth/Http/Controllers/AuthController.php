@@ -9,6 +9,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Modules\Auth\Http\Requests\SignInRequest;
 use App\Modules\Auth\Http\Resources\SignInResource;
 use App\Modules\Auth\Http\Resources\ProfileResource;
+use App\Modules\Auth\Http\Resources\AdminInfrastructureResource;
 use App\Modules\Auth\Services\AuthService;
 use App\Common\Http\Responses\ApiResponse;
 
@@ -72,6 +73,24 @@ class AuthController
     {
         $this->authService->signOut();
         return ApiResponse::success(null, '');
+    }
+
+    /**
+     * Get admin infrastructures (sedes) for the authenticated profile
+     */
+    public function adminInfrastructures(): JsonResponse
+    {
+        $infras = $this->authService->getAdminInfrastructures();
+        return ApiResponse::success(AdminInfrastructureResource::collection($infras), '');
+    }
+
+    /**
+     * Select an infrastructure (sede) and get a new token
+     */
+    public function selectInfrastructure(int $infrastructureId): JsonResponse
+    {
+        $result = $this->authService->selectInfrastructure($infrastructureId);
+        return ApiResponse::success(new SignInResource($result), '');
     }
 
     /**
