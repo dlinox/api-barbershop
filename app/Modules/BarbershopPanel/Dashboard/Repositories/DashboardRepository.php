@@ -5,6 +5,7 @@ namespace App\Modules\BarbershopPanel\Dashboard\Repositories;
 use App\Models\Barbershop\Ticket;
 use App\Models\Profile\Barber;
 use App\Models\Barbershop\TicketService;
+use App\Models\Treasury\Expense;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -180,5 +181,238 @@ class DashboardRepository
             ->groupBy('cpm.id', 'cpm.name', 'cpm.type')
             ->orderByDesc('amount')
             ->get();
+    }
+
+    // ─── Finance Dashboard ────────────────────────────────────────────────────
+
+    public function financeSummary(int $branchId, int $infrastructureId, string $from, string $to): array
+    {
+        $revenueByType = $this->paymentBreakdownBase($branchId, $from, $to)
+            ->pluck('amount', 'type');
+        $cashRevenue = (float) ($revenueByType['cash'] ?? 0);
+        $bankRevenue = (float) ($revenueByType['bank'] ?? 0);
+
+        $revenue = (float) Ticket::where('branch_id', $branchId)
+            ->where('status', 'confirmed')
+            ->whereBetween('ticket_date', [$from, $to])
+            ->sum('total');
+
+        $expenses = (float) Expense::where('infrastructure_id', $infrastructureId)
+            ->whereIn('status', ['pending', 'approved'])
+            ->whereBetween('transaction_date', [$from, $to])
+            ->sum('amount');
+
+        $barberPayments = (float) DB::table('treasury_employee_payments as tep')
+            ->join('profile_barbers as pb', 'pb.id', '=', 'tep.employee_id')
+            ->where('tep.employee_type', 'profile_barbers')
+            ->where('pb.branch_id', $branchId)
+            ->where('tep.status', '!=', 'cancelled')
+            ->whereBetween('tep.payment_date', [$from, $to])
+            ->sum('tep.total_amount');
+
+        $workerPayments = (float) DB::table('treasury_employee_payments as tep')
+            ->join('profile_workers as pw', 'pw.id', '=', 'tep.employee_id')
+            ->where('tep.employee_type', 'profile_workers')
+            ->where('pw.infrastructure_id', $infrastructureId)
+            ->where('tep.status', '!=', 'cancelled')
+            ->whereBetween('tep.payment_date', [$from, $to])
+            ->sum('tep.total_amount');
+
+        $pendingBarberAdvances = (float) DB::table('treasury_employee_advances as tea')
+            ->join('profile_barbers as pb', 'pb.id', '=', 'tea.employee_id')
+            ->where('tea.employee_type', 'profile_barbers')
+            ->where('pb.branch_id', $branchId)
+            ->where('tea.status', 'pending')
+            ->sum('tea.amount');
+
+        $pendingWorkerAdvances = (float) DB::table('treasury_employee_advances as tea')
+            ->join('profile_workers as pw', 'pw.id', '=', 'tea.employee_id')
+            ->where('tea.employee_type', 'profile_workers')
+            ->where('pw.infrastructure_id', $infrastructureId)
+            ->where('tea.status', 'pending')
+            ->sum('tea.amount');
+
+        $totalPayments    = $barberPayments + $workerPayments;
+        $totalEgress      = $expenses + $totalPayments;
+        $netFlow          = $revenue - $totalEgress;
+        $pendingAdvances  = $pendingBarberAdvances + $pendingWorkerAdvances;
+
+        return [
+            'revenue'         => $revenue,
+            'cashRevenue'     => $cashRevenue,
+            'bankRevenue'     => $bankRevenue,
+            'expenses'        => $expenses,
+            'barberPayments'  => $barberPayments,
+            'workerPayments'  => $workerPayments,
+            'totalPayments'   => $totalPayments,
+            'totalEgress'     => $totalEgress,
+            'netFlow'         => $netFlow,
+            'pendingAdvances' => $pendingAdvances,
+        ];
+    }
+
+    public function cashFlow(int $branchId, int $infrastructureId, string $from, string $to): array
+    {
+        $revenueByDay = Ticket::where('branch_id', $branchId)
+            ->where('status', 'confirmed')
+            ->whereBetween('ticket_date', [$from, $to])
+            ->select(
+                DB::raw("DATE_FORMAT(ticket_date, '%Y-%m-%d') as day"),
+                DB::raw('SUM(total) as revenue')
+            )
+            ->groupBy(DB::raw("DATE_FORMAT(ticket_date, '%Y-%m-%d')"))
+            ->pluck('revenue', 'day');
+
+        $expensesByDay = Expense::where('infrastructure_id', $infrastructureId)
+            ->whereIn('status', ['pending', 'approved'])
+            ->whereBetween('transaction_date', [$from, $to])
+            ->select(
+                DB::raw("DATE_FORMAT(transaction_date, '%Y-%m-%d') as day"),
+                DB::raw('SUM(amount) as expenses')
+            )
+            ->groupBy(DB::raw("DATE_FORMAT(transaction_date, '%Y-%m-%d')"))
+            ->pluck('expenses', 'day');
+
+        $days    = [];
+        $current = \Carbon\Carbon::parse($from);
+        $end     = \Carbon\Carbon::parse($to);
+
+        while ($current->lte($end)) {
+            $day    = $current->toDateString();
+            $days[] = [
+                'day'      => $day,
+                'revenue'  => (float) ($revenueByDay[$day]  ?? 0),
+                'expenses' => (float) ($expensesByDay[$day] ?? 0),
+            ];
+            $current->addDay();
+        }
+
+        return $days;
+    }
+
+    public function expensesByType(int $infrastructureId, string $from, string $to): array
+    {
+        return Expense::where('treasury_expenses.infrastructure_id', $infrastructureId)
+            ->whereIn('treasury_expenses.status', ['pending', 'approved'])
+            ->whereBetween('treasury_expenses.transaction_date', [$from, $to])
+            ->join('treasury_expense_types as tet', 'treasury_expenses.expense_type_id', '=', 'tet.id')
+            ->select(
+                'tet.name as type',
+                DB::raw('COUNT(*) as count'),
+                DB::raw('SUM(treasury_expenses.amount) as amount')
+            )
+            ->groupBy('treasury_expenses.expense_type_id', 'tet.name')
+            ->orderByDesc('amount')
+            ->get()
+            ->map(fn($r) => [
+                'type'   => $r->type,
+                'count'  => (int)   $r->count,
+                'amount' => (float) $r->amount,
+            ])
+            ->toArray();
+    }
+
+    public function employeePaymentsSummary(int $branchId, int $infrastructureId, string $from, string $to): array
+    {
+        $barbers = DB::table('treasury_employee_payments as tep')
+            ->join('profile_barbers as pb', 'pb.id', '=', 'tep.employee_id')
+            ->join('core_persons as cp', 'cp.id', '=', 'pb.id')
+            ->where('tep.employee_type', 'profile_barbers')
+            ->where('pb.branch_id', $branchId)
+            ->where('tep.status', '!=', 'cancelled')
+            ->whereBetween('tep.payment_date', [$from, $to])
+            ->select(
+                DB::raw("CONCAT(cp.name, ' ', cp.paternal_surname) as employee"),
+                DB::raw("'Barbero' as role"),
+                DB::raw('COUNT(*) as payments'),
+                DB::raw('SUM(tep.base_amount) as base_amount'),
+                DB::raw('SUM(tep.deductions) as deductions'),
+                DB::raw('SUM(tep.total_amount) as total_amount')
+            )
+            ->groupBy('tep.employee_id', 'cp.name', 'cp.paternal_surname')
+            ->get()
+            ->map(fn($r) => [
+                'employeeName'      => $r->employee,
+                'paymentsCount'     => (int)   $r->payments,
+                'baseAmount'        => (float) $r->base_amount,
+                'deductionsAmount'  => (float) $r->deductions,
+                'totalPaid'         => (float) $r->total_amount,
+            ])
+            ->toArray();
+
+        $workers = DB::table('treasury_employee_payments as tep')
+            ->join('profile_workers as pw', 'pw.id', '=', 'tep.employee_id')
+            ->join('core_persons as cp', 'cp.id', '=', 'pw.id')
+            ->where('tep.employee_type', 'profile_workers')
+            ->where('pw.infrastructure_id', $infrastructureId)
+            ->where('tep.status', '!=', 'cancelled')
+            ->whereBetween('tep.payment_date', [$from, $to])
+            ->select(
+                DB::raw("CONCAT(cp.name, ' ', cp.paternal_surname) as employee"),
+                DB::raw("'Trabajador' as role"),
+                DB::raw('COUNT(*) as payments'),
+                DB::raw('SUM(tep.base_amount) as base_amount'),
+                DB::raw('SUM(tep.deductions) as deductions'),
+                DB::raw('SUM(tep.total_amount) as total_amount')
+            )
+            ->groupBy('tep.employee_id', 'cp.name', 'cp.paternal_surname')
+            ->get()
+            ->map(fn($r) => [
+                'employeeName'      => $r->employee,
+                'paymentsCount'     => (int)   $r->payments,
+                'baseAmount'        => (float) $r->base_amount,
+                'deductionsAmount'  => (float) $r->deductions,
+                'totalPaid'         => (float) $r->total_amount,
+            ])
+            ->toArray();
+
+        return ['barbers' => $barbers, 'workers' => $workers];
+    }
+
+    public function pendingAdvances(int $branchId, int $infrastructureId): array
+    {
+        $barber = DB::table('treasury_employee_advances as tea')
+            ->join('profile_barbers as pb', 'pb.id', '=', 'tea.employee_id')
+            ->join('core_persons as cp', 'cp.id', '=', 'pb.id')
+            ->where('tea.employee_type', 'profile_barbers')
+            ->where('pb.branch_id', $branchId)
+            ->where('tea.status', 'pending')
+            ->select(
+                'tea.id',
+                DB::raw("CONCAT(cp.name, ' ', cp.paternal_surname) as employee"),
+                DB::raw("'Barbero' as role"),
+                'tea.amount',
+                'tea.advance_date',
+                'tea.reason'
+            )
+            ->get();
+
+        $worker = DB::table('treasury_employee_advances as tea')
+            ->join('profile_workers as pw', 'pw.id', '=', 'tea.employee_id')
+            ->join('core_persons as cp', 'cp.id', '=', 'pw.id')
+            ->where('tea.employee_type', 'profile_workers')
+            ->where('pw.infrastructure_id', $infrastructureId)
+            ->where('tea.status', 'pending')
+            ->select(
+                'tea.id',
+                DB::raw("CONCAT(cp.name, ' ', cp.paternal_surname) as employee"),
+                DB::raw("'Trabajador' as role"),
+                'tea.amount',
+                'tea.advance_date',
+                'tea.reason'
+            )
+            ->get();
+
+        return $barber->concat($worker)
+            ->sortByDesc('advance_date')
+            ->values()
+            ->map(fn($r) => [
+                'employeeName' => $r->employee,
+                'employeeRole' => $r->role,
+                'amount'       => (float) $r->amount,
+                'date'         => $r->advance_date,
+                'reason'       => $r->reason,
+            ])
+            ->toArray();
     }
 }

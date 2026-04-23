@@ -46,4 +46,37 @@ class DashboardController
         $to   = $request->query('to',   now()->toDateString());
         return ApiResponse::success($this->service->paymentBreakdown($from, $to));
     }
+
+    public function financeSummary(Request $request): JsonResponse
+    {
+        $from = $request->query('from', now()->startOfMonth()->toDateString());
+        $to   = $request->query('to',   now()->toDateString());
+        return ApiResponse::success($this->service->financeSummary($from, $to));
+    }
+
+    public function cashFlow(Request $request): JsonResponse
+    {
+        $from = $request->query('from', now()->startOfMonth()->toDateString());
+        $to   = $request->query('to',   now()->toDateString());
+        return ApiResponse::success($this->service->cashFlow($from, $to));
+    }
+
+    public function expensesByType(Request $request): JsonResponse
+    {
+        $from = $request->query('from', now()->startOfMonth()->toDateString());
+        $to   = $request->query('to',   now()->toDateString());
+        return ApiResponse::success($this->service->expensesByType($from, $to));
+    }
+
+    public function employeePaymentsSummary(Request $request): JsonResponse
+    {
+        $from = $request->query('from', now()->startOfMonth()->toDateString());
+        $to   = $request->query('to',   now()->toDateString());
+        return ApiResponse::success($this->service->employeePaymentsSummary($from, $to));
+    }
+
+    public function pendingAdvances(): JsonResponse
+    {
+        return ApiResponse::success($this->service->pendingAdvances());
+    }
 }

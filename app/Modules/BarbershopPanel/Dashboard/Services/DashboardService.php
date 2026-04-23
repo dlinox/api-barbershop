@@ -40,4 +40,47 @@ class DashboardService
     {
         return $this->repository->paymentBreakdown(AdminContext::barbershopBranchId(), $from, $to);
     }
+
+    public function financeSummary(string $from, string $to): array
+    {
+        return $this->repository->financeSummary(
+            AdminContext::barbershopBranchId(),
+            AdminContext::infrastructureId(),
+            $from,
+            $to
+        );
+    }
+
+    public function cashFlow(string $from, string $to): array
+    {
+        return $this->repository->cashFlow(
+            AdminContext::barbershopBranchId(),
+            AdminContext::infrastructureId(),
+            $from,
+            $to
+        );
+    }
+
+    public function expensesByType(string $from, string $to): array
+    {
+        return $this->repository->expensesByType(AdminContext::infrastructureId(), $from, $to);
+    }
+
+    public function employeePaymentsSummary(string $from, string $to): array
+    {
+        return $this->repository->employeePaymentsSummary(
+            AdminContext::barbershopBranchId(),
+            AdminContext::infrastructureId(),
+            $from,
+            $to
+        );
+    }
+
+    public function pendingAdvances(): array
+    {
+        return $this->repository->pendingAdvances(
+            AdminContext::barbershopBranchId(),
+            AdminContext::infrastructureId()
+        );
+    }
 }
