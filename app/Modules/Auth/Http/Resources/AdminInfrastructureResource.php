@@ -15,6 +15,7 @@ class AdminInfrastructureResource extends JsonResource
             'id'   => $this->id,
             'name' => $this->infrastructurable->name,
             'type' => $type,
+            'logo' => $this->infrastructurable->logo ?? null,
         ];
     }
 }
