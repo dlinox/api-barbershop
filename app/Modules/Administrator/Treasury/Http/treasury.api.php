@@ -37,8 +37,8 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/treasury-expenses')->gr
 Route::middleware(['auth:api', 'super_admin'])->prefix('/treasury-expense-types')->group(function () {
     Route::post('/data-table', [ExpenseTypeController::class, 'dataTable'])->name('treasury-expense-types.dataTable');
     Route::post('/save', [ExpenseTypeController::class, 'save'])->name('treasury-expense-types.save');
-    Route::get('/select-items', [ExpenseTypeController::class, 'selectItems'])->name('treasury-expense-types.selectItems');
     Route::delete('/delete/{id}', [ExpenseTypeController::class, 'delete'])->name('treasury-expense-types.delete');
+    // GET /select-items → movido a shared.api.php
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/treasury-general-expenses')->group(function () {

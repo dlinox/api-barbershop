@@ -21,15 +21,15 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/company-logo')->group(f
 Route::middleware(['auth:api', 'super_admin'])->prefix('/payment-methods')->group(function () {
     Route::post('/data-table', [PaymentMethodsController::class, 'dataTable'])->name('payment-methods.dataTable');
     Route::post('/save', [PaymentMethodsController::class, 'save'])->name('payment-methods.save');
-    Route::get('/get-active-payment-methods', [PaymentMethodsController::class, 'getActivePaymentMethods'])->name('payment-methods.getActivePaymentMethods');
     Route::delete('/delete/{id}', [PaymentMethodsController::class, 'delete'])->name('payment-methods.delete');
+    // GET /get-active-payment-methods → movido a shared.api.php
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/document-types')->group(function () {
     Route::post('/data-table', [DocumentTypeController::class, 'dataTable'])->name('document-types.dataTable');
     Route::post('/save', [DocumentTypeController::class, 'save'])->name('document-types.save');
-    Route::get('/select-items', [DocumentTypeController::class, 'selectItems'])->name('document-types.selectItems');
     Route::delete('/delete/{code}', [DocumentTypeController::class, 'delete'])->name('document-types.delete');
+    // GET /select-items → movido a shared.api.php
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/employee-schedules')->group(function () {

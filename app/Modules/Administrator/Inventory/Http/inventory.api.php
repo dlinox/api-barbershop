@@ -14,15 +14,15 @@ use App\Modules\Administrator\Inventory\Http\Controllers\SaleController;
 Route::middleware(['auth:api', 'super_admin'])->prefix('/inventory-categories')->group(function () {
     Route::post('/data-table', [CategoryController::class, 'dataTable'])->name('inventory-categories.dataTable');
     Route::post('/save', [CategoryController::class, 'save'])->name('inventory-categories.save');
-    Route::get('/select-items', [CategoryController::class, 'selectItems'])->name('inventory-categories.selectItems');
     Route::delete('/delete/{id}', [CategoryController::class, 'delete'])->name('inventory-categories.delete');
+    // GET /select-items → movido a shared.api.php
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/inventory-brands')->group(function () {
     Route::post('/data-table', [BrandController::class, 'dataTable'])->name('inventory-brands.dataTable');
     Route::post('/save', [BrandController::class, 'save'])->name('inventory-brands.save');
-    Route::get('/select-items', [BrandController::class, 'selectItems'])->name('inventory-brands.selectItems');
     Route::delete('/delete/{id}', [BrandController::class, 'delete'])->name('inventory-brands.delete');
+    // GET /select-items → movido a shared.api.php
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/inventory-suppliers')->group(function () {

@@ -5,7 +5,7 @@ namespace App\Modules\AcademyPanel\Academy\Http\Controllers;
 use App\Common\Http\Responses\ApiResponse;
 use App\Modules\AcademyPanel\Academy\Services\EnrollmentPaymentAdvanceService;
 use App\Modules\Administrator\Academy\Http\Requests\EnrollmentPaymentAdvance\EnrollmentPaymentAdvanceRequest;
-use App\Modules\Administrator\Academy\Http\Resources\EnrollmentPaymentAdvance\EnrollmentPaymentAdvanceItemResource;
+use App\Modules\Administrator\Academy\Http\Resources\EnrollmentPaymentAdvance\EnrollmentPaymentAdvanceResource;
 
 class EnrollmentPaymentAdvanceController
 {
@@ -14,7 +14,7 @@ class EnrollmentPaymentAdvanceController
     public function getAvailableByStudentId(int $studentId)
     {
         $items = $this->advanceService->getAvailableByStudentId($studentId);
-        return ApiResponse::success(EnrollmentPaymentAdvanceItemResource::collection($items));
+        return ApiResponse::success(EnrollmentPaymentAdvanceResource::collection($items));
     }
 
     public function save(EnrollmentPaymentAdvanceRequest $request)

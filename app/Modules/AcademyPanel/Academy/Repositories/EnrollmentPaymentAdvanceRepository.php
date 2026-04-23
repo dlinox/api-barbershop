@@ -9,9 +9,9 @@ class EnrollmentPaymentAdvanceRepository
 {
     public function getAvailableByStudentId(int $studentId)
     {
-        return EnrollmentPaymentAdvance::where('profile_student_id', $studentId)
-            ->where('is_available', true)
-            ->orderBy('id', 'desc')
+        return EnrollmentPaymentAdvance::where('student_id', $studentId)
+            ->whereNull('used_at')
+            ->orderBy('payment_date', 'desc')
             ->get();
     }
 

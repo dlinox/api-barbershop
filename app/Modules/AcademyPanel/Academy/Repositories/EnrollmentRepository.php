@@ -42,4 +42,12 @@ class EnrollmentRepository
     {
         return $this->query()->where('academy_enrollments.id', $id)->first();
     }
+
+    public function save($data)
+    {
+        return Enrollment::updateOrCreate(
+            ['id' => $data['id'] ?? null],
+            $data
+        );
+    }
 }
