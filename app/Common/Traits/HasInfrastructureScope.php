@@ -51,7 +51,7 @@ trait HasInfrastructureScope
             return $request->attributes->get('admin_infrastructure_ids');
         }
 
-        $infraIds = [];
+        $infraIds = null;
 
         try {
             $payload = JWTAuth::parseToken()->getPayload();
@@ -65,9 +65,11 @@ trait HasInfrastructureScope
                         ->pluck('core_infrastructure_id')
                         ->toArray();
                 }
+                // Panel users (workers, barbers, etc.) already have their sede scoped
+                // via the JWT `inf` claim — no additional infrastructure check needed
             }
         } catch (\Exception) {
-            // Si no se puede parsear el token, retornar array vacío (sin acceso)
+            // Si no se puede parsear el token, retornar null (sin restricción por infra)
         }
 
         $request->attributes->set('admin_infrastructure_ids', $infraIds);

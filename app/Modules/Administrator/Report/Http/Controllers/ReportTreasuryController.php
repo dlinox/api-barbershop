@@ -71,6 +71,11 @@ class ReportTreasuryController
         return ApiResponse::success($items);
     }
 
+    public function selectCashSessions(): JsonResponse
+    {
+        return ApiResponse::success($this->service->selectCashSessions());
+    }
+
     public function dataTableIncomeVsExpense(Request $request): JsonResponse
     {
         $items = $this->service->dataTableIncomeVsExpense($request);

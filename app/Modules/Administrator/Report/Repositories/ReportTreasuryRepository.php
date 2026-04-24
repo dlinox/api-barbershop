@@ -6,6 +6,7 @@ use App\Models\Treasury\CashSession;
 use App\Models\Treasury\Expense;
 use App\Models\Treasury\Income;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ReportTreasuryRepository
@@ -152,5 +153,27 @@ class ReportTreasuryRepository
             'actualClose'    => (float) $s->actual_closing_amount,
             'difference'     => (float) $s->difference,
         ])->toArray();
+    }
+
+    public function selectCashSessions(): Collection
+    {
+        return DB::table('treasury_cash_sessions as cs')
+            ->join('treasury_cash_registers as cr', 'cr.id', '=', 'cs.cash_register_id')
+            ->join('core_infrastructures as ci', 'ci.id', '=', 'cr.infrastructure_id')
+            ->leftJoin('barbershop_branches as bb', function ($join) {
+                $join->on('bb.id', '=', 'ci.infrastructurable_id')
+                    ->where('ci.infrastructurable_type', '=', 'barbershop_branches');
+            })
+            ->leftJoin('academy_branches as ab', function ($join) {
+                $join->on('ab.id', '=', 'ci.infrastructurable_id')
+                    ->where('ci.infrastructurable_type', '=', 'academy_branches');
+            })
+            ->select(
+                'cs.id as value',
+                DB::raw("CONCAT(DATE_FORMAT(cs.opened_at, '%d/%m/%Y'), ' - ', COALESCE(bb.name, ab.name, '---'), ' - ', cr.name) as title"),
+            )
+            ->orderByDesc('cs.opened_at')
+            ->limit(200)
+            ->get();
     }
 }

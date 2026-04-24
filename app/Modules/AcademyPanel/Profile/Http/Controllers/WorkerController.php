@@ -7,6 +7,7 @@ use App\Common\Http\Responses\ApiResponse;
 use App\Modules\AcademyPanel\Profile\Services\WorkerService;
 use App\Modules\Administrator\Profile\Http\Requests\WorkerRequest;
 use App\Modules\Administrator\Profile\Http\Resources\WorkerDataTableItemResource;
+use App\Modules\Administrator\Treasury\Http\Resources\Worker\WorkerSelectItemResource;
 
 class WorkerController
 {
@@ -36,6 +37,7 @@ class WorkerController
     public function selectAsyncItems(Request $request)
     {
         $items = $this->workerService->selectAsyncItems($request);
+        $items = WorkerSelectItemResource::collection($items);
         return ApiResponse::success($items);
     }
 }

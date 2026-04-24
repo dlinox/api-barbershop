@@ -76,9 +76,10 @@ class WorkerRepository
 
         return Worker::select(
             'profile_workers.id',
-            'core_persons.name',
-            'core_persons.paternal_surname',
-            'core_persons.maternal_surname',
+            'core_persons.name as person_name',
+            'core_persons.paternal_surname as person_paternal_surname',
+            'core_persons.maternal_surname as person_maternal_surname',
+            'core_persons.document_number as person_document_number',
         )
             ->join('core_persons', 'profile_workers.id', '=', 'core_persons.id')
             ->where('profile_workers.infrastructure_id', $infrastructureId)
@@ -86,9 +87,11 @@ class WorkerRepository
             ->when($search, fn($q) => $q->where(function ($q) use ($search) {
                 $q->where('core_persons.name', 'like', "%{$search}%")
                     ->orWhere('core_persons.paternal_surname', 'like', "%{$search}%")
-                    ->orWhere('core_persons.maternal_surname', 'like', "%{$search}%");
+                    ->orWhere('core_persons.maternal_surname', 'like', "%{$search}%")
+                    ->orWhere('core_persons.document_number', 'like', "%{$search}%");
             }))
             ->orderBy('core_persons.name')
+            ->limit(20)
             ->get();
     }
 }

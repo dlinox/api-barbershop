@@ -100,6 +100,11 @@ class ReportBarbershopService
         return ($this->reportDataTableQuery)($request, 'barbershop_cash_session_summary');
     }
 
+    public function selectCashSessions(): array
+    {
+        return $this->repository->selectCashSessions()->toArray();
+    }
+
     // ─── Generación de PDFs ───
 
     public function generateIncomePerDayPdf(Request $request): Report

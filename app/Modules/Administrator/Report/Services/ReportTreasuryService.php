@@ -88,6 +88,11 @@ class ReportTreasuryService
         return ($this->reportDataTableQuery)($request, 'treasury_cash_session');
     }
 
+    public function selectCashSessions(): array
+    {
+        return $this->repository->selectCashSessions()->toArray();
+    }
+
     public function dataTableIncomeVsExpense(Request $request): array
     {
         return ($this->reportDataTableQuery)($request, 'treasury_income_vs_expense');

@@ -7,6 +7,7 @@ use App\Models\Barbershop\Ticket;
 use App\Models\Treasury\Income;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class ReportBarbershopRepository
 {
@@ -185,5 +186,23 @@ class ReportBarbershopRepository
             'revenue'  => (float) $s->revenue,
             'avgPrice' => (float) $s->avg_price,
         ])->toArray();
+    }
+
+    public function selectCashSessions(): Collection
+    {
+        return DB::table('treasury_cash_sessions as cs')
+            ->join('treasury_cash_registers as cr', 'cr.id', '=', 'cs.cash_register_id')
+            ->join('core_infrastructures as ci', 'ci.id', '=', 'cr.infrastructure_id')
+            ->join('barbershop_branches as bb', function ($join) {
+                $join->on('bb.id', '=', 'ci.infrastructurable_id')
+                    ->where('ci.infrastructurable_type', '=', 'barbershop_branches');
+            })
+            ->select(
+                'cs.id as value',
+                DB::raw("CONCAT(DATE_FORMAT(cs.opened_at, '%d/%m/%Y'), ' - ', bb.name, ' - ', cr.name) as title"),
+            )
+            ->orderByDesc('cs.opened_at')
+            ->limit(200)
+            ->get();
     }
 }

@@ -33,6 +33,7 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/report-barbershop')->gr
     Route::post('/data-table-income-per-day', [ReportBarbershopController::class, 'dataTableIncomePerDay']);
     Route::post('/data-table-barber-commissions', [ReportBarbershopController::class, 'dataTableBarberCommissions']);
     Route::post('/data-table-cash-session-summary', [ReportBarbershopController::class, 'dataTableCashSessionSummary']);
+    Route::get('/select-cash-sessions', [ReportBarbershopController::class, 'selectCashSessions']);
     Route::post('/generate-income-per-day', [ReportBarbershopController::class, 'generateIncomePerDayPdf']);
     Route::post('/generate-barber-commissions', [ReportBarbershopController::class, 'generateBarberCommissionsPdf']);
     Route::post('/generate-cash-session-summary', [ReportBarbershopController::class, 'generateCashSessionSummaryPdf']);
@@ -50,6 +51,7 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/report-treasury')->grou
     Route::post('/data-table-income-per-day', [ReportTreasuryController::class, 'dataTableIncomePerDay']);
     Route::post('/data-table-expense-per-day', [ReportTreasuryController::class, 'dataTableExpensePerDay']);
     Route::post('/data-table-cash-session', [ReportTreasuryController::class, 'dataTableCashSession']);
+    Route::get('/select-cash-sessions', [ReportTreasuryController::class, 'selectCashSessions']);
     Route::post('/data-table-income-vs-expense', [ReportTreasuryController::class, 'dataTableIncomeVsExpense']);
     Route::post('/data-table-pending-expenses', [ReportTreasuryController::class, 'dataTablePendingExpenses']);
     // PDF Generation

@@ -8,6 +8,8 @@ use App\Models\Behavior\Permission;
 
 class PermissionSeeder extends Seeder
 {
+    private array $seededNames = [];
+
     /**
      * Run the database seeds.
      */
@@ -24,46 +26,61 @@ class PermissionSeeder extends Seeder
 
         foreach ($files as $file) {
             $permissions = require $file->getPathname();
-            
+
             if (is_array($permissions)) {
-                // Si retorna un solo nodo asociativo, envuélvelo en un array secuencial
                 if (isset($permissions['name'])) {
                     $permissions = [$permissions];
                 }
                 $this->seedPermissions($permissions);
             }
         }
+
+        $this->deleteStalePermissions();
     }
 
     private function seedPermissions(array $permissions, $parentId = null, $parentLevel = null): void
     {
-        // Verificar si se pasó un solo elemento asociativo en la recursividad, y envolver
         if (isset($permissions['name'])) {
             $permissions = [$permissions];
         }
 
         foreach ($permissions as $permissionData) {
-            // Extraer los hijos si existen
             $children = $permissionData['children'] ?? [];
             unset($permissionData['children']);
 
-            // Asignar el parent
             $permissionData['parent_id'] = $parentId;
-            
-            // Consideración requerida: heredar el level del padre (módulo)
+
             $currentLevel = $permissionData['level'] ?? $parentLevel ?? '1';
             $permissionData['level'] = $currentLevel;
 
-            // Crear o actualizar el permiso
             $permission = Permission::updateOrCreate(
                 ['name' => $permissionData['name']],
                 $permissionData
             );
 
-            // Llamada recursiva para los hijos, enviando el nivel actual
+            $this->seededNames[] = $permissionData['name'];
+
             if (!empty($children)) {
                 $this->seedPermissions($children, $permission->id, $currentLevel);
             }
         }
+    }
+
+    private function deleteStalePermissions(): void
+    {
+        $stale = Permission::whereNotIn('name', $this->seededNames)->get();
+
+        if ($stale->isEmpty()) {
+            return;
+        }
+
+        $staleIds = $stale->pluck('id')->toArray();
+
+        // Remove role associations before deleting
+        \DB::table('behavior_role_permissions')->whereIn('behavior_permission_id', $staleIds)->delete();
+
+        Permission::whereIn('id', $staleIds)->delete();
+
+        $this->command->info("Eliminados {$stale->count()} permisos obsoletos.");
     }
 }

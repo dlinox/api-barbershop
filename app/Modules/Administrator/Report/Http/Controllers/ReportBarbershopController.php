@@ -79,6 +79,11 @@ class ReportBarbershopController
         return ApiResponse::success($items);
     }
 
+    public function selectCashSessions(): JsonResponse
+    {
+        return ApiResponse::success($this->service->selectCashSessions());
+    }
+
     // ─── Generación de PDFs ───
 
     public function generateIncomePerDayPdf(GenerateBarbershopIncomePerDayRequest $request): JsonResponse
