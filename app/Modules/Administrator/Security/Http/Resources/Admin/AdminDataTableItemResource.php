@@ -10,7 +10,10 @@ class AdminDataTableItemResource extends JsonResource
     {
         return [
             'id' => $this->core_person_id,
-            'infrastructures' => $this->infrastructures->pluck('id')->toArray(),
+            'infrastructures' => $this->infrastructures->map(fn($i) => [
+                'id'   => $i->id,
+                'name' => $i->infrastructurable?->name ?? 'Sin nombre',
+            ])->toArray(),
             'person' => [
                 'id' => $this->core_person_id,
                 'documentType' => $this->person_document_type,
@@ -31,7 +34,8 @@ class AdminDataTableItemResource extends JsonResource
                 'isActive' => (bool) $this->user_is_active,
             ],
             'role' => [
-                'id' => $this->role_id,
+                'id'          => $this->role_id,
+                'displayName' => $this->role_display_name,
             ],
         ];
     }

@@ -4,14 +4,12 @@ namespace App\Modules\BarbershopPanel\Profile\Repositories\Actions;
 
 use App\Common\Http\Context\AdminContext;
 use App\Common\Exceptions\ApiException;
-use App\Models\Auth\User;
 use App\Models\Behavior\Role;
 use Illuminate\Support\Facades\DB;
 
 use App\Modules\BarbershopPanel\Profile\Repositories\WorkerRepository;
 use App\Modules\Shared\Repositories\ProfileRepository;
 use App\Modules\Shared\Repositories\Actions\CreateOrUpdatePersonAction;
-use App\Modules\Auth\Repositories\Actions\CreateOrUpdateUserAction;
 
 class CreateOrUpdateWorkerAction
 {
@@ -19,7 +17,6 @@ class CreateOrUpdateWorkerAction
         private WorkerRepository $workerRepository,
         private ProfileRepository $profileRepository,
         private CreateOrUpdatePersonAction $createOrUpdatePersonAction,
-        private CreateOrUpdateUserAction $createOrUpdateUserAction,
     ) {}
 
     public function execute(array $data): void
@@ -42,20 +39,6 @@ class CreateOrUpdateWorkerAction
                 $worker = $this->workerRepository->findByPersonId($person->id);
                 if ($worker) throw new ApiException('La persona ya tiene un perfil de trabajador');
 
-                $existingProfile = $this->profileRepository->findByProfileableId($person->id);
-
-                if ($existingProfile) {
-                    $user = User::find($existingProfile->auth_user_id);
-                    if (!$user) throw new ApiException('Error al encontrar el usuario asociado');
-                } else {
-                    $user = $this->createOrUpdateUserAction->execute([
-                        'username' => $person->document_number,
-                        'email'    => $person->email,
-                        'password' => $person->document_number,
-                        'is_active' => $isActive,
-                    ]);
-                }
-
                 $worker = $this->workerRepository->create($person->id, [
                     'infrastructure_id' => $infrastructureId,
                     'position'          => $data['position'] ?? null,
@@ -66,9 +49,9 @@ class CreateOrUpdateWorkerAction
 
                 if (!$worker) throw new ApiException('Error al crear el perfil de trabajador');
 
-                $profileExists = $this->profileRepository->findUserIdAndType($user->id, 'profile_workers');
-                if ($profileExists) throw new ApiException('El usuario ya tiene un perfil de trabajador');
-                $behaviorProfile = $this->profileRepository->create($user->id, 'profile_workers', $worker->id, $role->id);
+                $profileExists = $this->profileRepository->findByProfileableIdAndType($worker->id, 'workers');
+                if ($profileExists) throw new ApiException('El trabajador ya tiene un perfil asignado');
+                $behaviorProfile = $this->profileRepository->create(null, 'profile_workers', $worker->id, $role->id);
                 $behaviorProfile->update(['is_active' => $isActive]);
             } else {
                 $worker = $this->workerRepository->findByPersonId($data['id']);
@@ -83,7 +66,7 @@ class CreateOrUpdateWorkerAction
                     'is_active'         => $isActive,
                 ]);
 
-                $existingProfile = $this->profileRepository->findByProfileableIdAndType($person->id, 'profile_workers');
+                $existingProfile = $this->profileRepository->findByProfileableIdAndType($person->id, 'workers');
                 if ($existingProfile) {
                     $existingProfile->update(['is_active' => $isActive]);
                 }

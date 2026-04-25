@@ -32,10 +32,19 @@ class CreateOrUpdateAdminAction
         try {
             $person = $this->createOrUpdatePersonAction->execute($data['person'], $data['id']);
 
-            $profile = $this->profileRepository->findByProfileableId($person->id);
-
-            if ($profile !== null && isset($data['user']['id'])) {
-                if ($profile->auth_user_id !== $data['user']['id']) throw new ApiException('El usuario no coincide con la persona');
+            // If the person already has a user account (via any other profile),
+            // reuse it as-is without touching username/email/password
+            if (empty($data['user']['id'])) {
+                $existingUser = \App\Models\Auth\User::where('username', $data['user']['username'])->first();
+                if ($existingUser) {
+                    // Just pass the id so createOrUpdateUserAction only updates (no duplicate checks will fire)
+                    $data['user'] = [
+                        'id'        => $existingUser->id,
+                        'username'  => $existingUser->username,
+                        'email'     => $existingUser->email,
+                        'is_active' => $data['user']['is_active'] ?? $existingUser->is_active,
+                    ];
+                }
             }
 
             $data['user']['password'] = $person->document_number;
@@ -56,6 +65,10 @@ class CreateOrUpdateAdminAction
                 $admin = $this->adminRepository->findByPersonId($data['id']);
                 if (!$admin) throw new ApiException('Error al encontrar el perfil de administrador');
                 if ($data['id'] != $person->id) throw new ApiException('El perfil de administrador no coincide con la persona');
+
+                $profile = $this->profileRepository->findByProfileableId($admin->core_person_id);
+                if (!$profile) throw new ApiException('Error al encontrar el perfil del administrador');
+                $profile->update(['behavior_role_id' => $role->id]);
             }
 
             DB::commit();

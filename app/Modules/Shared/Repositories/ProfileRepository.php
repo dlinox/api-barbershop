@@ -6,7 +6,7 @@ use App\Models\Behavior\Profile;
 
 class ProfileRepository
 {
-    public function create(int $userId, string $profileType, int $profileId, $roleId): Profile
+    public function create(?int $userId, string $profileType, int $profileId, $roleId): Profile
     {
         return Profile::create([
             'auth_user_id' => $userId,

@@ -41,7 +41,7 @@ class AdminRepository
             ->join('auth_users', 'behavior_profiles.auth_user_id', '=', 'auth_users.id')
             ->join('behavior_roles', 'behavior_roles.id', '=', 'behavior_profiles.behavior_role_id')
             ->where('behavior_roles.level', '1')
-            ->with('infrastructures');
+            ->with('infrastructures.infrastructurable');
 
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $items->orderBy('profile_admins.core_person_id', 'desc');

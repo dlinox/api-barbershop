@@ -6,6 +6,7 @@ use App\Models\Barbershop\Ticket;
 use App\Common\Http\Context\AdminContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class TicketRepository
 {
@@ -55,10 +56,31 @@ class TicketRepository
             ->get()
             ->keyBy('status');
 
+        $confirmedPayments = DB::table('treasury_income_payment_methods as ipm')
+            ->join('treasury_incomes as i', 'i.id', '=', 'ipm.income_id')
+            ->join('core_payment_methods as pm', 'pm.id', '=', 'ipm.payment_method_id')
+            ->join('barbershop_tickets as t', function ($join) {
+                $join->on('i.transactionable_id', '=', 't.id')
+                    ->where('i.transactionable_type', '=', 'barbershop_tickets');
+            })
+            ->where('t.cash_session_id', $cashSessionId)
+            ->where('t.status', 'confirmed')
+            ->selectRaw("
+                COALESCE(SUM(CASE WHEN pm.type = 'cash' THEN ipm.amount ELSE 0 END), 0) as cash_amount,
+                COALESCE(SUM(CASE WHEN pm.type != 'cash' THEN ipm.amount ELSE 0 END), 0) as bank_amount
+            ")
+            ->first();
+
         return [
-            'confirmed' => ['count' => (int)($stats['confirmed']->count ?? 0), 'amount' => (float)($stats['confirmed']->amount ?? 0)],
+            'confirmed' => [
+                'count'      => (int)($stats['confirmed']->count ?? 0),
+                'amount'     => (float)($stats['confirmed']->amount ?? 0),
+                'cashAmount' => (float)($confirmedPayments->cash_amount ?? 0),
+                'bankAmount' => (float)($confirmedPayments->bank_amount ?? 0),
+            ],
             'pending'   => ['count' => (int)($stats['pending']->count ?? 0),   'amount' => (float)($stats['pending']->amount ?? 0)],
             'cancelled' => ['count' => (int)($stats['cancelled']->count ?? 0), 'amount' => (float)($stats['cancelled']->amount ?? 0)],
+            'total'     => ['count' => (int)$stats->sum('count'),               'amount' => (float)$stats->sum('amount')],
         ];
     }
 

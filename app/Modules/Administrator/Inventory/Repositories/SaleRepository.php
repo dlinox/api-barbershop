@@ -109,10 +109,16 @@ class SaleRepository
             ->values()
             ->toArray();
 
+        $paymentSummaryCollection = collect($paymentSummary);
+        $cashAmount = (float) $paymentSummaryCollection->where('methodType', 'cash')->sum('total');
+        $bankAmount = (float) $paymentSummaryCollection->where('methodType', '!=', 'cash')->sum('total');
+
         return [
             'completed' => [
-                'count'  => (int) ($stats['completed']->count ?? 0),
-                'amount' => (float) ($stats['completed']->amount ?? 0),
+                'count'      => (int) ($stats['completed']->count ?? 0),
+                'amount'     => (float) ($stats['completed']->amount ?? 0),
+                'cashAmount' => $cashAmount,
+                'bankAmount' => $bankAmount,
             ],
             'pending' => [
                 'count'  => (int) ($stats['pending']->count ?? 0),
