@@ -5,7 +5,7 @@ namespace App\Modules\BarbershopPanel\Barbershop\Http\Controllers;
 use App\Common\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 use App\Modules\BarbershopPanel\Barbershop\Services\BarberService;
-use App\Modules\Administrator\Barbershop\Http\Requests\Barber\BarberRequest;
+use App\Modules\BarbershopPanel\Barbershop\Http\Requests\BarberRequest;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberDataTableItemResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberSelectItemResource;
 

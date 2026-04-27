@@ -61,4 +61,26 @@ class ServiceRepository
         $branchId = AdminContext::barbershopBranchId();
         return Service::where('branch_id', $branchId)->where('is_active', true)->get();
     }
+
+    public function getActiveServicesByInfrastructure(int $infrastructureId)
+    {
+        if ($infrastructureId !== AdminContext::infrastructureId()) {
+            throw new ApiException('La sede solicitada no corresponde a la sede seleccionada', 403);
+        }
+
+        $branchId = AdminContext::barbershopBranchId();
+
+        return Service::select(
+            'barbershop_services.id',
+            'barbershop_services.name',
+            'barbershop_categories.name as category_name',
+            'barbershop_services.price',
+            'barbershop_services.duration',
+        )
+            ->join('barbershop_categories', 'barbershop_services.category_id', '=', 'barbershop_categories.id')
+            ->where('barbershop_services.branch_id', $branchId)
+            ->where('barbershop_services.is_active', true)
+            ->orderBy('barbershop_services.name')
+            ->get();
+    }
 }

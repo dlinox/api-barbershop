@@ -5,7 +5,7 @@ namespace App\Modules\BarbershopPanel\Barbershop\Http\Controllers;
 use App\Common\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 use App\Modules\BarbershopPanel\Barbershop\Services\TicketService;
-use App\Modules\Administrator\Barbershop\Http\Requests\Ticket\TicketRequest;
+use App\Modules\BarbershopPanel\Barbershop\Http\Requests\TicketRequest;
 use App\Modules\Administrator\Barbershop\Http\Resources\Ticket\TicketDataTableItemResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Ticket\TicketResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Ticket\WaitingQueueTicketResource;

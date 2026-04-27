@@ -29,4 +29,9 @@ class ServiceService
     {
         return $this->serviceRepository->getActiveServices();
     }
+
+    public function getActiveServicesByInfrastructure(int $infrastructureId)
+    {
+        return $this->serviceRepository->getActiveServicesByInfrastructure($infrastructureId);
+    }
 }

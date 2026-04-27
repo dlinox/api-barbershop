@@ -31,8 +31,11 @@ class ClientRepository
         return $items->dataTable($request);
     }
 
-    public function selectAsyncItems($search)
+    public function selectAsyncItems($search, $value = null)
     {
+        $selected = null;
+        $limit = 25;
+
         $items = Client::select(
             'profile_clients.id as id',
             'core_persons.name as person_name',
@@ -41,6 +44,13 @@ class ClientRepository
             'core_persons.document_number as person_document_number',
         )
             ->join('core_persons', 'profile_clients.id', '=', 'core_persons.id');
+
+        if (!empty($value)) {
+            $selected = (clone $items)->where('profile_clients.id', $value)->first();
+            if ($selected) {
+                $limit = 24;
+            }
+        }
 
         if (!empty($search)) {
             $items->where(function ($query) use ($search) {
@@ -51,6 +61,16 @@ class ClientRepository
             });
         }
 
-        return $items->limit(20)->get();
+        if ($selected) {
+            $items->where('profile_clients.id', '!=', $value);
+        }
+
+        $items = $items->limit($limit)->get();
+
+        if ($selected) {
+            $items->prepend($selected);
+        }
+
+        return $items;
     }
 }

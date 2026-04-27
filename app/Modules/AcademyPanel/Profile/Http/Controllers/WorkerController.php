@@ -5,7 +5,7 @@ namespace App\Modules\AcademyPanel\Profile\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Common\Http\Responses\ApiResponse;
 use App\Modules\AcademyPanel\Profile\Services\WorkerService;
-use App\Modules\Administrator\Profile\Http\Requests\WorkerRequest;
+use App\Modules\AcademyPanel\Profile\Http\Requests\WorkerRequest;
 use App\Modules\Administrator\Profile\Http\Resources\WorkerDataTableItemResource;
 use App\Modules\Administrator\Treasury\Http\Resources\Worker\WorkerSelectItemResource;
 

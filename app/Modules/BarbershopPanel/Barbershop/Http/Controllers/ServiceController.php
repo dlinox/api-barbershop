@@ -8,6 +8,7 @@ use App\Modules\BarbershopPanel\Barbershop\Services\ServiceService;
 use App\Modules\Administrator\Barbershop\Http\Requests\Service\ServiceRequest;
 use App\Modules\Administrator\Barbershop\Http\Resources\Service\ServiceDataTableItemResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Service\ServiceSelectItemResource;
+use App\Modules\Administrator\Barbershop\Http\Resources\Service\ServiceSelectItemByInfrastructureResource;
 
 class ServiceController
 {
@@ -35,6 +36,15 @@ class ServiceController
     public function selectItems()
     {
         $items = ServiceSelectItemResource::collection($this->serviceService->getActiveServices());
+        return ApiResponse::success($items);
+    }
+
+    public function getByInfrastructure(int $infrastructureId)
+    {
+        $items = ServiceSelectItemByInfrastructureResource::collection(
+            $this->serviceService->getActiveServicesByInfrastructure($infrastructureId)
+        );
+
         return ApiResponse::success($items);
     }
 }

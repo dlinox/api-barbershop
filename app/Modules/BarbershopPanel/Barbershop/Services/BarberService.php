@@ -24,6 +24,6 @@ class BarberService
 
     public function selectAsyncItems($request)
     {
-        return $this->barberRepository->selectAsyncItems($request->search);
+        return $this->barberRepository->selectAsyncItems($request->search, $request->value);
     }
 }

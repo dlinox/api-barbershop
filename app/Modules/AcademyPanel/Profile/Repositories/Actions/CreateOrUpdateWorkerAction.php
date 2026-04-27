@@ -4,28 +4,20 @@ namespace App\Modules\AcademyPanel\Profile\Repositories\Actions;
 
 use App\Common\Http\Context\AdminContext;
 use App\Common\Exceptions\ApiException;
-use App\Models\Behavior\Role;
 use Illuminate\Support\Facades\DB;
 
 use App\Modules\AcademyPanel\Profile\Repositories\WorkerRepository;
-use App\Modules\Shared\Repositories\ProfileRepository;
 use App\Modules\Shared\Repositories\Actions\CreateOrUpdatePersonAction;
 
 class CreateOrUpdateWorkerAction
 {
     public function __construct(
         private WorkerRepository $workerRepository,
-        private ProfileRepository $profileRepository,
         private CreateOrUpdatePersonAction $createOrUpdatePersonAction,
     ) {}
 
     public function execute(array $data): void
     {
-        $role = Role::where('name', 'trabajador')->where('is_active', true)->first();
-        if (!$role) {
-            throw new ApiException('El rol trabajador no existe, comuníquese con el administrador');
-        }
-
         $infrastructureId = AdminContext::infrastructureId();
 
         try {
@@ -48,11 +40,6 @@ class CreateOrUpdateWorkerAction
                 ]);
 
                 if (!$worker) throw new ApiException('Error al crear el perfil de trabajador');
-
-                $profileExists = $this->profileRepository->findByProfileableIdAndType($worker->id, 'workers');
-                if ($profileExists) throw new ApiException('El trabajador ya tiene un perfil asignado');
-                $behaviorProfile = $this->profileRepository->create(null, 'profile_workers', $worker->id, $role->id);
-                $behaviorProfile->update(['is_active' => $isActive]);
             } else {
                 $worker = $this->workerRepository->findByPersonId($data['id']);
                 if (!$worker) throw new ApiException('Error al encontrar el perfil de trabajador');
@@ -65,11 +52,6 @@ class CreateOrUpdateWorkerAction
                     'payment_frequency' => $data['payment_frequency'] ?? null,
                     'is_active'         => $isActive,
                 ]);
-
-                $existingProfile = $this->profileRepository->findByProfileableIdAndType($person->id, 'workers');
-                if ($existingProfile) {
-                    $existingProfile->update(['is_active' => $isActive]);
-                }
             }
 
             DB::commit();

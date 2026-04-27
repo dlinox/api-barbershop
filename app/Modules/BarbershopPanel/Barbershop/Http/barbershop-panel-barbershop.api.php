@@ -40,6 +40,7 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/barbershop-services')
     Route::post('/data-table',    [ServiceController::class, 'dataTable'])  ->name('bp.barbershop-services.dataTable') ->middleware('permission:barbershop_panel.config.service');
     Route::post('/save',          [ServiceController::class, 'save'])       ->name('bp.barbershop-services.save')      ->middleware('permission:barbershop_panel.config.service');
     Route::get('/select-items',   [ServiceController::class, 'selectItems'])->name('bp.barbershop-services.selectItems');
+    Route::get('/by-infrastructure/{infrastructureId}', [ServiceController::class, 'getByInfrastructure'])->name('bp.barbershop-services.getByInfrastructure');
     Route::delete('/delete/{id}', [ServiceController::class, 'delete'])     ->name('bp.barbershop-services.delete')    ->middleware('permission:barbershop_panel.config.service');
 });
 

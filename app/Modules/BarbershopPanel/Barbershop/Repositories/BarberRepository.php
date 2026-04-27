@@ -39,9 +39,11 @@ class BarberRepository
         return $items->dataTable($request);
     }
 
-    public function selectAsyncItems($search)
+    public function selectAsyncItems($search, $value = null)
     {
         $branchId = AdminContext::barbershopBranchId();
+        $selected = null;
+        $limit = 25;
 
         $items = Barber::select(
             'profile_barbers.id as id',
@@ -54,6 +56,13 @@ class BarberRepository
             ->where('profile_barbers.branch_id', $branchId)
             ->where('profile_barbers.is_active', true);
 
+        if (!empty($value)) {
+            $selected = (clone $items)->where('profile_barbers.id', $value)->first();
+            if ($selected) {
+                $limit = 24;
+            }
+        }
+
         if (!empty($search)) {
             $items->where(function ($q) use ($search) {
                 $q->where('core_persons.name', 'like', "%{$search}%")
@@ -62,6 +71,16 @@ class BarberRepository
             });
         }
 
-        return $items->limit(20)->get();
+        if ($selected) {
+            $items->where('profile_barbers.id', '!=', $value);
+        }
+
+        $items = $items->limit($limit)->get();
+
+        if ($selected) {
+            $items->prepend($selected);
+        }
+
+        return $items;
     }
 }

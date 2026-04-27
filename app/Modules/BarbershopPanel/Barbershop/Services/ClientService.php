@@ -24,6 +24,6 @@ class ClientService
 
     public function selectAsyncItems($request)
     {
-        return $this->clientRepository->selectAsyncItems($request->search);
+        return $this->clientRepository->selectAsyncItems($request->search, $request->value);
     }
 }
