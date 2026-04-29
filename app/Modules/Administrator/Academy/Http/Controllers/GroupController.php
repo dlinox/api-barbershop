@@ -37,6 +37,12 @@ class GroupController
         return ApiResponse::success(null, 'Grupo eliminado correctamente');
     }
 
+    public function cancel(int $id)
+    {
+        $this->groupService->cancel($id);
+        return ApiResponse::success(null, 'Grupo cancelado correctamente');
+    }
+
     public function getAvailableEnrollmentGroups($studentId)
     {
         $items = $this->groupService->getAvailableEnrollmentGroups($studentId);

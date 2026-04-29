@@ -8,6 +8,8 @@ use App\Common\Http\Context\AdminContext;
 use App\Modules\BarbershopPanel\Treasury\Services\EmployeePaymentService;
 use App\Modules\Administrator\Treasury\Http\Requests\EmployeePayment\EmployeePaymentRequest;
 use App\Modules\Administrator\Treasury\Http\Resources\EmployeePayment\EmployeePaymentDataTableItemResource;
+use App\Modules\Administrator\Treasury\Http\Resources\Barber\BarberPaymentSummaryItemResource;
+use App\Modules\Administrator\Treasury\Http\Resources\Worker\WorkerPaymentSummaryItemResource;
 
 class EmployeePaymentController
 {
@@ -45,6 +47,52 @@ class EmployeePaymentController
         $data['infrastructure_id'] = AdminContext::infrastructureId();
         $this->employeePaymentService->save($data);
         return ApiResponse::success(null, 'Pago registrado correctamente');
+    }
+
+    public function workerPaymentSummary(Request $request)
+    {
+        $items = $this->employeePaymentService->workerPaymentSummary($request);
+        $items['data'] = WorkerPaymentSummaryItemResource::collection($items['data']);
+        return ApiResponse::success($items);
+    }
+
+    public function barberPaymentSummary(Request $request)
+    {
+        $items = $this->employeePaymentService->barberPaymentSummary($request);
+        $items['data'] = BarberPaymentSummaryItemResource::collection($items['data']);
+        return ApiResponse::success($items);
+    }
+
+    public function workerPaymentCalculation(Request $request, int $workerId)
+    {
+        $request->validate([
+            'period_start' => 'required|date',
+            'period_end' => 'required|date|after_or_equal:period_start',
+        ]);
+
+        $data = $this->employeePaymentService->workerPaymentCalculation(
+            $workerId,
+            $request->period_start,
+            $request->period_end,
+        );
+
+        return ApiResponse::success($data);
+    }
+
+    public function barberPaymentCalculation(Request $request, int $barberId)
+    {
+        $request->validate([
+            'period_start' => 'required|date',
+            'period_end' => 'required|date|after_or_equal:period_start',
+        ]);
+
+        $data = $this->employeePaymentService->barberPaymentCalculation(
+            $barberId,
+            $request->period_start,
+            $request->period_end,
+        );
+
+        return ApiResponse::success($data);
     }
 
     public function delete(int $id)

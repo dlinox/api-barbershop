@@ -75,17 +75,41 @@ class EnrollmentService
 
             $this->syncEnrollmentMaterialsAction->execute($enrollment->id, $data['materials'] ?? [], $infrastructureId);
 
+            $income = null;
+
             if (!empty($data['income'])) {
-                $this->createIncomeAction->execute(
-                    data: $data['income'],
-                    infrastructureId: $infrastructureId,
-                    transactionableType: 'academy_enrollments',
-                    transactionableId: $enrollment->id,
-                );
+                $payments = $data['payments'] ?? [];
+
+                if (count($payments) > 0) {
+                    $enrollmentPayment = $enrollment->payments()->create([]);
+
+                    foreach ($payments as $payment) {
+                        $enrollmentPayment->details()->create([
+                            'enrollment_payment_id' => $enrollmentPayment->id,
+                            'group_payment_plan_id' => $payment['plan_id'],
+                            'type' => $payment['type'],
+                            'subtotal' => $payment['subtotal'],
+                            'discount' => $payment['discount'],
+                            'total' => $payment['total'],
+                        ]);
+                    }
+
+                    $income = $this->createIncomeAction->execute(
+                        data: $data['income'],
+                        infrastructureId: $infrastructureId,
+                        transactionableType: 'academy_enrollment_payments',
+                        transactionableId: $enrollmentPayment->id,
+                    );
+
+                    if (!empty($data['advance_ids'])) {
+                        $this->advanceRepository->markAsUsed($data['advance_ids'], $enrollmentPayment->id);
+                    }
+                }
             }
 
             DB::commit();
-            return $enrollment;
+
+            return ['incomeId' => $income?->id];
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

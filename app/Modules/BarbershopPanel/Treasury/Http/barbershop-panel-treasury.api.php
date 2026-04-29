@@ -69,6 +69,12 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-worker-payme
     Route::post('/data-table', [EmployeePaymentController::class, 'workerDataTable'])
         ->name('barbershop-panel.treasury-worker-payments.dataTable')
         ->middleware('permission:barbershop_panel.finance.worker_payment');
+    Route::post('/payment-summary', [EmployeePaymentController::class, 'workerPaymentSummary'])
+        ->name('barbershop-panel.treasury-worker-payments.paymentSummary')
+        ->middleware('permission:barbershop_panel.finance.worker_payment');
+    Route::post('/payment-calculation/{workerId}', [EmployeePaymentController::class, 'workerPaymentCalculation'])
+        ->name('barbershop-panel.treasury-worker-payments.paymentCalculation')
+        ->middleware('permission:barbershop_panel.finance.worker_payment');
     Route::post('/save', [EmployeePaymentController::class, 'saveWorkerPayment'])
         ->name('barbershop-panel.treasury-worker-payments.save')
         ->middleware('permission:barbershop_panel.finance.worker_payment');
@@ -80,6 +86,12 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-worker-payme
 Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-barber-payments')->group(function () {
     Route::post('/data-table', [EmployeePaymentController::class, 'barberDataTable'])
         ->name('barbershop-panel.treasury-barber-payments.dataTable')
+        ->middleware('permission:barbershop_panel.finance.barber_payment');
+    Route::post('/payment-summary', [EmployeePaymentController::class, 'barberPaymentSummary'])
+        ->name('barbershop-panel.treasury-barber-payments.paymentSummary')
+        ->middleware('permission:barbershop_panel.finance.barber_payment');
+    Route::post('/payment-calculation/{barberId}', [EmployeePaymentController::class, 'barberPaymentCalculation'])
+        ->name('barbershop-panel.treasury-barber-payments.paymentCalculation')
         ->middleware('permission:barbershop_panel.finance.barber_payment');
     Route::post('/save', [EmployeePaymentController::class, 'saveBarberPayment'])
         ->name('barbershop-panel.treasury-barber-payments.save')

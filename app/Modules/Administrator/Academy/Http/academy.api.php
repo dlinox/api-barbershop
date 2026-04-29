@@ -49,6 +49,7 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/groups')->group(functio
     Route::post('/data-table', [GroupController::class, 'dataTable'])->name('groups.dataTable');
     Route::post('/save', [GroupController::class, 'save'])->name('groups.save');
     Route::delete('/delete/{id}', [GroupController::class, 'delete'])->name('groups.delete');
+    Route::patch('/cancel/{id}', [GroupController::class, 'cancel'])->name('groups.cancel');
     Route::post('/assign-teacher', [GroupController::class, 'assignTeacher'])->name('groups.assignTeacher');
     Route::get('/check-teacher/{groupId}/{teacherId}', [GroupController::class, 'checkTeacher'])->name('groups.checkTeacher');
     Route::get('/select-items', [GroupController::class, 'selectItems'])->name('groups.selectItems');

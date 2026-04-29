@@ -23,12 +23,12 @@ class GroupRequest extends ApiFormRequest
             'days_of_week' => 'array|required|min:1|max:7',
             'days_of_week.*' => 'string',
             'attendance_tolerance_minutes' => 'nullable|integer|min:0',
+            'status' => 'nullable|in:active,coming,cancelled,finished',
             'payment_plans' => 'array|required|min:1',
             'payment_plans.*.id' => 'nullable',
             'payment_plans.*.start_date' => 'required|date',
             'payment_plans.*.end_date' => 'required|date|after_or_equal:payment_plans.*.start_date',
             'payment_plans.*.amount' => 'required|numeric|min:0',
-            'is_active' => 'required|boolean',
         ];
     }
 
@@ -64,8 +64,6 @@ class GroupRequest extends ApiFormRequest
             'days_of_week.*.string' => 'Los días deben ser texto',
             'attendance_tolerance_minutes.integer' => 'La tolerancia de asistencia debe ser un número entero',
             'attendance_tolerance_minutes.min' => 'La tolerancia de asistencia no puede ser negativa',
-            'is_active.required' => 'El estado es requerido',
-            'is_active.boolean' => 'El estado debe ser verdadero o falso',
 
             'payment_plans.required' => 'Los planes de pago son requeridos',
             'payment_plans.array' => 'Los planes de pago deben ser un array',

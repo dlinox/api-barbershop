@@ -34,6 +34,12 @@ class GroupController
         return ApiResponse::success(null, 'Grupo eliminado correctamente');
     }
 
+    public function cancel(int $id)
+    {
+        $this->groupService->cancel($id);
+        return ApiResponse::success(null, 'Grupo cancelado correctamente');
+    }
+
     public function assignTeacher(AssignTeacherRequest $request)
     {
         $this->groupService->assignTeacher($request->validated());

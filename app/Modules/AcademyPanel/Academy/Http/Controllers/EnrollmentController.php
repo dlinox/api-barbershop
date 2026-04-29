@@ -43,8 +43,8 @@ class EnrollmentController
 
     public function registerPayment(EnrollmentRegisterPaymentRequest $request)
     {
-        $this->enrollmentService->registerPayment($request->validated());
-        return ApiResponse::success(null, 'Pago registrado correctamente');
+        $result = $this->enrollmentService->registerPayment($request->validated());
+        return ApiResponse::success($result, 'Pago registrado correctamente');
     }
 
     public function getEnrollment(int $id)

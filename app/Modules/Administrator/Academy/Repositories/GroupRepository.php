@@ -120,6 +120,15 @@ class GroupRepository
         return $group->delete();
     }
 
+    public function cancel(int $id)
+    {
+        $group = Group::findOrFail($id);
+        $group->status   = 'cancelled';
+        $group->is_active = false;
+        $group->save();
+        return $group;
+    }
+
     public function getActiveGroups()
     {
         $query = $this->getGroupsQuery()
@@ -142,7 +151,7 @@ class GroupRepository
             'academy_groups.enrollment_price',
             'academy_groups.monthly_price',
             'academy_groups.attendance_tolerance_minutes',
-            'academy_groups.is_active',
+            'academy_groups.status',
 
             'academy_groups.branch_id',
             'academy_branches.name as branch_name',
@@ -152,8 +161,7 @@ class GroupRepository
         )
             ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
-            ->where('academy_groups.end_date', '>', now())
-            ->where('academy_groups.is_active', true);
+            ->whereIn('academy_groups.status', ['active', 'coming']);
 
         $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');
 
@@ -162,14 +170,12 @@ class GroupRepository
 
     public function getAvailableEnrollmentGroups(int $studentId)
     {
-
         $enrollments = Enrollment::where('profile_student_id', $studentId)->get();
         $groupIds = $enrollments->pluck('group_id')->toArray();
 
         return $this->getGroupsQuery()
             ->distinct()
-            ->where('academy_groups.end_date', '>', now()) // fecha de fin mayor a la fecha actual
-            ->where('academy_groups.is_active', true)
+            ->whereIn('academy_groups.status', ['active', 'coming'])
             ->whereNotIn('academy_groups.id', $groupIds)
             ->orderBy('academy_groups.id', 'desc')
             ->get();
@@ -187,7 +193,7 @@ class GroupRepository
             'academy_groups.enrollment_price',
             'academy_groups.monthly_price',
             'academy_groups.attendance_tolerance_minutes',
-            'academy_groups.is_active',
+            'academy_groups.status',
 
 
             'academy_groups.branch_id',
@@ -227,7 +233,7 @@ class GroupRepository
             'academy_groups.enrollment_price',
             'academy_groups.monthly_price',
             'academy_groups.attendance_tolerance_minutes',
-            'academy_groups.is_active',
+            'academy_groups.status',
 
 
             'academy_groups.branch_id',

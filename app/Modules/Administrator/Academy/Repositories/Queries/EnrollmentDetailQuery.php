@@ -67,7 +67,7 @@ class EnrollmentDetailQuery
             'branch_name' => $group->branch->name,
             'schedule_shift' => Shift::tryFrom($schedule->shift)?->label() ?? $schedule->shift,
             'schedule_time' => substr($schedule->start_time, 0, 5) . ' - ' . substr($schedule->end_time, 0, 5),
-            'days_of_week' => $daysFormatted,
+            'days_of_week' => $group->days_of_week,
             'start_date' => Carbon::parse($group->start_date)->format('d/m/Y'),
             'end_date' => Carbon::parse($group->end_date)->format('d/m/Y'),
 

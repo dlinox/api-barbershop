@@ -53,6 +53,7 @@ class EnrollmentDetailResource extends JsonResource
             'scheduleShift' => Shift::tryFrom($schedule->shift)?->label() ?? $schedule->shift,
             'scheduleTime' => substr($schedule->start_time, 0, 5) . ' - ' . substr($schedule->end_time, 0, 5),
             'daysOfWeek' => $daysFormatted,
+            'ddddddddddddddddddd' => $group->days_of_week,
             'startDate' => Carbon::parse($group->start_date)->format('d/m/Y'),
             'endDate' => Carbon::parse($group->end_date)->format('d/m/Y'),
 

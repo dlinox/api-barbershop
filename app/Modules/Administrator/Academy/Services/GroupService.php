@@ -50,6 +50,11 @@ class GroupService
         return $this->groupRepository->delete($id);
     }
 
+    public function cancel(int $id)
+    {
+        return $this->groupRepository->cancel($id);
+    }
+
     public function getAvailableEnrollmentGroups(int $studentId)
     {
         return $this->groupRepository->getAvailableEnrollmentGroups($studentId);

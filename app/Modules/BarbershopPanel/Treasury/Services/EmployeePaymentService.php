@@ -22,6 +22,28 @@ class EmployeePaymentService
         return $this->barberPaymentRepository->dataTable($request);
     }
 
+    public function workerPaymentSummary($request)
+    {
+        return $this->workerPaymentRepository->paymentSummaryDataTable($request);
+    }
+
+    public function barberPaymentSummary($request)
+    {
+        return $this->barberPaymentRepository->paymentSummaryDataTable($request);
+    }
+
+    public function workerPaymentCalculation(int $workerId, string $periodStart, string $periodEnd): array
+    {
+        $this->workerPaymentRepository->ensureBelongsToInfrastructure($workerId);
+        return $this->workerPaymentRepository->paymentCalculation($workerId, $periodStart, $periodEnd);
+    }
+
+    public function barberPaymentCalculation(int $barberId, string $periodStart, string $periodEnd): array
+    {
+        $this->barberPaymentRepository->ensureBelongsToBranch($barberId);
+        return $this->barberPaymentRepository->paymentCalculation($barberId, $periodStart, $periodEnd);
+    }
+
     public function save(array $data)
     {
         $employeeType = $data['employee_type'] ?? null;

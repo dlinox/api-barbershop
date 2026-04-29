@@ -80,13 +80,19 @@ class GroupRepository
         return $group->delete();
     }
 
+    public function cancel(int $id)
+    {
+        $group = Group::findOrFail($id);
+        $group->status   = 'cancelled';
+        $group->is_active = false;
+        $group->save();
+        return $group;
+    }
+
     public function getActiveAndUpcoming()
     {
-        $branchId = AdminContext::academyBranchId();
         return $this->getGroupsQuery()
-            ->where('academy_groups.end_date', '>', now())
-            ->where('academy_groups.is_active', true)
-            ->where('academy_groups.branch_id', $branchId)
+            ->whereIn('academy_groups.status', ['active', 'coming'])
             ->get();
     }
 
@@ -97,8 +103,7 @@ class GroupRepository
 
         return $this->getGroupsQuery()
             ->distinct()
-            ->where('academy_groups.end_date', '>', now())
-            ->where('academy_groups.is_active', true)
+            ->whereIn('academy_groups.status', ['active', 'coming'])
             ->whereNotIn('academy_groups.id', $groupIds)
             ->orderBy('academy_groups.id', 'desc')
             ->get();
@@ -110,7 +115,7 @@ class GroupRepository
         $query = Group::select(
             'academy_groups.id', 'academy_groups.name', 'academy_groups.start_date', 'academy_groups.end_date',
             'academy_groups.days_of_week', 'academy_groups.enrollment_price', 'academy_groups.monthly_price',
-            'academy_groups.attendance_tolerance_minutes', 'academy_groups.is_active',
+            'academy_groups.attendance_tolerance_minutes', 'academy_groups.status',
             'academy_groups.branch_id', 'academy_branches.name as branch_name',
             'academy_groups.level_id', 'academy_levels.name as level_name',
         )
@@ -138,7 +143,7 @@ class GroupRepository
         return Group::select(
             'academy_groups.id', 'academy_groups.name', 'academy_groups.start_date', 'academy_groups.end_date',
             'academy_groups.days_of_week', 'academy_groups.enrollment_price', 'academy_groups.monthly_price',
-            'academy_groups.attendance_tolerance_minutes', 'academy_groups.is_active',
+            'academy_groups.attendance_tolerance_minutes', 'academy_groups.status',
             'academy_groups.branch_id', 'academy_branches.name as branch_name',
             'academy_groups.level_id', 'academy_levels.name as level_name',
             'academy_groups.schedule_id', 'academy_schedules.shift as schedule_shift',

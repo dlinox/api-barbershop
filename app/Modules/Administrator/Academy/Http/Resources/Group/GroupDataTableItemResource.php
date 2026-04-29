@@ -18,7 +18,7 @@ class GroupDataTableItemResource extends JsonResource
             'monthlyPrice' => (float) $this->monthly_price,
             'daysOfWeek' => explode(',', $this->days_of_week),
             'attendanceToleranceMinutes' => (int) $this->attendance_tolerance_minutes,
-            'isActive' => $this->is_active,
+            'status' => $this->status,
             'branch' => [
                 'id' => $this->branch_id,
                 'name' => $this->branch_name,

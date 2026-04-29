@@ -48,6 +48,7 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/groups')->group(function
     Route::post('/data-table',                               [GroupController::class, 'dataTable'])                   ->name('ap.groups.dataTable')                   ->middleware('permission:academy_panel.group.view');
     Route::post('/save',                                     [GroupController::class, 'save'])                        ->name('ap.groups.save')                        ->middleware('permission:academy_panel.group.view');
     Route::delete('/delete/{id}',                            [GroupController::class, 'delete'])                      ->name('ap.groups.delete')                      ->middleware('permission:academy_panel.group.view');
+    Route::patch('/cancel/{id}',                             [GroupController::class, 'cancel'])                      ->name('ap.groups.cancel')                      ->middleware('permission:academy_panel.group.view');
     Route::post('/assign-teacher',                           [GroupController::class, 'assignTeacher'])               ->name('ap.groups.assignTeacher')               ->middleware('permission:academy_panel.group.view');
     Route::get('/check-teacher/{groupId}/{teacherId}',       [GroupController::class, 'checkTeacher'])                ->name('ap.groups.checkTeacher')                ->middleware('permission:academy_panel.group.view');
     Route::get('/select-items',                              [GroupController::class, 'selectItems'])                 ->name('ap.groups.selectItems');

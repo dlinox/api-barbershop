@@ -25,6 +25,7 @@ class Group extends Model
         'monthly_price',
         'days_of_week',
         'attendance_tolerance_minutes',
+        'status',
         'is_active',
     ];
 

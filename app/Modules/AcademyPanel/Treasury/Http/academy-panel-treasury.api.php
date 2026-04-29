@@ -69,6 +69,12 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-worker-payments
     Route::post('/data-table', [EmployeePaymentController::class, 'workerDataTable'])
         ->name('academy-panel.treasury-worker-payments.dataTable')
         ->middleware('permission:academy_panel.finance.worker_payment');
+    Route::post('/payment-summary', [EmployeePaymentController::class, 'workerPaymentSummary'])
+        ->name('academy-panel.treasury-worker-payments.paymentSummary')
+        ->middleware('permission:academy_panel.finance.worker_payment');
+    Route::post('/payment-calculation/{id}', [EmployeePaymentController::class, 'workerPaymentCalculation'])
+        ->name('academy-panel.treasury-worker-payments.paymentCalculation')
+        ->middleware('permission:academy_panel.finance.worker_payment');
     Route::post('/save', [EmployeePaymentController::class, 'saveWorkerPayment'])
         ->name('academy-panel.treasury-worker-payments.save')
         ->middleware('permission:academy_panel.finance.worker_payment');
@@ -80,6 +86,12 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-worker-payments
 Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-teacher-payments')->group(function () {
     Route::post('/data-table', [EmployeePaymentController::class, 'teacherDataTable'])
         ->name('academy-panel.treasury-teacher-payments.dataTable')
+        ->middleware('permission:academy_panel.finance.teacher_payment');
+    Route::post('/payment-summary', [EmployeePaymentController::class, 'teacherPaymentSummary'])
+        ->name('academy-panel.treasury-teacher-payments.paymentSummary')
+        ->middleware('permission:academy_panel.finance.teacher_payment');
+    Route::post('/payment-calculation/{id}', [EmployeePaymentController::class, 'teacherPaymentCalculation'])
+        ->name('academy-panel.treasury-teacher-payments.paymentCalculation')
         ->middleware('permission:academy_panel.finance.teacher_payment');
     Route::post('/save', [EmployeePaymentController::class, 'saveTeacherPayment'])
         ->name('academy-panel.treasury-teacher-payments.save')

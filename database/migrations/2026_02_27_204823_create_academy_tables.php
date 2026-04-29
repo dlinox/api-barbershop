@@ -90,6 +90,7 @@ return new class extends Migration
             //timpo de tolerancia en minutos
             $table->integer('attendance_tolerance_minutes')->default(0);
 
+            $table->enum('status', ['active', 'coming', 'cancelled', 'finished'])->default('active');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
@@ -99,6 +100,7 @@ return new class extends Migration
             $table->foreign('room_id')->references('id')->on('academy_rooms')->restrictOnDelete();
 
             $table->index('is_active');
+            $table->index('status');
             $table->index('name');
         });
 

@@ -4,12 +4,14 @@ namespace App\Modules\AcademyPanel\Treasury\Services;
 
 use App\Modules\AcademyPanel\Treasury\Repositories\WorkerPaymentRepository;
 use App\Modules\AcademyPanel\Treasury\Repositories\TeacherPaymentRepository;
+use App\Modules\Administrator\Academy\Repositories\Queries\TeacherPaymentCalculationQuery;
 
 class EmployeePaymentService
 {
     public function __construct(
         private readonly WorkerPaymentRepository $workerPaymentRepository,
         private readonly TeacherPaymentRepository $teacherPaymentRepository,
+        private readonly TeacherPaymentCalculationQuery $teacherPaymentCalculationQuery,
     ) {}
 
     public function workerDataTable($request)
@@ -20,6 +22,27 @@ class EmployeePaymentService
     public function teacherDataTable($request)
     {
         return $this->teacherPaymentRepository->dataTable($request);
+    }
+
+    public function teacherPaymentSummary($request)
+    {
+        return $this->teacherPaymentRepository->paymentSummaryDataTable($request);
+    }
+
+    public function workerPaymentSummary($request)
+    {
+        return $this->workerPaymentRepository->paymentSummaryDataTable($request);
+    }
+
+    public function teacherPaymentCalculation(int $teacherId, string $periodStart, string $periodEnd): array
+    {
+        $this->teacherPaymentRepository->ensureBelongsToBranch($teacherId);
+        return ($this->teacherPaymentCalculationQuery)($teacherId, $periodStart, $periodEnd);
+    }
+
+    public function workerPaymentCalculation(int $workerId, string $periodStart, string $periodEnd): array
+    {
+        return $this->workerPaymentRepository->paymentCalculation($workerId, $periodStart, $periodEnd);
     }
 
     public function save(array $data)
