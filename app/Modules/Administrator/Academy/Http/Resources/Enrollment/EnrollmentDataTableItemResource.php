@@ -61,11 +61,22 @@ class EnrollmentDataTableItemResource extends JsonResource
                 'name' => $this->group_name,
                 'startDate' => $this->group_start_date,
                 'endDate' => $this->group_end_date,
-                'daysOfWeek' => $this->group_days_of_week,
+                'daysOfWeek' => DateHelper::getDayNamesFromCsv($this->group_days_of_week ?? ''),
                 'isActive' => $this->group_is_active,
                 'level' => [
                     'id' => $this->group_level_id,
                     'name' => $this->group_level_name,
+                ],
+                'branch' => [
+                    'name' => $this->group_branch_name,
+                ],
+                'schedule' => [
+                    'shift' => $this->group_schedule_shift,
+                    'startTime' => $this->group_schedule_start_time ? substr($this->group_schedule_start_time, 0, 5) : null,
+                    'endTime'   => $this->group_schedule_end_time   ? substr($this->group_schedule_end_time, 0, 5)   : null,
+                ],
+                'room' => [
+                    'number' => $this->group_room_number,
                 ],
             ],
             'payments' => $payments,

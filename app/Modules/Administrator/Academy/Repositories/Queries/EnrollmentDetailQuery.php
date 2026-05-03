@@ -24,6 +24,8 @@ class EnrollmentDetailQuery
             'payments' => fn($q) => $q->where('status', 'active'),
             'payments.details',
             'materials.presentation',
+            'groupChangeAsOrigin',
+            'groupChangeAsDestination',
         ])->findOrFail($id);
     }
 

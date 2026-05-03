@@ -39,6 +39,9 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-general-expe
     Route::post('/cancel/{id}', [GeneralExpenseController::class, 'cancel'])
         ->name('barbershop-panel.treasury-general-expenses.cancel')
         ->middleware('permission:barbershop_panel.finance.general_expense');
+    Route::post('/approve/{id}', [GeneralExpenseController::class, 'approve'])
+        ->name('barbershop-panel.treasury-general-expenses.approve')
+        ->middleware('permission:barbershop_panel.finance.general_expense');
 });
 
 Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-worker-advances')->group(function () {
@@ -81,6 +84,9 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-worker-payme
     Route::delete('/delete/{id}', [EmployeePaymentController::class, 'delete'])
         ->name('barbershop-panel.treasury-worker-payments.delete')
         ->middleware('permission:barbershop_panel.finance.worker_payment');
+    Route::get('/generate-pdf/{id}', [EmployeePaymentController::class, 'generateWorkerPaymentPdf'])
+        ->name('barbershop-panel.treasury-worker-payments.generatePdf')
+        ->middleware('permission:barbershop_panel.finance.worker_payment');
 });
 
 Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-barber-payments')->group(function () {
@@ -99,6 +105,9 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-barber-payme
     Route::delete('/delete/{id}', [EmployeePaymentController::class, 'delete'])
         ->name('barbershop-panel.treasury-barber-payments.delete')
         ->middleware('permission:barbershop_panel.finance.barber_payment');
+    Route::get('/generate-pdf/{id}', [EmployeePaymentController::class, 'generateBarberPaymentPdf'])
+        ->name('barbershop-panel.treasury-barber-payments.generatePdf')
+        ->middleware('permission:barbershop_panel.finance.barber_payment');
 });
 
 Route::middleware(['auth:api'])->prefix('/barbershop-panel/worker-attendances')->group(function () {
@@ -116,6 +125,9 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/worker-attendances')-
         ->middleware('permission:barbershop_panel.attendance.worker');
     Route::post('/update', [WorkerAttendanceController::class, 'update'])
         ->name('barbershop-panel.worker-attendances.update')
+        ->middleware('permission:barbershop_panel.attendance.worker');
+    Route::get('/history/{workerId}', [WorkerAttendanceController::class, 'history'])
+        ->name('barbershop-panel.worker-attendances.history')
         ->middleware('permission:barbershop_panel.attendance.worker');
 });
 

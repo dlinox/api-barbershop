@@ -50,6 +50,19 @@ class WorkerRepository
             DB::raw("CONCAT(core_persons.name, ' ', COALESCE(core_persons.paternal_surname, ''), ' ', COALESCE(core_persons.maternal_surname, '')) as full_name"),
             'profile_workers.position as position',
             'profile_workers.monthly_salary as monthly_salary',
+            'profile_workers.infrastructure_id as infrastructure_id',
+            DB::raw("(
+                SELECT CASE
+                    WHEN ci.infrastructurable_type = 'barbershop_branches'
+                        THEN (SELECT bb.name FROM barbershop_branches bb WHERE bb.id = ci.infrastructurable_id)
+                    WHEN ci.infrastructurable_type = 'academy_branches'
+                        THEN (SELECT ab.name FROM academy_branches ab WHERE ab.id = ci.infrastructurable_id)
+                    ELSE NULL
+                END
+                FROM core_infrastructures ci
+                WHERE ci.id = profile_workers.infrastructure_id
+                LIMIT 1
+            ) as infrastructure_name"),
             DB::raw("(SELECT MAX(ep.payment_date) FROM treasury_employee_payments ep WHERE ep.employee_type = 'profile_workers' AND ep.employee_id = profile_workers.id AND ep.status = 'paid') as last_payment_date"),
             DB::raw("(SELECT COALESCE(SUM(ep.total_amount), 0) FROM treasury_employee_payments ep WHERE ep.employee_type = 'profile_workers' AND ep.employee_id = profile_workers.id AND ep.status = 'paid') as total_paid"),
         )
@@ -133,6 +146,8 @@ class WorkerRepository
             ->get();
 
         $absencesCount = $attendances->where('status', 'absent')->count();
+        $presentCount = $attendances->whereIn('status', ['present', 'late'])->count();
+        $lateCount    = $attendances->where('status', 'late')->count();
 
         return [
             'advances' => [
@@ -148,6 +163,8 @@ class WorkerRepository
                 'count' => $absencesCount,
             ],
             'attendances' => [
+                'presentCount' => $presentCount,
+                'lateCount'    => $lateCount,
                 'items' => $attendances->map(fn($a) => [
                     'id' => $a->id,
                     'date' => $a->date->format('Y-m-d'),

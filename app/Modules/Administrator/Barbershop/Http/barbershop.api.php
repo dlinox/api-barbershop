@@ -71,4 +71,5 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/barber-attendances')->g
     Route::post('/register-absent',       [BarberAttendanceController::class, 'registerAbsent'])  ->name('barber-attendances.registerAbsent')  ;
     Route::post('/update',                [BarberAttendanceController::class, 'update'])           ->name('barber-attendances.update')           ;
     Route::post('/generate-qr-code',      [BarberAttendanceController::class, 'generateQrCode'])  ->name('barber-attendances.generateQrCode')  ;
+    Route::get('/history/{barberId}',      [BarberAttendanceController::class, 'history'])          ->name('barber-attendances.history')          ;
 });

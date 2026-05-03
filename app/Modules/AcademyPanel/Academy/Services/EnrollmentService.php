@@ -2,6 +2,10 @@
 
 namespace App\Modules\AcademyPanel\Academy\Services;
 
+use App\Common\Helpers\DateHelper;
+use App\Common\Enums\DayOfWeek;
+use App\Models\Academy\Enums\Shift;
+use App\Models\Academy\EnrollmentGroupChange;
 use App\Models\Academy\Group;
 use App\Models\Core\Company;
 use App\Common\Helpers\PdfHelper;
@@ -179,6 +183,133 @@ class EnrollmentService
         $headerHtml = View::make('enrollments.common.header', $data)->render();
         $footerHtml = View::make('enrollments.common.footer', $data)->render();
 
+        $mpdf = PdfHelper::create(config: [
+            'margin_top'    => 35,
+            'margin_header' => 8,
+            'margin_bottom' => 18,
+            'margin_footer' => 8,
+        ]);
+        $mpdf->SetHTMLHeader($headerHtml);
+        $mpdf->SetHTMLFooter($footerHtml);
+
+        if ($enrollmentLoaded->status === 'cancelled') {
+            $mpdf->SetWatermarkText('CANCELADO', 0.1);
+            $mpdf->showWatermarkText = true;
+        }
+
+        $mpdf->WriteHTML($html);
+
+        $pdfContent = $mpdf->Output('', 'S');
+
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => "inline; filename=\"ficha-matricula-{$id}.pdf\"",
+        ]);
+    }
+
+    public function generateGroupChangePdf(int $id)
+    {
+        $change = EnrollmentGroupChange::with([
+            'originEnrollment.student.person.documentTypeRelation',
+            'originEnrollment.group.level',
+            'originEnrollment.group.branch',
+            'originEnrollment.group.schedule',
+            'originEnrollment.group.paymentPlans',
+            'originEnrollment.payments.details',
+            'destinationEnrollment.group.level',
+            'destinationEnrollment.group.branch',
+            'destinationEnrollment.group.schedule',
+            'destinationEnrollment.group.paymentPlans',
+            'destinationEnrollment.payments.details',
+            'changedByUser',
+        ])->findOrFail($id);
+
+        $originEnrollment = $change->originEnrollment;
+        $originGroup = $originEnrollment->group;
+        $destEnrollment = $change->destinationEnrollment;
+        $destGroup = $destEnrollment->group;
+        $person = $originEnrollment->student->person;
+
+        $originPaidPlanIds = $originEnrollment->payments
+            ->flatMap(fn($p) => $p->details)
+            ->pluck('group_payment_plan_id')
+            ->toArray();
+
+        $originPaymentPlans = $originGroup->paymentPlans
+            ->sortBy(fn($p) => [$p->type === 'enrollment' ? 0 : 1, $p->start_date])
+            ->values()
+            ->map(fn($plan) => [
+                'type'       => $plan->type === 'enrollment' ? 'Matrícula' : 'Mensualidad',
+                'start_date' => $plan->start_date ? \Carbon\Carbon::parse($plan->start_date)->format('d/m/Y') : '—',
+                'end_date'   => $plan->end_date ? \Carbon\Carbon::parse($plan->end_date)->format('d/m/Y') : '—',
+                'amount'     => (float) $plan->amount,
+                'is_paid'    => in_array($plan->id, $originPaidPlanIds),
+            ])
+            ->all();
+
+        $paidPlanIds = $destEnrollment->payments
+            ->flatMap(fn($p) => $p->details)
+            ->pluck('group_payment_plan_id')
+            ->toArray();
+
+        $paymentPlans = $destGroup->paymentPlans
+            ->sortBy(fn($p) => [$p->type === 'enrollment' ? 0 : 1, $p->start_date])
+            ->values()
+            ->map(fn($plan) => [
+                'type'       => $plan->type === 'enrollment' ? 'Matrícula' : 'Mensualidad',
+                'start_date' => $plan->start_date ? \Carbon\Carbon::parse($plan->start_date)->format('d/m/Y') : '—',
+                'end_date'   => $plan->end_date ? \Carbon\Carbon::parse($plan->end_date)->format('d/m/Y') : '—',
+                'amount'     => (float) $plan->amount,
+                'is_paid'    => in_array($plan->id, $paidPlanIds),
+            ])
+            ->all();
+
+        $data = [
+            'company'       => Company::first(),
+            'generated_by'  => Auth::user()?->username ?? 'Sistema',
+            'generated_at'  => now()->format('d/m/Y H:i'),
+            'change_id'     => $change->id,
+            'changed_at'    => $change->changed_at?->format('d/m/Y H:i'),
+            'changed_by'    => $change->changedByUser?->username ?? 'Sistema',
+            'reason'        => $change->reason ?? '—',
+            // Student
+            'student_full_name' => $person->full_name,
+            'document_type'     => $person->documentTypeRelation?->name ?? '—',
+            'document_number'   => $person->document_number,
+            'phone'             => $person->phone ?? null,
+            // Origin group
+            'origin_enrollment_id'   => $originEnrollment->id,
+            'origin_group_name'      => $originGroup->name,
+            'origin_level_name'      => $originGroup->level?->name ?? '—',
+            'origin_branch_name'     => $originGroup->branch?->name ?? '—',
+            'origin_schedule_shift'  => $originGroup->schedule ? (Shift::tryFrom($originGroup->schedule->shift)?->label() ?? $originGroup->schedule->shift) : '—',
+            'origin_schedule_time'   => $originGroup->schedule
+                ? (substr($originGroup->schedule->start_time, 0, 5) . ' – ' . substr($originGroup->schedule->end_time, 0, 5))
+                : '—',
+            'origin_days_of_week'    => collect(explode(',', $originGroup->days_of_week ?? ''))->map(fn($d) => DayOfWeek::tryFrom(trim($d))?->label() ?? trim($d))->filter()->implode(', '),
+            'origin_start_date'      => $originGroup->start_date ? \Carbon\Carbon::parse($originGroup->start_date)->format('d/m/Y') : '—',
+            'origin_end_date'        => $originGroup->end_date ? \Carbon\Carbon::parse($originGroup->end_date)->format('d/m/Y') : '—',
+            // Destination group
+            'dest_enrollment_id'  => $destEnrollment->id,
+            'dest_group_name'     => $destGroup->name,
+            'dest_level_name'     => $destGroup->level?->name ?? '—',
+            'dest_branch_name'    => $destGroup->branch?->name ?? '—',
+            'dest_schedule_shift' => $destGroup->schedule ? (Shift::tryFrom($destGroup->schedule->shift)?->label() ?? $destGroup->schedule->shift) : '—',
+            'dest_schedule_time'  => $destGroup->schedule
+                ? (substr($destGroup->schedule->start_time, 0, 5) . ' – ' . substr($destGroup->schedule->end_time, 0, 5))
+                : '—',
+            'dest_days_of_week'   => collect(explode(',', $destGroup->days_of_week ?? ''))->map(fn($d) => DayOfWeek::tryFrom(trim($d))?->label() ?? trim($d))->filter()->implode(', '),
+            'dest_start_date'     => $destGroup->start_date ? \Carbon\Carbon::parse($destGroup->start_date)->format('d/m/Y') : '—',
+            'dest_end_date'       => $destGroup->end_date ? \Carbon\Carbon::parse($destGroup->end_date)->format('d/m/Y') : '—',
+            // Payments
+            'origin_payment_plans' => $originPaymentPlans,
+            'payment_plans'        => $paymentPlans,
+        ];
+
+        $html       = View::make('enrollments.group-change-certificate', $data)->render();
+        $headerHtml = View::make('enrollments.group-change-header', $data)->render();
+        $footerHtml = View::make('enrollments.common.footer', $data)->render();
+
         $mpdf = PdfHelper::createFromHtml($html, config: [
             'margin_top'    => 35,
             'margin_header' => 8,
@@ -190,7 +321,7 @@ class EnrollmentService
 
         return response($pdfContent, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => "inline; filename=\"ficha-matricula-{$id}.pdf\"",
+            'Content-Disposition' => "inline; filename=\"cambio-grupo-{$id}.pdf\"",
         ]);
     }
 }

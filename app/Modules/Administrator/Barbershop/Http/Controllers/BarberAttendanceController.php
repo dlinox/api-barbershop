@@ -50,4 +50,10 @@ class BarberAttendanceController
         $data = $this->barberAttendanceService->generateQrCode();
         return ApiResponse::success($data);
     }
+
+    public function history(int $barberId)
+    {
+        $data = $this->barberAttendanceService->history($barberId);
+        return ApiResponse::success($data);
+    }
 }

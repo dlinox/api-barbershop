@@ -10,7 +10,7 @@ class BarberSelectItemResource extends JsonResource
     {
         return [
             'value' => $this->id,
-            'title' => trim($this->person_name . ' ' . $this->person_paternal_surname . ' ' . $this->person_maternal_surname) . ' (' . $this->person_document_number . ')',
+            'title' => collect([$this->person_name, $this->person_paternal_surname, $this->person_maternal_surname])->filter()->implode(' ') . ' (' . $this->person_document_number . ')',
         ];
     }
 }

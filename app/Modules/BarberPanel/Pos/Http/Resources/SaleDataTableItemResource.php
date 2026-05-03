@@ -9,7 +9,7 @@ class SaleDataTableItemResource extends JsonResource
     public function toArray($request): array
     {
         $clientName = $this->person_name
-            ? trim("{$this->person_name} {$this->person_paternal_surname}")
+            ? collect([$this->person_name, $this->person_paternal_surname])->filter()->implode(' ')
             : 'Público General';
 
         return [

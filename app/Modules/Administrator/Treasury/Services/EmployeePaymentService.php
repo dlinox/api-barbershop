@@ -19,7 +19,7 @@ class EmployeePaymentService
         return $this->employeePaymentRepository->dataTable($request);
     }
 
-    public function save(array $data)
+    public function save(array $data): \App\Models\Treasury\EmployeePayment
     {
         $this->validateNoOverlappingPeriod($data);
         $data['period'] = $this->formatPeriod($data['period_start'], $data['period_end']);

@@ -29,8 +29,15 @@ return [
                 'display_name' => 'Estudiantes',
                 'type' => 'module',
                 'children' => [
-                    ['name' => 'academy_panel.students.db',         'display_name' => 'DB Estudiantes',          'type' => 'view'],
-                    ['name' => 'academy_panel.students.enrollment', 'display_name' => 'Inscripciones',           'type' => 'view'],
+                    ['name' => 'academy_panel.students.db',                          'display_name' => 'DB Estudiantes',          'type' => 'view'],
+                    [
+                        'name'         => 'academy_panel.students.enrollment',
+                        'display_name' => 'Inscripciones',
+                        'type'         => 'view',
+                        'children'     => [
+                            ['name' => 'academy_panel.students.enrollment.change_group', 'display_name' => 'Cambio de Grupo', 'type' => 'action'],
+                        ],
+                    ],
                     ['name' => 'academy_panel.students.attendance', 'display_name' => 'Asistencia Estudiantes', 'type' => 'view'],
                 ],
             ],

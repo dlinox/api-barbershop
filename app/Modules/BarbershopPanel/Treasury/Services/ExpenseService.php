@@ -21,6 +21,11 @@ class ExpenseService
         return $this->repository->save($data);
     }
 
+    public function approve(int $id)
+    {
+        return $this->repository->approve($id);
+    }
+
     public function cancel(int $id)
     {
         return $this->repository->cancel($id);

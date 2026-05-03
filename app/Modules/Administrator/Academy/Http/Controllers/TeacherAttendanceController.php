@@ -45,6 +45,12 @@ class TeacherAttendanceController
         return ApiResponse::success(null, 'Falta registrada correctamente');
     }
 
+    public function history(int $teacherId)
+    {
+        $data = $this->teacherAttendanceService->history($teacherId);
+        return ApiResponse::success($data);
+    }
+
     public function generateQrCode()
     {
         $data = $this->teacherAttendanceService->generateQrCode();

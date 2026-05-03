@@ -2,6 +2,7 @@
 
 namespace App\Modules\Administrator\Academy\Http\Resources\Enrollment;
 
+use App\Common\Helpers\DateHelper;
 use App\Models\Academy\EnrollmentPaymentDetail;
 use App\Models\Academy\Group;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -44,7 +45,7 @@ class EnrollmentItemResource extends JsonResource
                 'name' => $this->group_name,
                 'startDate' => $this->group_start_date,
                 'endDate' => $this->group_end_date,
-                'daysOfWeek' => $this->group_days_of_week,
+                'daysOfWeek' => DateHelper::getDayNamesFromCsv($this->group_days_of_week ?? ''),
                 'isActive' => $this->group_is_active,
                 'level' => [
                     'id' => $this->group_level_id,

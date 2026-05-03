@@ -141,6 +141,23 @@ class BarberAttendanceService
         ];
     }
 
+    public function history(int $barberId): array
+    {
+        return BarberAttendance::where('barber_id', $barberId)
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(fn($a) => [
+                'id'          => $a->id,
+                'date'        => $a->date->format('Y-m-d'),
+                'status'      => $a->status,
+                'checkIn'     => $a->check_in,
+                'checkOut'    => $a->check_out,
+                'observation' => $a->observation,
+            ])
+            ->values()
+            ->toArray();
+    }
+
     private function resolveCheckInStatus(string $checkIn): string
     {
         $schedule = EmployeeSchedule::where('type', 'barber')

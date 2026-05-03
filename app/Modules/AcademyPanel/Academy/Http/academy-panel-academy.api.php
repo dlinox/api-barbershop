@@ -15,6 +15,7 @@ use App\Modules\AcademyPanel\Academy\Http\Controllers\MaterialController;
 use App\Modules\AcademyPanel\Academy\Http\Controllers\TeacherAttendanceController;
 use App\Modules\AcademyPanel\Academy\Http\Controllers\StudentGuardianController;
 use App\Modules\AcademyPanel\Academy\Http\Controllers\EnrollmentPaymentAdvanceController;
+use App\Modules\AcademyPanel\Academy\Http\Controllers\ChangeGroupController;
 
 Route::middleware(['auth:api'])->prefix('/academy-panel/branches')->group(function () {
     Route::post('/data-table',    [BranchController::class, 'dataTable'])  ->name('ap.branches.dataTable');
@@ -75,8 +76,10 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/enrollments')->group(fun
     Route::post('/update',               [EnrollmentController::class, 'update'])             ->name('ap.enrollments.update')             ->middleware('permission:academy_panel.students.enrollment');
     Route::get('/get/{id}',              [EnrollmentController::class, 'getEnrollment'])      ->name('ap.enrollments.getEnrollment')      ->middleware('permission:academy_panel.students.enrollment');
     Route::post('/register-payment',     [EnrollmentController::class, 'registerPayment'])    ->name('ap.enrollments.registerPayment')    ->middleware('permission:academy_panel.students.enrollment');
-    Route::get('/generate-pdf/{id}',     [EnrollmentController::class, 'generatePdf'])        ->name('ap.enrollments.generatePdf')        ->middleware('permission:academy_panel.students.enrollment');
-    Route::get('/detail/{id}',           [EnrollmentController::class, 'detail'])             ->name('ap.enrollments.detail')             ->middleware('permission:academy_panel.students.enrollment');
+    Route::get('/generate-pdf/{id}',     [EnrollmentController::class, 'generatePdf'])             ->name('ap.enrollments.generatePdf')             ->middleware('permission:academy_panel.students.enrollment');
+    Route::get('/group-change-pdf/{id}', [EnrollmentController::class, 'generateGroupChangePdf'])  ->name('ap.enrollments.generateGroupChangePdf')  ->middleware('permission:academy_panel.students.enrollment');
+    Route::get('/detail/{id}',           [EnrollmentController::class, 'detail'])                  ->name('ap.enrollments.detail')                  ->middleware('permission:academy_panel.students.enrollment');
+    Route::post('/change-group',         [ChangeGroupController::class, 'changeGroup'])       ->name('ap.enrollments.changeGroup')        ->middleware('permission:academy_panel.students.enrollment.change_group');
 });
 
 Route::middleware(['auth:api'])->prefix('/academy-panel/attendances')->group(function () {
@@ -107,6 +110,7 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/teacher-attendances')->g
     Route::post('/register-absent',    [TeacherAttendanceController::class, 'registerAbsent'])  ->name('ap.teacher-attendances.registerAbsent')  ->middleware('permission:academy_panel.teachers.attendance');
     Route::post('/update',             [TeacherAttendanceController::class, 'update'])           ->name('ap.teacher-attendances.update')           ->middleware('permission:academy_panel.teachers.attendance');
     Route::post('/generate-qr-code',   [TeacherAttendanceController::class, 'generateQrCode'])  ->name('ap.teacher-attendances.generateQrCode')  ->middleware('permission:academy_panel.teachers.attendance');
+    Route::get('/history/{teacherId}', [TeacherAttendanceController::class, 'history'])          ->name('ap.teacher-attendances.history')          ->middleware('permission:academy_panel.teachers.attendance');
 });
 
 Route::middleware(['auth:api'])->prefix('/academy-panel/student-guardians')->group(function () {

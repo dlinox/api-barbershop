@@ -46,6 +46,7 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/treasury-general-expens
     Route::post('/save', [GeneralExpenseController::class, 'save'])->name('treasury-general-expenses.save');
     Route::get('/get-by-id/{id}', [GeneralExpenseController::class, 'getById'])->name('treasury-general-expenses.getById');
     Route::post('/cancel/{id}', [GeneralExpenseController::class, 'cancel'])->name('treasury-general-expenses.cancel');
+    Route::post('/approve/{id}', [GeneralExpenseController::class, 'approve'])->name('treasury-general-expenses.approve');
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/treasury-incomes')->group(function () {
@@ -53,6 +54,8 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/treasury-incomes')->gro
     Route::get('/get-by-id/{id}', [IncomeController::class, 'getById'])->name('treasury-incomes.getById');
     Route::get('/generate-pdf/{id}', [IncomeController::class, 'generatePdf'])->name('treasury-incomes.generatePdf');
     Route::post('/annul/{id}', [IncomeController::class, 'annul'])->name('treasury-incomes.annul');
+    Route::post('/update/{id}', [IncomeController::class, 'update'])->name('treasury-incomes.update');
+    Route::get('/audits/{id}', [IncomeController::class, 'audits'])->name('treasury-incomes.audits');
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/treasury-employee-advances')->group(function () {
@@ -65,6 +68,8 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/treasury-employee-payme
     Route::post('/data-table', [EmployeePaymentController::class, 'dataTable'])->name('treasury-employee-payments.dataTable');
     Route::post('/save', [EmployeePaymentController::class, 'save'])->name('treasury-employee-payments.save');
     Route::delete('/delete/{id}', [EmployeePaymentController::class, 'delete'])->name('treasury-employee-payments.delete');
+    Route::get('/generate-teacher-payment-pdf/{id}', [EmployeePaymentController::class, 'generateTeacherPaymentPdf'])->name('treasury-employee-payments.generateTeacherPaymentPdf');
+    Route::get('/generate-barber-payment-pdf/{id}', [EmployeePaymentController::class, 'generateBarberPaymentPdf'])->name('treasury-employee-payments.generateBarberPaymentPdf');
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/workers')->group(function () {
@@ -74,6 +79,7 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/workers')->group(functi
     Route::post('/save', [WorkerController::class, 'save'])->name('treasury-workers.save');
     Route::get('/select-async-items', [WorkerController::class, 'selectAsyncItems'])->name('treasury-workers.selectAsyncItems');
     Route::delete('/delete/{id}', [WorkerController::class, 'delete'])->name('treasury-workers.delete');
+    Route::get('/generate-payment-pdf/{id}', [WorkerController::class, 'generateWorkerPaymentPdf'])->name('treasury-workers.generatePaymentPdf');
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/worker-attendances')->group(function () {
@@ -83,4 +89,5 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/worker-attendances')->g
     Route::post('/register-absent', [WorkerAttendanceController::class, 'registerAbsent'])->name('worker-attendances.registerAbsent');
     Route::post('/update', [WorkerAttendanceController::class, 'update'])->name('worker-attendances.update');
     Route::post('/generate-qr-code', [WorkerAttendanceController::class, 'generateQrCode'])->name('worker-attendances.generateQrCode');
+    Route::get('/history/{workerId}', [WorkerAttendanceController::class, 'history'])->name('worker-attendances.history');
 });

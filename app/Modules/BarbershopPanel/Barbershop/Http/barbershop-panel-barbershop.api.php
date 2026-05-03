@@ -66,4 +66,5 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/barber-attendances')-
     Route::post('/register-absent',    [BarberAttendanceController::class, 'registerAbsent'])  ->name('bp.barber-attendances.registerAbsent')  ->middleware('permission:barbershop_panel.attendance.barber');
     Route::post('/update',             [BarberAttendanceController::class, 'update'])           ->name('bp.barber-attendances.update')           ->middleware('permission:barbershop_panel.attendance.barber');
     Route::post('/generate-qr-code',   [BarberAttendanceController::class, 'generateQrCode'])  ->name('bp.barber-attendances.generateQrCode')  ->middleware('permission:barbershop_panel.attendance.barber');
+    Route::get('/history/{barberId}',   [BarberAttendanceController::class, 'history'])          ->name('bp.barber-attendances.history')          ->middleware('permission:barbershop_panel.attendance.barber');
 });

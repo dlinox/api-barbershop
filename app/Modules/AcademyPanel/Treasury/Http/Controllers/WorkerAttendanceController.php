@@ -44,4 +44,10 @@ class WorkerAttendanceController
         $this->workerAttendanceService->update($request->all());
         return ApiResponse::success(null, 'Asistencia actualizada correctamente');
     }
+
+    public function history(int $workerId)
+    {
+        $items = $this->workerAttendanceService->history($workerId);
+        return ApiResponse::success($items);
+    }
 }

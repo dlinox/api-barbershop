@@ -23,11 +23,20 @@ class EnrollmentRepository
             'academy_groups.start_date as group_start_date', 'academy_groups.end_date as group_end_date',
             'academy_groups.days_of_week as group_days_of_week', 'academy_groups.is_active as group_is_active',
             'academy_groups.level_id as group_level_id', 'academy_levels.name as group_level_name',
+            'academy_branches.name as group_branch_name',
+            'academy_groups.schedule_id as group_schedule_id',
+            'academy_schedules.shift as group_schedule_shift',
+            'academy_schedules.start_time as group_schedule_start_time',
+            'academy_schedules.end_time as group_schedule_end_time',
+            'academy_groups.room_id as group_room_id',
+            'academy_rooms.number as group_room_number',
         )
             ->join('core_persons', 'academy_enrollments.profile_student_id', '=', 'core_persons.id')
             ->join('academy_groups', 'academy_enrollments.group_id', '=', 'academy_groups.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
             ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id')
+            ->join('academy_schedules', 'academy_groups.schedule_id', '=', 'academy_schedules.id')
+            ->leftJoin('academy_rooms', 'academy_groups.room_id', '=', 'academy_rooms.id')
             ->where('academy_groups.branch_id', $branchId);
     }
 

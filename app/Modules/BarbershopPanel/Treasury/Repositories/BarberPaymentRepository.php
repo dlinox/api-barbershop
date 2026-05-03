@@ -157,6 +157,12 @@ class BarberPaymentRepository
             }
         }
 
+        if (empty($data['period']) && !empty($data['period_start'])) {
+            $data['period'] = ucfirst(\Carbon\Carbon::parse($data['period_start'])
+                ->locale('es')
+                ->translatedFormat('F Y'));
+        }
+
         $advanceIds = $data['calculation_details']['advance_ids'] ?? [];
 
         try {

@@ -132,13 +132,30 @@ class BarberAttendanceService
             ->where('is_active', true)->first();
 
         if (!$schedule) {
-            return 'on_time';
+            return 'present';
         }
 
         $expectedStart = strtotime($schedule->start_time);
         $tolerance = ($schedule->late_tolerance_minutes ?? 0) * 60;
         $checkInTime = strtotime($checkIn);
 
-        return ($checkInTime <= $expectedStart + $tolerance) ? 'on_time' : 'late';
+        return ($checkInTime <= $expectedStart + $tolerance) ? 'present' : 'late';
+    }
+
+    public function history(int $barberId): array
+    {
+        return BarberAttendance::where('barber_id', $barberId)
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(fn($a) => [
+                'id'          => $a->id,
+                'date'        => $a->date->format('Y-m-d'),
+                'status'      => $a->status,
+                'checkIn'     => $a->check_in,
+                'checkOut'    => $a->check_out,
+                'observation' => $a->observation,
+            ])
+            ->values()
+            ->toArray();
     }
 }

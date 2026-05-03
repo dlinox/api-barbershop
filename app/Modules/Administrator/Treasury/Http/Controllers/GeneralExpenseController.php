@@ -35,6 +35,12 @@ class GeneralExpenseController
         return ApiResponse::success(new ExpenseDataTableItemResource($item));
     }
 
+    public function approve(int $id): JsonResponse
+    {
+        $this->service->approve($id);
+        return ApiResponse::success(null, 'Gasto aprobado correctamente');
+    }
+
     public function cancel(int $id): JsonResponse
     {
         $this->service->cancel($id);

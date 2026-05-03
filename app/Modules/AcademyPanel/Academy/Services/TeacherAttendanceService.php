@@ -99,6 +99,24 @@ class TeacherAttendanceService
         ];
     }
 
+    public function history(int $teacherId): array
+    {
+        return TeacherAttendance::where('teacher_id', $teacherId)
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(fn($a) => [
+                'id'          => $a->id,
+                'date'        => $a->date->format('Y-m-d'),
+                'status'      => $a->status,
+                'checkIn'     => $a->check_in,
+                'checkOut'    => $a->check_out,
+                'observation' => $a->observation,
+                'groupId'     => $a->group_id,
+            ])
+            ->values()
+            ->toArray();
+    }
+
     private function resolveCheckInStatus(int $groupId): string
     {
         $group = Group::with('schedule')->find($groupId);

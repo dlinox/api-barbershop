@@ -2,6 +2,7 @@
 
 namespace App\Modules\AcademyPanel\Academy\Repositories;
 
+use App\Models\Academy\Group;
 use App\Models\Academy\GroupTeacher;
 use App\Common\Http\Context\AdminContext;
 
@@ -11,6 +12,14 @@ class TeacherAttendanceRepository
     {
         $branchId = AdminContext::academyBranchId();
         $date = $request->date ?? date('Y-m-d');
+        $dayOfWeek = (int) date('w', strtotime($date)); // 0=Dom, 6=Sáb
+
+        // Paso 1: grupos activos (por status) que tienen clase este día de la semana
+        $activeGroupIds = Group::where('status', 'active')
+            ->get(['id', 'days_of_week'])
+            ->filter(fn($g) => in_array($dayOfWeek, array_map('intval', explode(',', $g->days_of_week))))
+            ->pluck('id')
+            ->all();
 
         $query = GroupTeacher::select(
             'academy_group_teachers.id as group_teacher_id', 'academy_group_teachers.teacher_id',
@@ -42,6 +51,7 @@ class TeacherAttendanceRepository
                     ->where('academy_teacher_attendances.date', '=', $date);
             })
             ->where('academy_group_teachers.status', 'active')
+            ->whereIn('academy_groups.id', $activeGroupIds)
             ->where('academy_groups.branch_id', $branchId);
 
         if (empty($request->sortBy)) { $query->orderBy('core_persons.name', 'asc'); }

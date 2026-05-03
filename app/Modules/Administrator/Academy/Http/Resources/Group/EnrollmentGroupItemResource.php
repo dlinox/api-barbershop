@@ -28,7 +28,7 @@ class EnrollmentGroupItemResource extends JsonResource
             ];
         });
 
-        $payments = $payments->sortBy('type')->sortBy('startDate')->values();
+        $payments = $payments->sortBy(fn($p) => [$p['type'] === 'enrollment' ? 0 : 1, $p['startDate']])->values();
 
         $materials = Material::select(
             'academy_materials.id',

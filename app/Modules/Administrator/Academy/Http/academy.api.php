@@ -15,6 +15,7 @@ use App\Modules\Administrator\Academy\Http\Controllers\MaterialController;
 use App\Modules\Administrator\Academy\Http\Controllers\TeacherAttendanceController;
 use App\Modules\Administrator\Academy\Http\Controllers\StudentGuardianController;
 use App\Modules\Administrator\Academy\Http\Controllers\EnrollmentPaymentAdvanceController;
+use App\Modules\Administrator\Academy\Http\Controllers\ChangeGroupController;
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/branches')->group(function () {
     Route::post('/data-table', [BranchController::class, 'dataTable'])->name('branches.dataTable');
@@ -83,7 +84,9 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/enrollments')->group(fu
     Route::get('/get/{id}', [EnrollmentController::class, 'getEnrollment'])->name('enrollments.getEnrollment');
     Route::post('/register-payment', [EnrollmentController::class, 'registerPayment'])->name('enrollments.registerPayment');
     Route::get('/generate-pdf/{id}', [EnrollmentController::class, 'generatePdf'])->name('enrollments.generatePdf');
+    Route::get('/group-change-pdf/{id}', [EnrollmentController::class, 'generateGroupChangePdf'])->name('enrollments.generateGroupChangePdf');
     Route::get('/detail/{id}', [EnrollmentController::class, 'detail'])->name('enrollments.detail');
+    Route::post('/change-group', [ChangeGroupController::class, 'changeGroup'])->name('enrollments.changeGroup');
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/attendances')->group(function () {
@@ -117,6 +120,7 @@ Route::middleware(['auth:api', 'super_admin'])->prefix('/teacher-attendances')->
     Route::post('/register-absent', [TeacherAttendanceController::class, 'registerAbsent'])->name('teacher-attendances.registerAbsent');
     Route::post('/update', [TeacherAttendanceController::class, 'update'])->name('teacher-attendances.update');
     Route::post('/generate-qr-code', [TeacherAttendanceController::class, 'generateQrCode'])->name('teacher-attendances.generateQrCode');
+    Route::get('/history/{teacherId}', [TeacherAttendanceController::class, 'history'])->name('teacher-attendances.history');
 });
 
 Route::middleware(['auth:api', 'super_admin'])->prefix('/student-guardians')->group(function () {

@@ -58,6 +58,11 @@ class EnrollmentController
         return $this->enrollmentService->generatePdf($id);
     }
 
+    public function generateGroupChangePdf(int $id)
+    {
+        return $this->enrollmentService->generateGroupChangePdf($id);
+    }
+
     public function detail(int $id)
     {
         $enrollment = $this->enrollmentService->detail($id);

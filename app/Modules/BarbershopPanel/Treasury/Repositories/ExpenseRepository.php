@@ -33,6 +33,13 @@ class ExpenseRepository
         return $this->saveExpenseAction->execute($data, 'pending');
     }
 
+    public function approve(int $id): Expense
+    {
+        $expense = Expense::findOrFail($id);
+        $expense->update(['status' => 'approved']);
+        return $expense;
+    }
+
     public function cancel(int $id): Expense
     {
         $expense = Expense::findOrFail($id);

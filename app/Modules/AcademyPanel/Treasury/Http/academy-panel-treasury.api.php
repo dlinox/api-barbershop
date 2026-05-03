@@ -39,6 +39,9 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-general-expense
     Route::post('/cancel/{id}', [GeneralExpenseController::class, 'cancel'])
         ->name('academy-panel.treasury-general-expenses.cancel')
         ->middleware('permission:academy_panel.finance.general_expense');
+    Route::post('/approve/{id}', [GeneralExpenseController::class, 'approve'])
+        ->name('academy-panel.treasury-general-expenses.approve')
+        ->middleware('permission:academy_panel.finance.general_expense');
 });
 
 Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-worker-advances')->group(function () {
@@ -81,6 +84,9 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-worker-payments
     Route::delete('/delete/{id}', [EmployeePaymentController::class, 'delete'])
         ->name('academy-panel.treasury-worker-payments.delete')
         ->middleware('permission:academy_panel.finance.worker_payment');
+    Route::get('/generate-pdf/{id}', [EmployeePaymentController::class, 'generateWorkerPaymentPdf'])
+        ->name('academy-panel.treasury-worker-payments.generatePdf')
+        ->middleware('permission:academy_panel.finance.worker_payment');
 });
 
 Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-teacher-payments')->group(function () {
@@ -99,6 +105,9 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-teacher-payment
     Route::delete('/delete/{id}', [EmployeePaymentController::class, 'delete'])
         ->name('academy-panel.treasury-teacher-payments.delete')
         ->middleware('permission:academy_panel.finance.teacher_payment');
+    Route::get('/generate-pdf/{id}', [EmployeePaymentController::class, 'generateTeacherPaymentPdf'])
+        ->name('academy-panel.treasury-teacher-payments.generatePdf')
+        ->middleware('permission:academy_panel.finance.teacher_payment');
 });
 
 Route::middleware(['auth:api'])->prefix('/academy-panel/worker-attendances')->group(function () {
@@ -116,6 +125,9 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/worker-attendances')->gr
         ->middleware('permission:academy_panel.workers.attendance');
     Route::post('/update', [WorkerAttendanceController::class, 'update'])
         ->name('academy-panel.worker-attendances.update')
+        ->middleware('permission:academy_panel.workers.attendance');
+    Route::get('/history/{workerId}', [WorkerAttendanceController::class, 'history'])
+        ->name('academy-panel.worker-attendances.history')
         ->middleware('permission:academy_panel.workers.attendance');
 });
 

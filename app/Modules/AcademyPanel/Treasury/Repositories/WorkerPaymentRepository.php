@@ -69,6 +69,8 @@ class WorkerPaymentRepository
             ->get();
 
         $absencesCount = $attendances->where('status', 'absent')->count();
+        $presentCount = $attendances->whereIn('status', ['present', 'late'])->count();
+        $lateCount    = $attendances->where('status', 'late')->count();
 
         return [
             'advances' => [
@@ -84,6 +86,8 @@ class WorkerPaymentRepository
                 'count' => $absencesCount,
             ],
             'attendances' => [
+                'presentCount' => $presentCount,
+                'lateCount'    => $lateCount,
                 'items' => $attendances->map(fn($a) => [
                     'id' => $a->id,
                     'date' => $a->date->format('Y-m-d'),
@@ -114,6 +118,12 @@ class WorkerPaymentRepository
             if ($payment->status === 'cancelled') {
                 throw new \Exception('No se puede editar un pago cancelado');
             }
+        }
+
+        if (empty($data['period']) && !empty($data['period_start'])) {
+            $data['period'] = ucfirst(\Carbon\Carbon::parse($data['period_start'])
+                ->locale('es')
+                ->translatedFormat('F Y'));
         }
 
         $advanceIds = $data['calculation_details']['advance_ids'] ?? [];

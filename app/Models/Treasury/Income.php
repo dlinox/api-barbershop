@@ -46,15 +46,17 @@ class Income extends Model
         'total',
         'observations',
         'status',
+        'is_edited',
         'transaction_date',
         'user_id',
     ];
 
     protected $casts = [
-        'subtotal' => 'decimal:2',
-        'discount' => 'decimal:2',
-        'tax' => 'decimal:2',
-        'total' => 'decimal:2',
+        'subtotal'         => 'decimal:2',
+        'discount'         => 'decimal:2',
+        'tax'              => 'decimal:2',
+        'total'            => 'decimal:2',
+        'is_edited'        => 'boolean',
         'transaction_date' => 'date',
     ];
 
@@ -102,5 +104,10 @@ class Income extends Model
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'fileable');
+    }
+
+    public function audits(): HasMany
+    {
+        return $this->hasMany(IncomeAudit::class, 'income_id')->orderByDesc('created_at');
     }
 }

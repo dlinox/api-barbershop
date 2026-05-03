@@ -2,9 +2,9 @@
 
 namespace App\Modules\Administrator\Academy\Repositories;
 
+use App\Models\Academy\Group;
 use App\Models\Academy\GroupTeacher;
 use App\Common\Traits\HasInfrastructureScope;
-use Illuminate\Support\Facades\DB;
 
 class TeacherAttendanceRepository
 {
@@ -13,6 +13,14 @@ class TeacherAttendanceRepository
     public function dataTable($request)
     {
         $date = $request->date ?? date('Y-m-d');
+        $dayOfWeek = (int) date('w', strtotime($date)); // 0=Dom, 6=Sáb
+
+        // Paso 1: grupos activos (por status) que tienen clase este día de la semana
+        $activeGroupIds = Group::where('status', 'active')
+            ->get(['id', 'days_of_week'])
+            ->filter(fn($g) => in_array($dayOfWeek, array_map('intval', explode(',', $g->days_of_week))))
+            ->pluck('id')
+            ->all();
 
         $query = GroupTeacher::select(
             'academy_group_teachers.id as group_teacher_id',
@@ -61,12 +69,7 @@ class TeacherAttendanceRepository
                     ->where('academy_teacher_attendances.date', '=', $date);
             })
             ->where('academy_group_teachers.status', 'active')
-            ->where('academy_groups.is_active', true)
-            ->whereRaw('? >= academy_group_teachers.start_date', [$date])
-            ->where(function ($query) use ($date) {
-                $query->whereNull('academy_group_teachers.end_date')
-                    ->orWhereRaw('? <= academy_group_teachers.end_date', [$date]);
-            });
+            ->whereIn('academy_groups.id', $activeGroupIds);
 
         $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');
 

@@ -40,6 +40,11 @@ class ExpenseService
         return $this->repository->getById($id);
     }
 
+    public function approve(int $id)
+    {
+        return $this->repository->approve($id);
+    }
+
     // ─── Compartido ───
 
     public function cancel(int $id)

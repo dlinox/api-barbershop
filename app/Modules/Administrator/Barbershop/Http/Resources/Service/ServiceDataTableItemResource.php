@@ -14,6 +14,7 @@ class ServiceDataTableItemResource extends JsonResource
             'description' => $this->description,
             'categoryId' => $this->category_id,
             'categoryName' => $this->category_name,
+            'branchName' => $this->branch_name,
             'price' => $this->price,
             'duration' => $this->duration,
             'isActive' => (bool) $this->is_active,

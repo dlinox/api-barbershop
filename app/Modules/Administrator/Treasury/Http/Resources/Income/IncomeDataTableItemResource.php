@@ -9,7 +9,7 @@ class IncomeDataTableItemResource extends JsonResource
     public function toArray($request): array
     {
         $clientName = $this->person_name
-            ? trim("{$this->person_name} {$this->person_paternal_surname}")
+            ? collect([$this->person_name, $this->person_paternal_surname])->filter()->implode(' ')
             : 'Público General';
 
         return [
@@ -25,6 +25,7 @@ class IncomeDataTableItemResource extends JsonResource
             'tax'             => (float) $this->tax,
             'total'           => (float) $this->total,
             'status'          => $this->status,
+            'isEdited'        => (bool) $this->is_edited,
             'transactionDate' => $this->transaction_date?->format('Y-m-d'),
             'createdAt'       => $this->created_at?->format('Y-m-d H:i:s'),
         ];

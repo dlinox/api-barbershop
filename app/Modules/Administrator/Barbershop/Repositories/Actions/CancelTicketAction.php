@@ -5,6 +5,7 @@ namespace App\Modules\Administrator\Barbershop\Repositories\Actions;
 use App\Common\Exceptions\ApiException;
 use App\Models\Barbershop\Ticket;
 use App\Models\Inventory\Sale;
+use App\Models\Treasury\Income;
 use App\Modules\Administrator\Inventory\Repositories\Actions\RegisterKardexMovementAction;
 
 class CancelTicketAction
@@ -60,6 +61,12 @@ class CancelTicketAction
         }
 
         $ticket->update(['status' => 'cancelled']);
+
+        // ─── Cancelar el income asociado si existe ───
+        Income::where('transactionable_type', 'barbershop_tickets')
+            ->where('transactionable_id', $ticket->id)
+            ->where('status', '!=', 'cancelled')
+            ->update(['status' => 'cancelled']);
 
         return $ticket->load(['services', 'sale.items']);
     }

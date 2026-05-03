@@ -2,8 +2,6 @@
 
 namespace App\Modules\Administrator\Treasury\Services;
 
-use App\Models\Treasury\Income;
-use App\Common\Helpers\FileHelper;
 use App\Modules\Administrator\Treasury\Repositories\IncomeRepository;
 use App\Modules\Administrator\Treasury\Repositories\Actions\AnnulIncomeAction;
 use App\Modules\Administrator\Treasury\Repositories\Actions\GenerateIncomePdfAction;
@@ -31,28 +29,25 @@ class IncomeService
         return $this->annulIncomeAction->execute($id);
     }
 
-    private const PDF_TYPE = 'payment_receipt';
+    public function update(int $id, array $data)
+    {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($id, $data) {
+            return $this->incomeRepository->update($id, $data);
+        });
+    }
 
+    public function audits(int $id)
+    {
+        return $this->incomeRepository->getAudits($id);
+    }
+
+    /**
+     * Genera el PDF siempre on-the-fly para garantizar datos actualizados.
+     * El archivo anterior en disco se elimina si existe (ya no se cachea).
+     */
     public function generatePdf(int $id)
     {
-        $income = Income::findOrFail($id);
-
-        // ─── Buscar archivo existente ───
-        $existingFile = $income->files()
-            ->where('type', self::PDF_TYPE)
-            ->first();
-
-        // ─── Si no existe, generar con el action ───
-        if (!$existingFile || !FileHelper::fileExists($existingFile->disk, $existingFile->path)) {
-            $this->generateIncomePdfAction->execute($id);
-            $existingFile = $income->files()->where('type', self::PDF_TYPE)->first();
-        }
-
-        $content = file_get_contents(FileHelper::getFilePath($existingFile->disk, $existingFile->path));
-
-        return response($content, 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => "inline; filename=\"{$existingFile->name}\"",
-        ]);
+        return $this->generateIncomePdfAction->execute($id);
     }
 }
+

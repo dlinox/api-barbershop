@@ -158,9 +158,19 @@ class GroupRepository
 
             'academy_groups.level_id',
             'academy_levels.name as level_name',
+
+            'academy_groups.schedule_id',
+            'academy_schedules.shift as schedule_shift',
+            'academy_schedules.start_time as schedule_start_time',
+            'academy_schedules.end_time as schedule_end_time',
+
+            'academy_groups.room_id',
+            'academy_rooms.number as room_number',
         )
             ->join('academy_branches', 'academy_groups.branch_id', '=', 'academy_branches.id')
             ->join('academy_levels', 'academy_groups.level_id', '=', 'academy_levels.id')
+            ->join('academy_schedules', 'academy_groups.schedule_id', '=', 'academy_schedules.id')
+            ->join('academy_rooms', 'academy_groups.room_id', '=', 'academy_rooms.id')
             ->whereIn('academy_groups.status', ['active', 'coming']);
 
         $this->scopeByAcademyBranch($query, 'academy_groups.branch_id');

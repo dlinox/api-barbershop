@@ -146,4 +146,20 @@ class WorkerAttendanceService
 
         return $checkIn > $schedule->start_time ? 'late' : 'present';
     }
+
+    public function history(int $workerId): array
+    {
+        return WorkerAttendance::where('worker_id', $workerId)
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(fn($a) => [
+                'id'          => $a->id,
+                'date'        => $a->date,
+                'status'      => $a->status,
+                'checkIn'     => $a->check_in,
+                'checkOut'    => $a->check_out,
+                'observation' => $a->observation,
+            ])
+            ->toArray();
+    }
 }

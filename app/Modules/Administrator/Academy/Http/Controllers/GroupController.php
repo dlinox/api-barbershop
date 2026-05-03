@@ -54,7 +54,7 @@ class GroupController
     public function getActiveAndUpcoming()
     {
         $items = $this->groupService->getActiveAndUpcoming();
-        $items = GroupSelectItemResource::collection($items);
+        $items = EnrollmentGroupItemResource::collection($items);
         return ApiResponse::success($items);
     }
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Common\Traits\HasDataTable;
 use App\Models\Profile\Student;
 use App\Models\Core\File;
+use App\Models\Academy\EnrollmentGroupChange;
 
 class Enrollment extends Model
 {
@@ -59,5 +60,15 @@ class Enrollment extends Model
     public function files()
     {
         return $this->morphMany(File::class, 'fileable');
+    }
+
+    public function groupChangeAsOrigin()
+    {
+        return $this->hasOne(EnrollmentGroupChange::class, 'origin_enrollment_id');
+    }
+
+    public function groupChangeAsDestination()
+    {
+        return $this->hasOne(EnrollmentGroupChange::class, 'destination_enrollment_id');
     }
 }

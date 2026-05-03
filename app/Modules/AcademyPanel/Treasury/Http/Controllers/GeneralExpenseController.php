@@ -36,6 +36,12 @@ class GeneralExpenseController
         return ApiResponse::success($item);
     }
 
+    public function approve(int $id)
+    {
+        $this->expenseService->approve($id);
+        return ApiResponse::success(null, 'Gasto aprobado correctamente');
+    }
+
     public function cancel(int $id)
     {
         $this->expenseService->cancel($id);

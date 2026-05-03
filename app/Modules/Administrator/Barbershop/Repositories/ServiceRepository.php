@@ -18,11 +18,13 @@ class ServiceRepository
             'barbershop_services.description',
             'barbershop_services.category_id',
             'barbershop_categories.name as category_name',
+            'barbershop_branches.name as branch_name',
             'barbershop_services.price',
             'barbershop_services.duration',
             'barbershop_services.is_active',
         )
-            ->join('barbershop_categories', 'barbershop_services.category_id', '=', 'barbershop_categories.id');
+            ->join('barbershop_categories', 'barbershop_services.category_id', '=', 'barbershop_categories.id')
+            ->join('barbershop_branches', 'barbershop_services.branch_id', '=', 'barbershop_branches.id');
 
         $this->scopeByBranch($items, 'barbershop_services.branch_id');
 

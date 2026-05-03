@@ -50,4 +50,10 @@ class WorkerAttendanceController
         $data = $this->workerAttendanceService->generateQrCode();
         return ApiResponse::success($data);
     }
+
+    public function history(int $workerId)
+    {
+        $items = $this->workerAttendanceService->history($workerId);
+        return ApiResponse::success($items);
+    }
 }

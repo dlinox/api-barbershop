@@ -79,7 +79,7 @@ class TeacherPaymentCalculationQuery
 
             $startTime = Carbon::parse($schedule->start_time);
             $endTime = Carbon::parse($schedule->end_time);
-            $hoursPerDay = round($endTime->diffInMinutes($startTime) / 60, 2);
+            $hoursPerDay = round(abs($endTime->diffInMinutes($startTime)) / 60, 2);
 
             $days = collect(explode(',', $group->days_of_week))
                 ->map(fn($d) => $this->daysMap[(int) trim($d)] ?? $d)

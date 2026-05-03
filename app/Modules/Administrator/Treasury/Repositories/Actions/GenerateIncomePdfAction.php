@@ -6,6 +6,7 @@ use App\Models\Treasury\Income;
 use App\Common\Helpers\PdfHelper;
 use App\Common\Helpers\FileHelper;
 use App\Models\Core\Company;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use App\Modules\Administrator\Treasury\Repositories\Queries\IncomeDetailQuery;
@@ -13,20 +14,21 @@ use App\Modules\Administrator\Treasury\Repositories\Queries\IncomeDetailQuery;
 class GenerateIncomePdfAction
 {
     private const PDF_TYPE = 'payment_receipt';
-    private const PDF_DISK = 'payment_receipts';
-    private const PDF_FOLDER = 'receipts';
 
     public function __construct(
         private readonly IncomeDetailQuery $incomeDetailQuery,
     ) {}
 
-    public function execute(int $incomeId): void
+    /**
+     * Genera el PDF on-the-fly (sin guardar en disco) y devuelve una Response HTTP.
+     * Elimina cualquier archivo en disco previamente cacheado para liberar espacio.
+     */
+    public function execute(int $incomeId): Response
     {
         $income = Income::findOrFail($incomeId);
 
-        // ─── Eliminar PDF anterior si existe ───
+        // ─── Limpiar archivo en disco si quedó guardado anteriormente ───
         $existingFile = $income->files()->where('type', self::PDF_TYPE)->first();
-
         if ($existingFile) {
             FileHelper::deleteFile($existingFile->disk, $existingFile->path);
             $existingFile->delete();
@@ -42,7 +44,7 @@ class GenerateIncomePdfAction
 
         $headerHtml = View::make('incomes.common.header', $data)->render();
         $footerHtml = View::make('incomes.common.footer', $data)->render();
-        $html = View::make('incomes.receipt', $data)->render();
+        $html       = View::make('incomes.receipt', $data)->render();
 
         $mpdf = PdfHelper::createFromHtml($html, config: [
             'margin_top'    => 35,
@@ -51,28 +53,29 @@ class GenerateIncomePdfAction
             'margin_footer' => 8,
         ], headerHtml: $headerHtml, footerHtml: $footerHtml);
 
-        $pdfContent = $mpdf->Output('', 'S');
+        // ─── Marca de agua si está cancelado ───
+        if ($income->status === 'cancelled') {
+            $mpdf->SetWatermarkText('CANCELADO');
+            $mpdf->showWatermarkText  = true;
+            $mpdf->watermarkTextAlpha = 0.12;
+        }
+
+        $pdfContent    = $mpdf->Output('', 'S');
         $receiptNumber = $income->receipt_serie . '-' . str_pad($income->receipt_number, 8, '0', STR_PAD_LEFT);
-        $filename = FileHelper::generateUniqueFilename("comprobante-{$receiptNumber}", 'pdf');
-        $path = self::PDF_FOLDER . '/' . $filename;
+        $filename      = "comprobante-{$receiptNumber}.pdf";
 
-        FileHelper::saveFile($pdfContent, $path, self::PDF_DISK);
-
-        $pdfName = "comprobante-{$receiptNumber}.pdf";
-        $income->files()->create([
-            'type' => self::PDF_TYPE,
-            'name' => $pdfName,
-            'path' => $path,
-            'disk' => self::PDF_DISK,
-            'mime_type' => 'application/pdf',
-            'size' => strlen($pdfContent),
+        return response($pdfContent, 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => "inline; filename=\"{$filename}\"",
+            'Cache-Control'       => 'no-store, no-cache, must-revalidate',
+            'Pragma'              => 'no-cache',
         ]);
     }
 
     private function baseData(): array
     {
         return [
-            'company' => Company::first(),
+            'company'      => Company::first(),
             'generated_by' => Auth::user()?->username ?? 'Sistema',
             'generated_at' => now()->format('d/m/Y H:i'),
         ];
