@@ -4,7 +4,7 @@ namespace App\Modules\AcademyPanel\Academy\Http\Controllers;
 
 use App\Common\Http\Responses\ApiResponse;
 use App\Modules\AcademyPanel\Academy\Services\EnrollmentPaymentAdvanceService;
-use App\Modules\Administrator\Academy\Http\Requests\EnrollmentPaymentAdvance\EnrollmentPaymentAdvanceRequest;
+use App\Modules\AcademyPanel\Academy\Http\Requests\EnrollmentPaymentAdvance\EnrollmentPaymentAdvanceRequest;
 use App\Modules\Administrator\Academy\Http\Resources\EnrollmentPaymentAdvance\EnrollmentPaymentAdvanceResource;
 
 class EnrollmentPaymentAdvanceController

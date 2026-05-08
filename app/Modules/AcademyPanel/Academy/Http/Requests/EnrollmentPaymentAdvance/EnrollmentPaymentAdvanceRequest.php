@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Administrator\Academy\Http\Requests\EnrollmentPaymentAdvance;
+namespace App\Modules\AcademyPanel\Academy\Http\Requests\EnrollmentPaymentAdvance;
 
 use App\Common\Http\Requests\ApiFormRequest;
 
@@ -22,15 +22,15 @@ class EnrollmentPaymentAdvanceRequest extends ApiFormRequest
     public function messages(): array
     {
         return [
-            'id.exists'             => 'El adelanto no existe',
-            'student_id.required'   => 'El estudiante es requerido',
-            'student_id.exists'     => 'El estudiante no existe',
-            'amount.required'       => 'El monto es requerido',
-            'amount.numeric'        => 'El monto debe ser un numero',
-            'amount.min'            => 'El monto debe ser mayor a 0',
-            'payment_date.required' => 'La fecha de pago es requerida',
-            'payment_date.date'     => 'La fecha de pago debe ser una fecha válida',
-            'observation.max'       => 'La observacion debe tener maximo 500 caracteres',
+            'id.exists'            => 'El adelanto no existe',
+            'student_id.required'  => 'El estudiante es requerido',
+            'student_id.exists'    => 'El estudiante no existe',
+            'amount.required'      => 'El monto es requerido',
+            'amount.numeric'       => 'El monto debe ser un número',
+            'amount.min'           => 'El monto debe ser mayor a 0',
+            'payment_date.required'=> 'La fecha de pago es requerida',
+            'payment_date.date'    => 'La fecha de pago debe ser una fecha válida',
+            'observation.max'      => 'La observación debe tener máximo 500 caracteres',
         ];
     }
 
@@ -41,7 +41,7 @@ class EnrollmentPaymentAdvanceRequest extends ApiFormRequest
             'student_id'   => 'Estudiante',
             'amount'       => 'Monto',
             'payment_date' => 'Fecha de pago',
-            'observation'  => 'Observacion',
+            'observation'  => 'Observación',
         ];
     }
 }
