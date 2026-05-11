@@ -79,7 +79,7 @@ return [
             'root' => storage_path('app/public/company_logos'),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/company_logos',
             'visibility' => 'public',
-            'throw' => false,
+            'throw' => true,
             'report' => false,
         ],
 

@@ -20,6 +20,12 @@ class CompanyRepository
             return $company;
         }
 
-        return Company::create($data);
+        // Solo crear si hay datos suficientes (no solo el logo)
+        if (isset($data['name'])) {
+            return Company::create($data);
+        }
+
+        // Si solo se está subiendo el logo y no hay empresa, crearla con defaults
+        return Company::create(array_merge(['name' => 'Mi Empresa'], $data));
     }
 }

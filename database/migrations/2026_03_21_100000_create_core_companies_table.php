@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('core_companies', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 200);
+            $table->string('name', 200)->nullable();
             $table->string('trade_name', 200)->nullable();
-            $table->string('ruc', 20)->unique();
+            $table->string('ruc', 20)->nullable()->unique();
             $table->string('address', 300)->nullable();
             $table->string('phone', 20)->nullable();
             $table->string('logo')->nullable();
