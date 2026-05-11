@@ -5,11 +5,13 @@ namespace App\Modules\Administrator\Profile\Repositories\Actions;
 use Illuminate\Support\Facades\DB;
 
 use App\Common\Exceptions\ApiException;
+use App\Models\Auth\User;
 use App\Models\Behavior\Role;
 
 use App\Modules\Administrator\Profile\Repositories\WorkerRepository;
 use App\Modules\Shared\Repositories\ProfileRepository;
 use App\Modules\Shared\Repositories\Actions\CreateOrUpdatePersonAction;
+use App\Modules\Auth\Repositories\Actions\CreateOrUpdateUserAction;
 
 class CreateOrUpdateWorkerAction
 {
@@ -17,6 +19,7 @@ class CreateOrUpdateWorkerAction
         private WorkerRepository $workerRepository,
         private ProfileRepository $profileRepository,
         private CreateOrUpdatePersonAction $createOrUpdatePersonAction,
+        private CreateOrUpdateUserAction $createOrUpdateUserAction,
     ) {}
 
     public function execute(array $data): void
@@ -37,6 +40,19 @@ class CreateOrUpdateWorkerAction
                 $worker = $this->workerRepository->findByPersonId($person->id);
                 if ($worker) throw new ApiException('La persona ya tiene un perfil de trabajador');
 
+                $existingProfile = $this->profileRepository->findByProfileableId($person->id);
+                if ($existingProfile) {
+                    $user = User::find($existingProfile->auth_user_id);
+                    if (!$user) throw new ApiException('Error al encontrar el usuario asociado');
+                } else {
+                    $user = $this->createOrUpdateUserAction->execute([
+                        'username' => $person->document_number,
+                        'email'    => $person->email,
+                        'password' => $person->document_number,
+                        'is_active' => $isActive,
+                    ]);
+                }
+
                 $worker = $this->workerRepository->create($person->id, [
                     'infrastructure_id' => $data['infrastructure_id'],
                     'position'          => $data['position'] ?? null,
@@ -49,7 +65,7 @@ class CreateOrUpdateWorkerAction
 
                 $profileExists = $this->profileRepository->findByProfileableIdAndType($worker->id, 'workers');
                 if ($profileExists) throw new ApiException('El trabajador ya tiene un perfil asignado');
-                $behaviorProfile = $this->profileRepository->create(null, 'profile_workers', $worker->id, $role->id);
+                $behaviorProfile = $this->profileRepository->create($user->id, 'workers', $worker->id, $role->id);
                 $behaviorProfile->update(['is_active' => $isActive]);
             } else {
                 $worker = $this->workerRepository->findByPersonId($data['id']);

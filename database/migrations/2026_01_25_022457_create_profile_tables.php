@@ -41,6 +41,7 @@ return new class extends Migration
 
         Schema::create('profile_workers', function (Blueprint $table) {
             $table->unsignedBigInteger('id'); // core_person_id
+            $table->unsignedBigInteger('infrastructure_id')->default(1);
             $table->string('position')->nullable();
             $table->decimal('monthly_salary', 10, 2)->nullable();         // salario mensual
             $table->enum('payment_frequency', ['monthly', 'biweekly'])->nullable(); // frecuencia
@@ -50,6 +51,7 @@ return new class extends Migration
             $table->foreign('id')->references('id')->on('core_persons')->onDelete('restrict');
             $table->primary('id');
             $table->index('is_active');
+            $table->index('infrastructure_id');
         });
     }
 

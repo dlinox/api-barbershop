@@ -23,7 +23,7 @@ class CreateOrUpdateStudentAction
         private CreateOrUpdateUserAction $createOrUpdateUserAction,
     ) {}
 
-    public function execute(array $data): void
+    public function execute(array $data): \App\Models\Academy\Student
     {
 
         $role = Role::where('name', 'estudiante')->where('is_active', true)->where('level', '3')->first();
@@ -81,6 +81,7 @@ class CreateOrUpdateStudentAction
             }
 
             DB::commit();
+            return $student;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;

@@ -214,9 +214,9 @@ INSERT INTO `auth_sessions` (`id`, `auth_user_id`, `behavior_profile_id`, `sessi
 INSERT INTO `auth_users` (`id`, `username`, `email`, `password`, `is_active`, `email_verified_at`, `last_sign_in_at`, `created_at`, `updated_at`) VALUES
 	(1, 'linox', 'super@admin.com', '$2y$12$eIgLsPURLrE9XbYLsP3KZ.2.7sGLXE17ZRVM04/VTT4gDZTFK2XuK', 1, '2026-02-17 02:40:08', '2026-02-19 14:06:25', '2026-02-17 02:40:08', '2026-02-19 14:06:25'),
 	(2, '00000001', 'admin@test.com', '$2y$12$vCODGEASNMuJI.GlnRkpfeBmdTl3DH3qCAbpqLCxYuT8O.vRXelDi', 1, NULL, '2026-03-14 16:49:36', '2026-02-17 02:41:53', '2026-03-14 16:49:36'),
-	(3, '76063570', 'carlos@gmail.com', '$2y$12$Cbqxd.jW6qd3rOEfYwB4R.lEafeP1NplOKt08/6nu.ZAZx1.U2nHa', 0, NULL, NULL, '2026-02-17 18:11:41', '2026-02-17 18:14:38'),
-	(4, '70063570', 'STIP@GMAIL.COM', '$2y$12$I0a2epusoMCU5tNBDLipCOyTGcsil9efPYgn1emXxGEzAiwa50hZq', 0, NULL, NULL, '2026-02-18 15:01:21', '2026-02-18 15:01:21'),
-	(5, '12312323', 'linox@gmail.com', '$2y$12$r.1AkaWTyvhZmFBlo0ye5O0uQFmfY/AXyu8lXp2CoUJ22dJ4IGZ8S', 0, NULL, NULL, '2026-02-18 17:55:33', '2026-02-18 17:55:33'),
+	-- (3, '76063570', 'carlos@gmail.com', '$2y$12$Cbqxd.jW6qd3rOEfYwB4R.lEafeP1NplOKt08/6nu.ZAZx1.U2nHa', 0, NULL, NULL, '2026-02-17 18:11:41', '2026-02-17 18:14:38'),
+	-- (4, '70063570', 'STIP@GMAIL.COM', '$2y$12$I0a2epusoMCU5tNBDLipCOyTGcsil9efPYgn1emXxGEzAiwa50hZq', 0, NULL, NULL, '2026-02-18 15:01:21', '2026-02-18 15:01:21'),
+	-- (5, '12312323', 'linox@gmail.com', '$2y$12$r.1AkaWTyvhZmFBlo0ye5O0uQFmfY/AXyu8lXp2CoUJ22dJ4IGZ8S', 0, NULL, NULL, '2026-02-18 17:55:33', '2026-02-18 17:55:33'),
 	(6, '76832299', 'C@GMAIL.COM', '$2y$12$O7vtgFa/FERbAnN.UQJjn.3GbjDH6r98L/f/r5G/KrZspbK.Qb.cK', 0, NULL, NULL, '2026-02-20 00:20:41', '2026-02-20 00:20:41'),
 	(7, '61893646', 'C1@GMAIL.COM', '$2y$12$2v32e.Lvyk8/HFdBdZtzTeomN1Xohgx2nI5CY.iIap2Wj1EfznQdS', 0, NULL, NULL, '2026-02-20 00:23:35', '2026-02-20 00:23:35'),
 	(8, '62805432', 'C2@GMAIL.COM', '$2y$12$.CIypFjolrQrOKxHvTBkLezZBa.ZSoQ8Maky.Nps5Mkk2lYQ/7D9G', 0, NULL, NULL, '2026-02-20 00:24:45', '2026-02-20 00:24:45'),

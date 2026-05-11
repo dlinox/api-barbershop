@@ -13,6 +13,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('address')->nullable();
+            $table->string('logo')->nullable();
             $table->string('ubication')->nullable();
             $table->string('phone')->nullable();
             $table->decimal('location_lat', 10, 8)->nullable();

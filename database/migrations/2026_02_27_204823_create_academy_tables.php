@@ -14,6 +14,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('address')->nullable();
+            $table->string('logo')->nullable();
             $table->string('ubication')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
@@ -107,12 +108,15 @@ return new class extends Migration
         Schema::create('profile_teachers', function (Blueprint $table) {
             $table->unsignedBigInteger('core_person_id');
             $table->unsignedBigInteger('branch_id')->nullable(); // academy_branches
+            $table->enum('payment_type', ['hourly', 'monthly'])->nullable();
+            $table->decimal('monthly_salary', 10, 2)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
             $table->foreign('core_person_id')->references('id')->on('core_persons')->onDelete('cascade');
             $table->foreign('branch_id')->references('id')->on('academy_branches')->nullOnDelete();
             $table->primary('core_person_id');
+            $table->index('payment_type', 'profile_teachers_payment_type_index');
             $table->index('is_active');
         });
 
@@ -163,7 +167,8 @@ return new class extends Migration
             $table->foreign('profile_student_id')->references('core_person_id')->on('profile_students')->restrictOnDelete();
             $table->foreign('group_id')->references('id')->on('academy_groups')->restrictOnDelete();
 
-            $table->unique(['profile_student_id', 'group_id']);
+            $table->index('profile_student_id', 'enrollments_student_id_index');
+            $table->index('group_id', 'enrollments_group_id_index');
         });
 
         Schema::create('academy_enrollment_payments', function (Blueprint $table) {

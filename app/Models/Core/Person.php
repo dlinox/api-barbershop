@@ -2,10 +2,15 @@
 
 namespace App\Models\Core;
 
+use App\Models\Profile\Admin;
+use App\Models\Profile\Barber;
+use App\Models\Profile\Client;
 use App\Models\Profile\Student;
 use App\Models\Profile\Teacher;
+use App\Models\Profile\Worker;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Person extends Model
 {
@@ -55,15 +60,33 @@ class Person extends Model
         return trim("{$this->name} {$this->paternal_surname} {$this->maternal_surname}");
     }
 
-    //student
-    public function studentRelation(): BelongsTo
+    public function adminRelation(): HasOne
     {
-        return $this->belongsTo(Student::class, 'id', 'core_person_id');
+        return $this->hasOne(Admin::class, 'core_person_id', 'id');
     }
 
-    //teacher
-    public function teacherRelation(): BelongsTo
+    public function studentRelation(): HasOne
     {
-        return $this->belongsTo(Teacher::class, 'id', 'core_person_id');
+        return $this->hasOne(Student::class, 'core_person_id', 'id');
+    }
+
+    public function teacherRelation(): HasOne
+    {
+        return $this->hasOne(Teacher::class, 'core_person_id', 'id');
+    }
+
+    public function clientRelation(): HasOne
+    {
+        return $this->hasOne(Client::class, 'id', 'id');
+    }
+
+    public function workerRelation(): HasOne
+    {
+        return $this->hasOne(Worker::class, 'id', 'id');
+    }
+
+    public function barberRelation(): HasOne
+    {
+        return $this->hasOne(Barber::class, 'id', 'id');
     }
 }
