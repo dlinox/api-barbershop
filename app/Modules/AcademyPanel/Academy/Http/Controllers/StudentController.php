@@ -22,8 +22,8 @@ class StudentController
 
     public function save(StudentRequest $request)
     {
-        $this->studentService->save($request->validated());
-        return ApiResponse::success(null, 'Alumno guardado correctamente');
+        $student = $this->studentService->save($request->validated());
+        return ApiResponse::success(['id' => $student->core_person_id], 'Alumno guardado correctamente');
     }
 
     public function selectAsyncItems(Request $request)

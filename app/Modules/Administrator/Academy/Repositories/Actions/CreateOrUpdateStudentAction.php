@@ -23,7 +23,7 @@ class CreateOrUpdateStudentAction
         private CreateOrUpdateUserAction $createOrUpdateUserAction,
     ) {}
 
-    public function execute(array $data): \App\Models\Academy\Student
+    public function execute(array $data): \App\Models\Profile\Student
     {
 
         $role = Role::where('name', 'estudiante')->where('is_active', true)->where('level', '3')->first();

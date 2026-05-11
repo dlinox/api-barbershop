@@ -4,8 +4,8 @@ namespace App\Modules\AcademyPanel\Academy\Http\Controllers;
 
 use App\Common\Http\Responses\ApiResponse;
 use App\Modules\AcademyPanel\Academy\Services\StudentGuardianService;
-use App\Modules\Administrator\Academy\Http\Requests\StudentGuardian\StudentGuardianRequest;
-use App\Modules\Administrator\Academy\Http\Resources\StudentGuardian\StudentGuardianItemResource;
+use App\Modules\AcademyPanel\Academy\Http\Requests\StudentGuardianRequest;
+use App\Modules\AcademyPanel\Academy\Http\Resources\StudentGuardianResource;
 
 class StudentGuardianController
 {
@@ -14,7 +14,7 @@ class StudentGuardianController
     public function findByStudentId(int $studentId)
     {
         $items = $this->studentGuardianService->findByStudentId($studentId);
-        return ApiResponse::success(StudentGuardianItemResource::collection($items));
+        return ApiResponse::success(StudentGuardianResource::collection($items));
     }
 
     public function save(StudentGuardianRequest $request)

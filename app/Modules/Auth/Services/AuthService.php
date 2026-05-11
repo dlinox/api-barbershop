@@ -203,7 +203,25 @@ class AuthService
     {
         $user = JWTAuth::user();
         $profileId = $this->getProfileIdFromToken();
-        if (!$profileId) throw new ApiException("No se encontro el perfil", 401);
+
+        // Si el token aún no tiene perfil seleccionado, devolver un usuario
+        // mínimo que indique al frontend que debe ir a seleccionar perfil.
+        if (!$profileId) {
+            return [
+                'name'     => $user->username,
+                'username' => $user->username,
+                'email'    => $user->email,
+                'profile'  => [
+                    'id'             => null,
+                    'role'           => null,
+                    'redirectTo'     => '/auth/select-profile',
+                    'roleLevel'      => null,
+                    'permissions'    => [],
+                    'infrastructure' => null,
+                ],
+            ];
+        }
+
         // infrastructureId = null: MeQuery will read 'inf' from JWT itself
         return ($this->meQuery)($user, $profileId);
     }

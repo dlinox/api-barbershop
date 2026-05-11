@@ -34,7 +34,7 @@ class StudentController
     public function save(StudentRequest $request)
     {
         $student = $this->studentService->save($request->validated());
-        return ApiResponse::success(['id' => $student->id], 'Estudiante guardado correctamente');
+        return ApiResponse::success(['id' => $student->core_person_id], 'Estudiante guardado correctamente');
     }
 
     public function saveUser(StudentUserRequest $request)
