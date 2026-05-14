@@ -26,6 +26,13 @@ class Barber extends Model
         'is_active',
     ];
 
+    public static $searchColumns = [
+        'core_persons.name',
+        'core_persons.paternal_surname',
+        'core_persons.maternal_surname',
+        'core_persons.document_number',
+    ];
+
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class, 'branch_id');

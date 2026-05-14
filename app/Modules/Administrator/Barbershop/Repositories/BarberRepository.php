@@ -75,11 +75,28 @@ class BarberRepository
 
         $this->scopeByBranch($items, 'profile_barbers.branch_id');
 
+        // Fix: apply is_active with qualified column to avoid ambiguity across joined tables
+        $filters = is_array($request->filters) ? $request->filters : [];
+        if (array_key_exists('isActive', $filters)) {
+            if (!is_null($filters['isActive'])) {
+                $items->where('auth_users.is_active', $filters['isActive']);
+            }
+            $request->merge(['filters' => collect($filters)->except('isActive')->all()]);
+        }
+
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $items->orderBy('core_persons.name', 'asc');
         }
 
-        $items = $items->dataTable($request);
+        $userSearchColumns = [
+            'core_persons.name',
+            'core_persons.paternal_surname',
+            'core_persons.maternal_surname',
+            'auth_users.username',
+            'auth_users.email',
+        ];
+
+        $items = $items->dataTable($request, $userSearchColumns);
         return $items;
     }
 

@@ -26,13 +26,14 @@
     22 => 'Illuminate\\View\\ViewServiceProvider',
     23 => 'Laravel\\Sanctum\\SanctumServiceProvider',
     24 => 'Laravel\\Socialite\\SocialiteServiceProvider',
-    25 => 'Carbon\\Laravel\\ServiceProvider',
-    26 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    27 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    28 => 'Pest\\Laravel\\PestServiceProvider',
-    29 => 'PHPOpenSourceSaver\\JWTAuth\\Providers\\LaravelServiceProvider',
-    30 => 'App\\Common\\Providers\\AppServiceProvider',
-    31 => 'App\\Common\\Providers\\RouteServiceProvider',
+    25 => 'Laravel\\Tinker\\TinkerServiceProvider',
+    26 => 'Carbon\\Laravel\\ServiceProvider',
+    27 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    28 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    29 => 'Pest\\Laravel\\PestServiceProvider',
+    30 => 'PHPOpenSourceSaver\\JWTAuth\\Providers\\LaravelServiceProvider',
+    31 => 'App\\Common\\Providers\\AppServiceProvider',
+    32 => 'App\\Common\\Providers\\RouteServiceProvider',
   ),
   'eager' => 
   array (
@@ -212,6 +213,7 @@
     'validation.presence' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'Illuminate\\Contracts\\Validation\\UncompromisedVerifier' => 'Illuminate\\Validation\\ValidationServiceProvider',
     'Laravel\\Socialite\\Contracts\\Factory' => 'Laravel\\Socialite\\SocialiteServiceProvider',
+    'command.tinker' => 'Laravel\\Tinker\\TinkerServiceProvider',
   ),
   'when' => 
   array (
@@ -255,6 +257,9 @@
     array (
     ),
     'Laravel\\Socialite\\SocialiteServiceProvider' => 
+    array (
+    ),
+    'Laravel\\Tinker\\TinkerServiceProvider' => 
     array (
     ),
   ),

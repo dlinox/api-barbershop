@@ -12,19 +12,22 @@ class StudentGuardianRequest extends ApiFormRequest
     {
         parent::prepareForValidation();
 
-        // Auto-fill student_id from the authenticated student's JWT profile
-        try {
-            $payload = JWTAuth::parseToken()->getPayload();
-            $profileId = $payload->get('prf');
+        // Auto-fill student_id from JWT only when the caller is the student themselves
+        // (StudentPanel). From AcademyPanel the admin always sends studentId explicitly.
+        if ($this->missing('student_id')) {
+            try {
+                $payload = JWTAuth::parseToken()->getPayload();
+                $profileId = $payload->get('prf');
 
-            if ($profileId) {
-                $profile = Profile::find($profileId);
-                if ($profile) {
-                    $this->merge(['student_id' => $profile->profileable_id]);
+                if ($profileId) {
+                    $profile = Profile::find($profileId);
+                    if ($profile && $profile->profileable_type === 'profile_students') {
+                        $this->merge(['student_id' => $profile->profileable_id]);
+                    }
                 }
+            } catch (\Exception) {
+                // Let validation handle the missing student_id
             }
-        } catch (\Exception) {
-            // Let validation handle the missing student_id
         }
     }
 

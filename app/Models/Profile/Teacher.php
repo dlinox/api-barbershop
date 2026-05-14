@@ -34,6 +34,13 @@ class Teacher extends Model
         'monthly_salary' => 'decimal:2',
     ];
 
+    public static $searchColumns = [
+        'core_persons.name',
+        'core_persons.paternal_surname',
+        'core_persons.maternal_surname',
+        'core_persons.document_number',
+    ];
+
     public function person(): BelongsTo
     {
         return $this->belongsTo(Person::class, 'core_person_id');

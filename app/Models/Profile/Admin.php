@@ -21,6 +21,15 @@ class Admin extends Model
         'core_person_id',
     ];
 
+    public static $searchColumns = [
+        'core_persons.name',
+        'core_persons.paternal_surname',
+        'core_persons.maternal_surname',
+        'core_persons.document_number',
+        'auth_users.username',
+        'auth_users.email',
+    ];
+
     public function person(): BelongsTo
     {
         return $this->belongsTo(Person::class, 'core_person_id');

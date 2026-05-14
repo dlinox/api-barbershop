@@ -22,8 +22,7 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-incomes')->g
         ->name('barbershop-panel.treasury-incomes.annul')
         ->middleware('permission:barbershop_panel.finance.income');
     Route::get('/generate-pdf/{id}', [IncomeController::class, 'generatePdf'])
-        ->name('barbershop-panel.treasury-incomes.generatePdf')
-        ->middleware('permission:barbershop_panel.finance.income');
+        ->name('barbershop-panel.treasury-incomes.generatePdf');
 });
 
 Route::middleware(['auth:api'])->prefix('/barbershop-panel/treasury-general-expenses')->group(function () {

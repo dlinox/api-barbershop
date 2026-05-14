@@ -43,6 +43,15 @@ class AdminRepository
             ->where('behavior_roles.level', '1')
             ->with('infrastructures.infrastructurable');
 
+        // Fix: apply is_active with qualified column to avoid ambiguity across joined tables
+        $filters = is_array($request->filters) ? $request->filters : [];
+        if (array_key_exists('isActive', $filters)) {
+            if (!is_null($filters['isActive'])) {
+                $items->where('auth_users.is_active', $filters['isActive']);
+            }
+            $request->merge(['filters' => collect($filters)->except('isActive')->all()]);
+        }
+
         if (empty($request->sortBy) || !isset($request->sortBy)) {
             $items->orderBy('profile_admins.core_person_id', 'desc');
         }

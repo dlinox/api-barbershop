@@ -22,8 +22,7 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-incomes')->grou
         ->name('academy-panel.treasury-incomes.annul')
         ->middleware('permission:academy_panel.finance.income');
     Route::get('/generate-pdf/{id}', [IncomeController::class, 'generatePdf'])
-        ->name('academy-panel.treasury-incomes.generatePdf')
-        ->middleware('permission:academy_panel.finance.income');
+        ->name('academy-panel.treasury-incomes.generatePdf');
 });
 
 Route::middleware(['auth:api'])->prefix('/academy-panel/treasury-general-expenses')->group(function () {
