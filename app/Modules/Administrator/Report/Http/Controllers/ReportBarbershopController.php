@@ -108,6 +108,10 @@ class ReportBarbershopController
     {
         $report = Report::findOrFail($id);
 
+        if (!FileHelper::fileExists('reports', $report->file_path)) {
+            return ApiResponse::notFound('El archivo del reporte no existe. Por favor, genéralo nuevamente.');
+        }
+
         $content = file_get_contents(FileHelper::getFilePath('reports', $report->file_path));
 
         return response($content, 200, [

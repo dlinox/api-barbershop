@@ -5,6 +5,7 @@ namespace App\Modules\AcademyPanel\Academy\Repositories;
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\Group;
 use App\Models\Academy\GroupTeacher;
+use App\Models\Profile\Teacher;
 use App\Common\Exceptions\ApiException;
 use App\Common\Http\Context\AdminContext;
 use Illuminate\Support\Facades\DB;
@@ -132,9 +133,20 @@ class GroupRepository
         return GroupTeacher::updateOrCreate(['id' => $data['id'] ?? null], $data);
     }
 
-    public function checkTeacher(int $groupId, int $teacherId): ?GroupTeacher
+    public function checkTeacher(int $groupId, int $teacherId): array
     {
-        return GroupTeacher::where('group_id', $groupId)->where('teacher_id', $teacherId)->where('status', 'active')->first();
+        $alreadyAssigned = GroupTeacher::where('group_id', $groupId)
+            ->where('teacher_id', $teacherId)
+            ->where('status', 'active')
+            ->exists();
+
+        if ($alreadyAssigned) {
+            throw new ApiException('El docente ya está asignado activamente a este grupo', 422);
+        }
+
+        $teacher = Teacher::findOrFail($teacherId);
+
+        return ['paymentType' => $teacher->payment_type];
     }
 
     private function getGroupsQuery()

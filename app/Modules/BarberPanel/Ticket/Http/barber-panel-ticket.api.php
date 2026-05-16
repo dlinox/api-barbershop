@@ -11,4 +11,5 @@ Route::middleware(['auth:api'])->prefix('/barber-panel/tickets')->group(function
     Route::post('/cancel/{id}', [TicketController::class, 'cancel']);
     Route::get('/waiting-queue/{cashSessionId}', [TicketController::class, 'waitingQueue']);
     Route::get('/services-by-infrastructure/{infrastructureId}', [TicketController::class, 'servicesByInfrastructure']);
+    Route::get('/generate-pdf/{incomeId}', [TicketController::class, 'generatePdf']);
 });

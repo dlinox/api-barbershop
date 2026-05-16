@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // CoreSeeder::class,
             DataBUSeeder::class,
-            PermissionSeeder::class,
+            // PermissionSeeder::class,
         ]);
     }
 }

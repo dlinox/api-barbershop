@@ -13,6 +13,7 @@ use App\Models\Academy\Branch;
 use App\Models\Academy\Enrollment;
 use App\Models\Academy\EnrollmentPayment;
 use App\Models\Barbershop\Branch as BarbershopBranch;
+use App\Models\Barbershop\Ticket as BarbershopTicket;
 use App\Models\Treasury\CashRegister;
 use App\Models\Treasury\CashSession;
 use App\Models\Treasury\Income;
@@ -47,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
             'academy_enrollments' => Enrollment::class,
             'academy_enrollment_payments' => EnrollmentPayment::class,
             'barbershop_branches' => BarbershopBranch::class,
+            'barbershop_tickets' => BarbershopTicket::class,
             'treasury_cash_registers' => CashRegister::class,
             'treasury_cash_sessions' => CashSession::class,
             'treasury_incomes' => Income::class,

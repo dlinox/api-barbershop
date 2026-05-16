@@ -3,7 +3,11 @@
 namespace App\Modules\BarberPanel\Ticket\Http\Controllers;
 
 use App\Common\Http\Responses\ApiResponse;
+use App\Models\Treasury\Income;
+use App\Models\Barbershop\Ticket;
 use App\Modules\Administrator\Barbershop\Http\Resources\Service\ServiceSelectItemByInfrastructureResource;
+use App\Modules\Administrator\Treasury\Repositories\Actions\GenerateIncomePdfAction;
+use App\Modules\BarberPanel\Shared\BarberContext;
 use App\Modules\BarberPanel\Ticket\Http\Requests\TicketRequest;
 use App\Modules\BarberPanel\Ticket\Http\Resources\TicketDataTableItemResource;
 use App\Modules\BarberPanel\Ticket\Http\Resources\TicketResource;
@@ -11,11 +15,13 @@ use App\Modules\BarberPanel\Ticket\Http\Resources\WaitingQueueTicketResource;
 use App\Modules\BarberPanel\Ticket\Services\TicketService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class TicketController
 {
     public function __construct(
         private readonly TicketService $service,
+        private readonly GenerateIncomePdfAction $generateIncomePdfAction,
     ) {}
 
     public function dataTable(Request $request): JsonResponse
@@ -62,5 +68,21 @@ class TicketController
         $items = $this->service->getServicesByInfrastructure($infrastructureId);
         $items = ServiceSelectItemByInfrastructureResource::collection($items);
         return ApiResponse::success($items);
+    }
+
+    public function generatePdf(int $incomeId): Response
+    {
+        $barberId = BarberContext::barberId();
+
+        // Verificar que el income pertenece a un ticket de este barbero
+        $income = Income::where('id', $incomeId)
+            ->where('transactionable_type', 'barbershop_tickets')
+            ->firstOrFail();
+
+        Ticket::where('id', $income->transactionable_id)
+            ->where('profile_barber_id', $barberId)
+            ->firstOrFail();
+
+        return ($this->generateIncomePdfAction)->execute($incomeId);
     }
 }
