@@ -18,22 +18,24 @@ class DashboardRepository
         $endOfMonth   = now()->endOfMonth()->toDateString();
 
         $ticketsToday = Ticket::where('branch_id', $branchId)
-            ->where('ticket_date', $today)
+            ->whereDate('ticket_date', $today)
             ->where('status', 'confirmed')
             ->count();
 
         $ticketsMonth = Ticket::where('branch_id', $branchId)
-            ->whereBetween('ticket_date', [$startOfMonth, $endOfMonth])
+            ->whereDate('ticket_date', '>=', $startOfMonth)
+            ->whereDate('ticket_date', '<=', $endOfMonth)
             ->where('status', 'confirmed')
             ->count();
 
         $revenueToday = (float) Ticket::where('branch_id', $branchId)
-            ->where('ticket_date', $today)
+            ->whereDate('ticket_date', $today)
             ->where('status', 'confirmed')
             ->sum('total');
 
         $revenueMonth = (float) Ticket::where('branch_id', $branchId)
-            ->whereBetween('ticket_date', [$startOfMonth, $endOfMonth])
+            ->whereDate('ticket_date', '>=', $startOfMonth)
+            ->whereDate('ticket_date', '<=', $endOfMonth)
             ->where('status', 'confirmed')
             ->sum('total');
 
@@ -134,7 +136,7 @@ class DashboardRepository
                 'client' => $t->client?->person?->full_name,
                 'total'  => (float) $t->total,
                 'status' => $t->status,
-                'date'   => $t->ticket_date,
+                'date'   => $t->ticket_date?->format('Y-m-d\TH:i:s'),
             ]);
     }
 
