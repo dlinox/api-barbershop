@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Common\Http\Responses\ApiResponse;
 use App\Modules\BarbershopPanel\Profile\Services\WorkerService;
 use App\Modules\BarbershopPanel\Profile\Http\Requests\WorkerRequest;
+use App\Modules\BarbershopPanel\Profile\Http\Resources\WorkerDetailResource;
 use App\Modules\Administrator\Profile\Http\Resources\WorkerDataTableItemResource;
 
 class WorkerController
@@ -37,5 +38,16 @@ class WorkerController
     {
         $items = $this->workerService->selectAsyncItems($request);
         return ApiResponse::success($items);
+    }
+
+    public function detail(int $id)
+    {
+        $worker = $this->workerService->detail($id);
+        return ApiResponse::success(new WorkerDetailResource($worker));
+    }
+
+    public function generatePdf(int $id)
+    {
+        return $this->workerService->generatePdf($id);
     }
 }

@@ -15,4 +15,10 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/workers')->group(functio
 
     Route::get('/select-async-items', [WorkerController::class, 'selectAsyncItems'])
         ->name('academy-panel.workers.selectAsyncItems');
+
+    Route::get('/detail/{id}', [WorkerController::class, 'detail'])
+        ->name('academy-panel.workers.detail');
+
+    Route::get('/generate-pdf/{id}', [WorkerController::class, 'generatePdf'])
+        ->name('academy-panel.workers.generatePdf');
 });

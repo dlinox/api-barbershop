@@ -19,8 +19,8 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/clients')->group(func
 Route::middleware(['auth:api'])->prefix('/barbershop-panel/barbers')->group(function () {
     Route::post('/data-table',        [BarberController::class, 'dataTable'])       ->name('bp.barbers.dataTable')       ->middleware('permission:barbershop_panel.persons.barber');
     Route::post('/save',              [BarberController::class, 'save'])             ->name('bp.barbers.save')             ->middleware('permission:barbershop_panel.persons.barber');
-    Route::get('/select-async-items', [BarberController::class, 'selectAsyncItems'])->name('bp.barbers.selectAsyncItems');
-});
+    Route::get('/select-async-items', [BarberController::class, 'selectAsyncItems'])->name('bp.barbers.selectAsyncItems');    Route::get('/detail/{id}',        [BarberController::class, 'detail'])          ->name('bp.barbers.detail')           ->middleware('permission:barbershop_panel.persons.barber');
+    Route::get('/generate-pdf/{id}',  [BarberController::class, 'generatePdf'])     ->name('bp.barbers.generatePdf')      ->middleware('permission:barbershop_panel.persons.barber');});
 
 Route::middleware(['auth:api'])->prefix('/barbershop-panel/barbershop-branches')->group(function () {
     Route::post('/data-table',    [BranchController::class, 'dataTable'])  ->name('bp.barbershop-branches.dataTable');
@@ -55,6 +55,7 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/barbershop-tickets')-
     Route::get('/get/{id}',                         [TicketController::class, 'getById'])        ->name('bp.barbershop-tickets.getById')        ->middleware('permission:barbershop_panel.reception.ticket');
     Route::post('/save',                            [TicketController::class, 'save'])           ->name('bp.barbershop-tickets.save')           ->middleware('permission:barbershop_panel.reception.ticket');
     Route::post('/cancel/{id}',                     [TicketController::class, 'cancel'])         ->name('bp.barbershop-tickets.cancel')         ->middleware('permission:barbershop_panel.reception.ticket');
+    Route::delete('/delete/{id}',                   [TicketController::class, 'delete'])         ->name('bp.barbershop-tickets.delete')         ->middleware('permission:barbershop_panel.reception.ticket');
     Route::get('/tickets-overview/{cashSessionId}', [TicketController::class, 'ticketsOverview'])->name('bp.barbershop-tickets.ticketsOverview')->middleware('permission:barbershop_panel.reception.ticket');
     Route::get('/waiting-queue/{cashSessionId}',    [TicketController::class, 'waitingQueue'])   ->name('bp.barbershop-tickets.waitingQueue')   ->middleware('permission:barbershop_panel.reception.ticket');
 });

@@ -84,6 +84,31 @@ class TicketRepository
         ];
     }
 
+    public function delete(int $id): void
+    {
+        $ticket = Ticket::findOrFail($id);
+
+        if ($ticket->status !== 'pending') {
+            throw new \Exception('Solo se pueden eliminar tickets con estado pendiente.');
+        }
+
+        $hasIncome = \App\Models\Treasury\Income::where('transactionable_type', 'barbershop_tickets')
+            ->where('transactionable_id', $ticket->id)
+            ->exists();
+
+        if ($hasIncome) {
+            throw new \Exception('No se puede eliminar un ticket que tiene un ingreso asociado.');
+        }
+
+        // Cancel pending sale if exists
+        if ($ticket->sale && $ticket->sale->status === 'pending') {
+            $ticket->sale->update(['status' => 'cancelled']);
+        }
+
+        $ticket->services()->delete();
+        $ticket->delete();
+    }
+
     public function waitingQueue(int $cashSessionId): Collection
     {
         return Ticket::select(

@@ -50,4 +50,14 @@ class TeacherRepository
         }
         return $items->limit(20)->get();
     }
+
+    public function detail(int $id): Teacher
+    {
+        return Teacher::with([
+            'person.documentTypeRelation',
+            'person.genderRelation',
+            'branch',
+            'groupTeachers.group.level',
+        ])->findOrFail($id);
+    }
 }

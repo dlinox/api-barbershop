@@ -83,4 +83,13 @@ class BarberRepository
 
         return $items;
     }
+
+    public function detail(int $id): Barber
+    {
+        return Barber::with([
+            'person.documentTypeRelation',
+            'person.genderRelation',
+            'branch',
+        ])->findOrFail($id);
+    }
 }

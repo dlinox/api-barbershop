@@ -15,4 +15,12 @@ Route::middleware(['auth:api'])->prefix('/barbershop-panel/workers')->group(func
 
     Route::get('/select-async-items', [WorkerController::class, 'selectAsyncItems'])
         ->name('barbershop-panel.workers.selectAsyncItems');
+
+    Route::get('/detail/{id}', [WorkerController::class, 'detail'])
+        ->name('barbershop-panel.workers.detail')
+        ->middleware('permission:barbershop_panel.persons.worker');
+
+    Route::get('/generate-pdf/{id}', [WorkerController::class, 'generatePdf'])
+        ->name('barbershop-panel.workers.generatePdf')
+        ->middleware('permission:barbershop_panel.persons.worker');
 });

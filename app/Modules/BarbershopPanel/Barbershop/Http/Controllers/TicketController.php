@@ -39,6 +39,12 @@ class TicketController
         return ApiResponse::success(null, 'Ticket cancelado correctamente');
     }
 
+    public function delete(int $id)
+    {
+        $this->ticketService->delete($id);
+        return ApiResponse::success(null, 'Ticket eliminado correctamente');
+    }
+
     public function ticketsOverview(int $cashSessionId)
     {
         $overview = $this->ticketService->ticketsOverview($cashSessionId);

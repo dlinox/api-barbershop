@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use App\Models\Core\Person;
+use App\Models\Core\Infrastructure;
 use App\Models\Behavior\Profile;
 use App\Common\Traits\HasDataTable;
 
@@ -45,6 +46,11 @@ class Worker extends Model
     public function person(): BelongsTo
     {
         return $this->belongsTo(Person::class, 'id');
+    }
+
+    public function infrastructure(): BelongsTo
+    {
+        return $this->belongsTo(Infrastructure::class, 'infrastructure_id');
     }
 
     public function profile(): MorphOne

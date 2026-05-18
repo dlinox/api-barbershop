@@ -95,4 +95,13 @@ class WorkerRepository
 
         return $query->limit(20)->get();
     }
+
+    public function detail(int $id): Worker
+    {
+        return Worker::with([
+            'person.documentTypeRelation',
+            'person.genderRelation',
+            'infrastructure.infrastructurable',
+        ])->findOrFail($id);
+    }
 }

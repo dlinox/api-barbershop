@@ -178,7 +178,8 @@ class DashboardRepository
             })
             ->where('bt.branch_id', $branchId)
             ->where('bt.status', 'confirmed')
-            ->whereBetween('bt.ticket_date', [$from, $to])
+            ->whereDate('bt.ticket_date', '>=', $from)
+            ->whereDate('bt.ticket_date', '<=', $to)
             ->select('cpm.name', 'cpm.type', DB::raw('SUM(tipm.amount) as amount'))
             ->groupBy('cpm.id', 'cpm.name', 'cpm.type')
             ->orderByDesc('amount')
@@ -196,7 +197,8 @@ class DashboardRepository
 
         $revenue = (float) Ticket::where('branch_id', $branchId)
             ->where('status', 'confirmed')
-            ->whereBetween('ticket_date', [$from, $to])
+            ->whereDate('ticket_date', '>=', $from)
+            ->whereDate('ticket_date', '<=', $to)
             ->sum('total');
 
         $expenses = (float) Expense::where('infrastructure_id', $infrastructureId)

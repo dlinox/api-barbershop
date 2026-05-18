@@ -5,6 +5,7 @@ namespace App\Modules\AcademyPanel\Academy\Http\Controllers;
 use App\Common\Http\Context\AdminContext;
 use App\Common\Http\Responses\ApiResponse;
 use App\Modules\AcademyPanel\Academy\Http\Requests\TeacherRequest;
+use App\Modules\AcademyPanel\Academy\Http\Resources\TeacherDetailResource;
 use App\Modules\AcademyPanel\Academy\Services\TeacherService;
 use App\Modules\Administrator\Academy\Http\Resources\Teacher\TeacherDataTableItemResource;
 use App\Modules\Administrator\Academy\Http\Resources\Teacher\TeacherSelectItemResource;
@@ -34,5 +35,16 @@ class TeacherController
         return ApiResponse::success(TeacherSelectItemResource::collection(
             $this->teacherService->selectAsyncItems($request)
         ));
+    }
+
+    public function detail(int $id)
+    {
+        $teacher = $this->teacherService->detail($id);
+        return ApiResponse::success(new TeacherDetailResource($teacher));
+    }
+
+    public function generatePdf(int $id)
+    {
+        return $this->teacherService->generatePdf($id);
     }
 }

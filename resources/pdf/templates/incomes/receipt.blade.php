@@ -62,7 +62,7 @@
             <table>
                 <tr>
                     <td class="total-label">Subtotal</td>
-                    <td class="total-value">S/ {{ number_format($subtotal, 2) }}</td>
+                    <td class="total-value">S/ {{ number_format($subtotal + $discount, 2) }}</td>
                 </tr>
                 @if($discount > 0)
                 <tr>

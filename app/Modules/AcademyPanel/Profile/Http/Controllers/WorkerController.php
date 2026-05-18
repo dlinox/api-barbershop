@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Common\Http\Responses\ApiResponse;
 use App\Modules\AcademyPanel\Profile\Services\WorkerService;
 use App\Modules\AcademyPanel\Profile\Http\Requests\WorkerRequest;
+use App\Modules\AcademyPanel\Profile\Http\Resources\WorkerDetailResource;
 use App\Modules\Administrator\Profile\Http\Resources\WorkerDataTableItemResource;
 use App\Modules\Administrator\Treasury\Http\Resources\Worker\WorkerSelectItemResource;
 
@@ -39,5 +40,16 @@ class WorkerController
         $items = $this->workerService->selectAsyncItems($request);
         $items = WorkerSelectItemResource::collection($items);
         return ApiResponse::success($items);
+    }
+
+    public function detail(int $id)
+    {
+        $worker = $this->workerService->detail($id);
+        return ApiResponse::success(new WorkerDetailResource($worker));
+    }
+
+    public function generatePdf(int $id)
+    {
+        return $this->workerService->generatePdf($id);
     }
 }

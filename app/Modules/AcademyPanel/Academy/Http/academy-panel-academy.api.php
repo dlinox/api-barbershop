@@ -67,6 +67,8 @@ Route::middleware(['auth:api'])->prefix('/academy-panel/teachers')->group(functi
     Route::post('/data-table',        [TeacherController::class, 'dataTable'])       ->name('ap.teachers.dataTable') ->middleware('permission:academy_panel.teachers.db');
     Route::post('/save',              [TeacherController::class, 'save'])            ->name('ap.teachers.save')      ->middleware('permission:academy_panel.teachers.db');
     Route::get('/select-async-items', [TeacherController::class, 'selectAsyncItems'])->name('ap.teachers.selectAsyncItems');
+    Route::get('/detail/{id}',        [TeacherController::class, 'detail'])          ->name('ap.teachers.detail')    ->middleware('permission:academy_panel.teachers.db');
+    Route::get('/generate-pdf/{id}',  [TeacherController::class, 'generatePdf'])     ->name('ap.teachers.generatePdf')->middleware('permission:academy_panel.teachers.db');
 });
 
 Route::middleware(['auth:api'])->prefix('/academy-panel/enrollments')->group(function () {

@@ -6,6 +6,7 @@ use App\Common\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 use App\Modules\BarbershopPanel\Barbershop\Services\BarberService;
 use App\Modules\BarbershopPanel\Barbershop\Http\Requests\BarberRequest;
+use App\Modules\BarbershopPanel\Barbershop\Http\Resources\BarberDetailResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberDataTableItemResource;
 use App\Modules\Administrator\Barbershop\Http\Resources\Barber\BarberSelectItemResource;
 
@@ -30,5 +31,16 @@ class BarberController
     {
         $item = BarberSelectItemResource::collection($this->barberService->selectAsyncItems($request));
         return ApiResponse::success($item);
+    }
+
+    public function detail(int $id)
+    {
+        $barber = $this->barberService->detail($id);
+        return ApiResponse::success(new BarberDetailResource($barber));
+    }
+
+    public function generatePdf(int $id)
+    {
+        return $this->barberService->generatePdf($id);
     }
 }

@@ -86,4 +86,16 @@ class TicketService
             throw $e;
         }
     }
+
+    public function delete(int $id): void
+    {
+        DB::beginTransaction();
+        try {
+            $this->ticketRepository->delete($id);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
 }
