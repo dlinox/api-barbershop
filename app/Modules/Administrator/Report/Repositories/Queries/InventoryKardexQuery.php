@@ -13,7 +13,7 @@ class InventoryKardexQuery
     public function __invoke(int $presentationId, int $infrastructureId, string $dateFrom, string $dateTo): array
     {
         $presentation = ProductPresentation::with('product')->findOrFail($presentationId);
-        $infrastructure = Infrastructure::findOrFail($infrastructureId);
+        $infrastructure = Infrastructure::with('infrastructurable')->findOrFail($infrastructureId);
 
         $movements = Kardex::where('presentation_id', $presentationId)
             ->where('infrastructure_id', $infrastructureId)
@@ -54,6 +54,7 @@ class InventoryKardexQuery
 
         return [
             'company'             => Company::first(),
+            'infrastructure'      => $queryData['infrastructure'],
             'report_title'        => 'KARDEX DE PRODUCTO',
             'report_subtitle'     => 'INVENTARIO',
             'report_date'         => $parsedFrom->format('d/m/Y') . ' - ' . $parsedTo->format('d/m/Y'),

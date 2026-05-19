@@ -12,7 +12,7 @@ class TreasuryIncomeVsExpenseQuery
 {
     public function __invoke(int $infrastructureId, string $dateFrom, string $dateTo): array
     {
-        $infrastructure = Infrastructure::findOrFail($infrastructureId);
+        $infrastructure = Infrastructure::with('infrastructurable')->findOrFail($infrastructureId);
         $from = $dateFrom;
         $to = $dateTo . ' 23:59:59';
 
@@ -82,6 +82,7 @@ class TreasuryIncomeVsExpenseQuery
 
         return [
             'company'             => Company::first(),
+            'infrastructure'      => $queryData['infrastructure'],
             'report_title'        => 'INGRESOS VS GASTOS',
             'report_subtitle'     => 'TESORERÍA',
             'report_date'         => $parsedFrom->format('d/m/Y') . ' - ' . $parsedTo->format('d/m/Y'),

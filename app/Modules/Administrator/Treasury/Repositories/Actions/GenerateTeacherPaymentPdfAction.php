@@ -26,6 +26,7 @@ class GenerateTeacherPaymentPdfAction
 
         $data = [
             'company'             => $company,
+            'branch'              => $teacher?->branch ?? null,
             'payment'             => $payment,
             'teacher'             => $teacher,
             'infrastructure'      => $infrastructure,

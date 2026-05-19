@@ -1,8 +1,12 @@
 <table style="width: 100%; font-family: 'Helvetica Neue', Arial, sans-serif; border-bottom: 2px solid #1a1a2e; padding-bottom: 6px;">
     <tr>
         <td style="width: 10%; text-align: left; vertical-align: middle;">
-            @if($company?->logo)
-                <img src="{{ public_path('storage/company_logos/' . basename($company->logo)) }}" style="max-height: 70px; max-width: 130px;" />
+            @php
+                $sede = $branch ?? \App\Common\Helpers\PdfLogoHelper::branchFromInfrastructure($infrastructure ?? null);
+                $logoPath = \App\Common\Helpers\PdfLogoHelper::resolve($sede, $company ?? null);
+            @endphp
+            @if($logoPath)
+                <img src="{{ $logoPath }}" style="max-height: 70px; max-width: 130px;" />
             @endif
         </td>
         <td style="width: 65%; text-align: left; vertical-align: middle;">

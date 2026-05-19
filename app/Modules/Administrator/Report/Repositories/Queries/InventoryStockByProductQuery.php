@@ -11,7 +11,7 @@ class InventoryStockByProductQuery
 {
     public function __invoke(?int $infrastructureId = null): array
     {
-        $infrastructure = $infrastructureId ? Infrastructure::find($infrastructureId) : null;
+        $infrastructure = $infrastructureId ? Infrastructure::with('infrastructurable')->find($infrastructureId) : null;
 
         $rows = DB::table('inventory_product_presentations as pp')
             ->join('inventory_products as p', 'p.id', '=', 'pp.product_id')
@@ -65,6 +65,7 @@ class InventoryStockByProductQuery
 
         return [
             'company'             => Company::first(),
+            'infrastructure'      => $queryData['infrastructure'],
             'report_title'        => 'STOCK POR PRODUCTO',
             'report_subtitle'     => 'INVENTARIO',
             'report_date'         => $now->format('d/m/Y'),

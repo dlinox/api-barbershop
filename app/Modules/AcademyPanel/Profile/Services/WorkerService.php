@@ -55,6 +55,7 @@ class WorkerService
 
         $data = [
             'company'           => Company::first(),
+            'branch'            => $worker->infrastructure?->infrastructurable ?? null,
             'generated_by'      => Auth::user()?->username ?? 'Sistema',
             'generated_at'      => now()->format('d/m/Y H:i'),
             'worker_id'         => (int) $worker->id,

@@ -12,7 +12,7 @@ class IncomeDetailQuery
             'details',
             'paymentMethods.paymentMethod',
             'person',
-            'infrastructure',
+            'infrastructure.infrastructurable',
         ])->findOrFail($id);
     }
 
@@ -26,6 +26,7 @@ class IncomeDetailQuery
         ];
 
         return [
+            'infrastructure'      => $income->infrastructure,
             'receipt_serie'       => $income->receipt_serie,
             'receipt_number'      => $income->receipt_number,
             'receipt_full_number' => $income->receipt_serie . '-' . str_pad($income->receipt_number, 8, '0', STR_PAD_LEFT),

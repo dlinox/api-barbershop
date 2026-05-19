@@ -59,6 +59,7 @@ class InventoryLowStockQuery
         ])->toArray();
 
         return [
+            'infrastructure'      => $infrastructure,
             'infrastructure_name' => $infrastructureName,
             'rows'                => $rows,
             'total_deficit'       => array_sum(array_column($rows, 'deficit')),
@@ -73,6 +74,7 @@ class InventoryLowStockQuery
 
         return [
             'company'             => Company::first(),
+            'infrastructure'      => $queryData['infrastructure'] ?? null,
             'report_title'        => 'PRODUCTOS CON STOCK BAJO / AGOTADO',
             'report_subtitle'     => 'INVENTARIO',
             'report_date'         => $now->format('d/m/Y'),

@@ -1,59 +1,136 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# api-barbershop
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Backend API REST de la **Plataforma Web Integral de Grupo Samanez**. Centraliza la lógica de negocio, autenticación, seguridad, persistencia y generación de reportes para la aplicación de gestión (`app-barbershop`).
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **PHP** ^8.2
+- **Laravel** ^12.0
+- **Autenticación:** JWT (`php-open-source-saver/jwt-auth`) + Sanctum
+- **Base de datos:** MySQL 8 / MariaDB 10.6+
+- **PDFs:** `mpdf/mpdf` ^8.3
+- **Tests:** Pest ^4.3
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Arquitectura
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Monolito modular orientado al dominio (DDD). El código se organiza por **contexto de negocio** dentro de `app/Modules`, no por capa técnica.
 
-## Learning Laravel
+```
+app/
+├── Common/          # Helpers, Exceptions, Middleware, Providers, Traits
+├── Console/         # Comandos artisan
+├── Models/          # Modelos Eloquent agrupados por dominio
+│   ├── Academy/  Auth/  Barbershop/  Behavior/  Core/
+│   └── Inventory/  Profile/  Reports/  Treasury/
+└── Modules/         # Lógica por panel
+    ├── Auth/  Profile/  Shared/
+    ├── Administrator/   AcademyPanel/   BarbershopPanel/
+    └── BarberPanel/     TeacherPanel/   StudentPanel/
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Cada submódulo respeta la estructura:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+<Modulo>/<Submódulo>/
+├── Http/
+│   ├── Controllers/   Requests/   Resources/
+│   └── *.api.php           # Rutas auto-cargadas por RouteServiceProvider
+├── Repositories/
+└── Services/
+```
 
-## Laravel Sponsors
+Cualquier archivo `*.api.php` dentro de una carpeta `Http/` se carga automáticamente bajo el prefijo `/api`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Módulos principales
 
-### Premium Partners
+| Módulo               | Propósito                                                                                              |
+| :------------------- | :----------------------------------------------------------------------------------------------------- |
+| `Auth`               | Login con correo, Google OAuth, selección de perfil/sede, refresh, logout.                             |
+| `Administrator`      | Panel del Super Admin (Academia, Barbería, Inventario, Tesorería, Seguridad, Configuración, Reportes). |
+| `AcademyPanel`       | Operación de cada sede académica.                                                                      |
+| `BarbershopPanel`    | Operación de cada barbería.                                                                            |
+| `BarberPanel`        | Asistencia, tickets, POS, caja del barbero.                                                            |
+| `TeacherPanel`       | Grupos asignados, asistencia del docente.                                                              |
+| `StudentPanel`       | Matrículas, asistencia y pagos del estudiante.                                                         |
+| `Profile` / `Shared` | Endpoints transversales (perfil del usuario, selectores, búsquedas).                                   |
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Base de datos
 
-## Contributing
+73 tablas agrupadas por prefijo de dominio: `core_*`, `auth_*`, `behavior_*`, `profile_*`, `academy_*`, `barbershop_*`, `barber_*`, `inventory_*`, `treasury_*`, `worker_*`, `reports`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Instalación (desarrollo local)
 
-## Code of Conduct
+```bash
+# 1. Instalar dependencias
+composer install
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 2. Configurar entorno
+cp .env.example .env
+php artisan key:generate
 
-## Security Vulnerabilities
+# 3. Crear la base de datos y configurarla en .env
+#    (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 4. Migrar y sembrar
+php artisan migrate
+php artisan db:seed --class=CoreSeeder
+php artisan db:seed --class=PermissionSeeder
 
-## License
+# 5. Levantar servidor
+php artisan serve
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+La API quedará disponible en `http://localhost:8000/api`.
+
+## Variables de entorno relevantes
+
+```dotenv
+APP_NAME="Grupo Samanez"
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_DATABASE=db_api_barbershop
+
+JWT_SECRET=********
+JWT_TTL=4320            # Access token (minutos)
+JWT_REFRESH_TTL=20160   # Refresh token (minutos)
+JWT_BLACKLIST_ENABLED=true
+```
+
+## Middleware personalizado
+
+| Alias                 | Función                                               |
+| :-------------------- | :---------------------------------------------------- |
+| `auth:api`            | Valida el JWT del header `Authorization: Bearer ...`. |
+| `super_admin`         | Restringe la ruta a usuarios con rol Super Admin.     |
+| `permission:<nombre>` | Verifica un permiso jerárquico específico.            |
+
+Los permisos se definen en `config/permissions/*.php` con la estructura `feature → module → view → action`.
+
+## Tarea programada (cron)
+
+Una única tarea programada actualiza el estado de los grupos académicos:
+
+```bash
+0 0 * * *  /usr/local/bin/php /home/USUARIO/api/artisan academy:update-group-status >> /dev/null 2>&1
+```
+
+Detalle completo en [`CRON.md`](./CRON.md).
+
+## Despliegue
+
+El despliegue oficial se realiza por **subida de `.zip` en cPanel** de Hostinger. Procedimiento paso a paso, requisitos del servidor y matriz de variables en la documentación general de la plataforma (`DOCUMENTACION.md`, sección 1.2).
+
+## Comandos útiles
+
+```bash
+php artisan optimize:clear          # Limpiar todas las cachés
+php artisan config:cache            # Cachear configuración (producción)
+php artisan route:cache             # Cachear rutas (producción)
+php artisan schedule:list           # Ver tareas programadas
+php artisan test                    # Ejecutar Pest
+```
+
+## Licencia
+
+Software propietario. Ver [`LICENCIA.md`](./LICENCIA.md).

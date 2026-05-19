@@ -11,7 +11,7 @@ class TreasuryExpensePerDayQuery
 {
     public function __invoke(int $infrastructureId, string $date): array
     {
-        $infrastructure = Infrastructure::findOrFail($infrastructureId);
+        $infrastructure = Infrastructure::with('infrastructurable')->findOrFail($infrastructureId);
 
         $expenses = Expense::approved()
             ->whereDate('transaction_date', $date)
@@ -50,6 +50,7 @@ class TreasuryExpensePerDayQuery
 
         return [
             'company'             => Company::first(),
+            'infrastructure'      => $queryData['infrastructure'],
             'report_title'        => 'REGISTRO DE GASTOS DIARIOS',
             'report_subtitle'     => 'TESORERÍA',
             'report_date'         => $parsedDate->format('d/m/Y'),

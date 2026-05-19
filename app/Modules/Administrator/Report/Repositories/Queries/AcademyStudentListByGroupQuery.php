@@ -50,6 +50,7 @@ class AcademyStudentListByGroupQuery
 
         return [
             'company'         => Company::first(),
+            'branch'          => $group->branch ?? null,
             'report_title'    => 'LISTA DE ALUMNOS POR GRUPO',
             'report_subtitle' => 'ESCUELA',
             'report_date'     => now()->format('d/m/Y'),

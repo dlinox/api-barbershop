@@ -11,7 +11,7 @@ class InventorySalesPerDayQuery
 {
     public function __invoke(int $infrastructureId, string $date): array
     {
-        $infrastructure = Infrastructure::findOrFail($infrastructureId);
+        $infrastructure = Infrastructure::with('infrastructurable')->findOrFail($infrastructureId);
 
         $sales = Sale::where('status', 'completed')
             ->whereDate('created_at', $date)
@@ -53,6 +53,7 @@ class InventorySalesPerDayQuery
 
         return [
             'company'             => Company::first(),
+            'infrastructure'      => $queryData['infrastructure'],
             'report_title'        => 'VENTAS DEL DÍA',
             'report_subtitle'     => 'INVENTARIO',
             'report_date'         => $parsedDate->format('d/m/Y'),

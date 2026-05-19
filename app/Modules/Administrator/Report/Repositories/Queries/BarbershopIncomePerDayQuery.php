@@ -98,6 +98,7 @@ class BarbershopIncomePerDayQuery
             'report_subtitle' => 'BARBERÍA',
             'report_date'     => $parsedDate->format('d/m/Y'),
             'report_day'      => $dayNames[$parsedDate->dayOfWeek],
+            'branch'          => $queryData['branch'],
             'branch_name'     => $queryData['branch']->name,
             'rows'            => $queryData['rows'],
             'total_cash'      => $queryData['totals']['cash'],

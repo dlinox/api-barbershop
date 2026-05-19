@@ -49,6 +49,7 @@ class TeacherService
 
         $data = [
             'company'       => Company::first(),
+            'branch'        => $branch ?? null,
             'generated_by'  => Auth::user()?->username ?? 'Sistema',
             'generated_at'  => now()->format('d/m/Y H:i'),
             'teacher_id'    => (int) $teacher->core_person_id,

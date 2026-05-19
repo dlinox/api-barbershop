@@ -13,7 +13,7 @@ class CashSessionSummaryQuery
 {
     public function __invoke(int $cashSessionId): array
     {
-        $session = CashSession::with(['cashRegister.infrastructure', 'openedByUser', 'closedByUser'])
+        $session = CashSession::with(['cashRegister.infrastructure.infrastructurable', 'openedByUser', 'closedByUser'])
             ->findOrFail($cashSessionId);
 
         $infrastructureId = $session->cashRegister?->infrastructure_id;
@@ -75,6 +75,7 @@ class CashSessionSummaryQuery
 
         return [
             'session'             => $session,
+            'infrastructure'      => $infrastructure,
             'infrastructure_name' => $infrastructureName,
             'payment_summary'     => $paymentSummary,
             'total_incomes'       => $totalIncomes,
@@ -90,6 +91,7 @@ class CashSessionSummaryQuery
 
         return [
             'company'              => Company::first(),
+            'infrastructure'       => $queryData['infrastructure'] ?? null,
             'report_title'         => 'RESUMEN DE CIERRE DE CAJA',
             'report_subtitle'      => 'BARBERÍA',
             'report_date'          => Carbon::parse($session->opened_at)->format('d/m/Y'),

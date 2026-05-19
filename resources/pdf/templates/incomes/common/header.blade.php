@@ -2,8 +2,12 @@
     <tr>
         {{-- 2. DATOS DE EMPRESA (centrado) --}}
         <td style="width: 10%; text-align: left; vertical-align: middle;">
-            @if($company?->logo)
-                <img src="{{ public_path('storage/company_logos/' . basename($company->logo)) }}" style="max-height: 80px; max-width: 150px;" />
+            @php
+                $sede = $branch ?? \App\Common\Helpers\PdfLogoHelper::branchFromInfrastructure($infrastructure ?? null);
+                $logoPath = \App\Common\Helpers\PdfLogoHelper::resolve($sede, $company ?? null);
+            @endphp
+            @if($logoPath)
+                <img src="{{ $logoPath }}" style="max-height: 80px; max-width: 150px;" />
             @endif
         </td>
         <td style="width: 65%; text-align: left; vertical-align: middle;">

@@ -11,7 +11,7 @@ class TreasuryPendingExpensesQuery
 {
     public function __invoke(?int $infrastructureId = null): array
     {
-        $infrastructure = $infrastructureId ? Infrastructure::find($infrastructureId) : null;
+        $infrastructure = $infrastructureId ? Infrastructure::with('infrastructurable')->find($infrastructureId) : null;
 
         $expenses = Expense::pending()
             ->when($infrastructureId, fn($q) => $q->where('infrastructure_id', $infrastructureId))
@@ -49,6 +49,7 @@ class TreasuryPendingExpensesQuery
 
         return [
             'company'             => \App\Models\Core\Company::first(),
+            'infrastructure'      => $queryData['infrastructure'],
             'report_title'        => 'GASTOS PENDIENTES DE APROBACIÓN',
             'report_subtitle'     => 'TESORERÍA',
             'report_date'         => $now->format('d/m/Y'),

@@ -266,6 +266,7 @@ class EnrollmentService
 
         $data = [
             'company'       => Company::first(),
+            'branch'        => $destGroup->branch ?? $originGroup->branch ?? null,
             'generated_by'  => Auth::user()?->username ?? 'Sistema',
             'generated_at'  => now()->format('d/m/Y H:i'),
             'change_id'     => $change->id,

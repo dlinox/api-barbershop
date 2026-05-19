@@ -45,6 +45,7 @@ class EnrollmentDetailQuery
             ->unique();
 
         return [
+            'branch' => $group->branch ?? null,
             'enrollment_id' => $enrollment->id,
             'enrollment_date' => Carbon::parse($enrollment->date)->format('d/m/Y'),
             'enrollment_status' => EnrollmentStatus::tryFrom($enrollment->status)?->label() ?? $enrollment->status,

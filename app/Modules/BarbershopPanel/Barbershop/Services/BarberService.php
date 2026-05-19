@@ -43,6 +43,7 @@ class BarberService
 
         $data = [
             'company'               => Company::first(),
+            'branch'                => $barber->branch ?? null,
             'generated_by'          => Auth::user()?->username ?? 'Sistema',
             'generated_at'          => now()->format('d/m/Y H:i'),
             'barber_id'             => (int) $barber->id,

@@ -10,7 +10,7 @@ class TreasuryCashSessionQuery
 {
     public function __invoke(int $cashSessionId): array
     {
-        $session = CashSession::with(['cashRegister.infrastructure', 'openedByUser', 'closedByUser'])
+        $session = CashSession::with(['cashRegister.infrastructure.infrastructurable', 'openedByUser', 'closedByUser'])
             ->findOrFail($cashSessionId);
 
         $infrastructure = $session->cashRegister?->infrastructure;
@@ -56,6 +56,7 @@ class TreasuryCashSessionQuery
 
         return [
             'session'             => $session,
+            'infrastructure'      => $infrastructure,
             'infrastructure_name' => $infraName,
             'register_name'       => $registerName,
             'income_rows'         => $incomeRows,
@@ -73,6 +74,7 @@ class TreasuryCashSessionQuery
 
         return [
             'company'             => Company::first(),
+            'infrastructure'      => $queryData['infrastructure'] ?? null,
             'report_title'        => 'CIERRE DE CAJA',
             'report_subtitle'     => 'TESORERÍA',
             'report_date'         => $openedAt->format('d/m/Y'),

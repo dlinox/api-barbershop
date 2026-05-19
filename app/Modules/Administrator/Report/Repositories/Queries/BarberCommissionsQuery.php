@@ -95,6 +95,7 @@ class BarberCommissionsQuery
             'report_subtitle' => 'BARBERÍA',
             'report_date'     => "{$from} - {$to}",
             'report_day'      => $queryData['branch']->name,
+            'branch'          => $queryData['branch'],
             'branch_name'     => $queryData['branch']->name,
             'date_from'       => $from,
             'date_to'         => $to,

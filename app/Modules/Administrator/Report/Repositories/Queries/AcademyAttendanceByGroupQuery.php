@@ -96,6 +96,7 @@ class AcademyAttendanceByGroupQuery
 
         return [
             'company'         => Company::first(),
+            'branch'          => $group->branch ?? null,
             'report_title'    => 'REGISTRO DE ASISTENCIA POR GRUPO',
             'report_subtitle' => 'ESCUELA',
             'report_date'     => $monthNames[$queryData['month']] . ' ' . $queryData['year'],
