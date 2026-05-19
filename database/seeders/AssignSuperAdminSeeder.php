@@ -14,18 +14,12 @@ class AssignSuperAdminSeeder extends Seeder
     public function run(): void
     {
         $username = '70498731';
+        $roles    = ['super_admin', 'gerente'];
 
         $user = User::where('username', $username)->first();
 
         if (!$user) {
             $this->command->error("Usuario '{$username}' no encontrado.");
-            return;
-        }
-
-        $role = Role::where('name', 'super_admin')->first();
-
-        if (!$role) {
-            $this->command->error("Rol 'super_admin' no encontrado.");
             return;
         }
 
@@ -38,18 +32,27 @@ class AssignSuperAdminSeeder extends Seeder
 
         $admin = Admin::firstOrCreate(['core_person_id' => $person->id]);
 
-        Profile::updateOrCreate(
-            [
-                'auth_user_id'     => $user->id,
-                'profileable_type' => 'profile_admins',
-                'profileable_id'   => $admin->core_person_id,
-            ],
-            [
-                'behavior_role_id' => $role->id,
-                'is_active'        => true,
-            ]
-        );
+        foreach ($roles as $roleName) {
+            $role = Role::where('name', $roleName)->first();
 
-        $this->command->info("Rol 'super_admin' asignado al usuario '{$username}'.");
+            if (!$role) {
+                $this->command->error("Rol '{$roleName}' no encontrado.");
+                continue;
+            }
+
+            Profile::updateOrCreate(
+                [
+                    'auth_user_id'     => $user->id,
+                    'profileable_type' => 'profile_admins',
+                    'profileable_id'   => $admin->core_person_id,
+                    'behavior_role_id' => $role->id,
+                ],
+                [
+                    'is_active' => true,
+                ]
+            );
+
+            $this->command->info("Rol '{$roleName}' asignado al usuario '{$username}'.");
+        }
     }
 }
