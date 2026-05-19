@@ -3,6 +3,7 @@
 namespace App\Modules\Administrator\Treasury\Repositories\Actions;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 
 use App\Common\Exceptions\ApiException;
 use App\Models\Profile\Worker;
@@ -41,9 +42,15 @@ class DeleteWorkerAction
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
+        } catch (QueryException $e) {
+            DB::rollBack();
+            if ($e->getCode() === '23000') {
+                throw new ApiException('No se puede eliminar el trabajador porque tiene registros relacionados');
+            }
+            throw new ApiException('Error al eliminar el trabajador');
         } catch (\Exception $e) {
             DB::rollBack();
-            throw new ApiException($e->getMessage());
+            throw new ApiException('Error al eliminar el trabajador');
         }
     }
 }

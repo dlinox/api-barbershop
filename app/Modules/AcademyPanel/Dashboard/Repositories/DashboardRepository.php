@@ -21,6 +21,7 @@ class DashboardRepository
 
         $activeGroupIds = Group::where('branch_id', $branchId)
             ->where('is_active', true)
+            ->where('status', 'active')
             ->pluck('id');
 
         $activeGroupsCount = $activeGroupIds->count();
