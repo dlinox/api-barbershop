@@ -14,9 +14,10 @@
         {{-- 2. DATOS DE EMPRESA --}}
         <td style="width: 65%; text-align: left; vertical-align: middle;">
             <div style="font-size: 14px; font-weight: bold; color: #1a1a2e;">
-                {{ $company->trade_name ?? $company->name ?? 'Mi Empresa' }}
+                {{ $sede?->name ?? $company->trade_name ?? $company->name ?? 'Mi Empresa' }}
             </div>
             <div style="font-size: 8.5px; color: #666; line-height: 1.5;">
+                @if($sede?->name){{ $company->trade_name ?? $company->name ?? 'Mi Empresa' }}<br>@endif
                 @if($company?->ruc)RUC: {{ $company->ruc }}<br>@endif
                 @if($company?->address){{ $company->address }}<br>@endif
                 @if($company?->phone)Tel: {{ $company->phone }}@endif
