@@ -1,8 +1,8 @@
 # Licencia Propietaria de Software
 
-**Producto:** `api-barbershop` — Backend API REST de la Plataforma Web Integral de Grupo Samanez.
+**Producto:** Backend API REST de la Plataforma Web Integral de Grupo Samanez.
 
-**Titular / Licenciante:** Denis Puma T.
+**Titular / Licenciante:** Denis L. Puma T.
 
 **Cliente / Licenciatario:** Grupo Samanez.
 
@@ -12,7 +12,7 @@
 
 ## 1. Definiciones
 
-- **Software:** El código fuente, archivos compilados, archivos de configuración, scripts, migraciones de base de datos, plantillas, documentación técnica y demás materiales asociados al proyecto `api-barbershop`.
+- **Software:** El código fuente, archivos compilados, archivos de configuración, scripts, migraciones de base de datos, plantillas, documentación técnica y demás materiales asociados al proyecto.
 - **Uso Interno:** Operación del Software exclusivamente para las actividades propias del Cliente (gestión de su academia, barberías, personal, finanzas y reportes).
 - **Modificación:** Cualquier alteración del código fuente realizada por el Cliente o por terceros contratados por el Cliente.
 
@@ -65,7 +65,7 @@ Las modificaciones realizadas por el Cliente para su uso interno son permitidas,
 
 ## 6. Soporte y Mantenimiento
 
-Esta licencia **no incluye** servicios de soporte técnico, mantenimiento, actualizaciones, capacitación ni resolución de incidencias. Dichos servicios, en caso de ser requeridos, deberán ser contratados por separado mediante un acuerdo independiente con el Titular.
+Esta licencia **no incluye** servicios de soporte técnico, actualizaciones. Dichos servicios, en caso de ser requeridos, deberán ser contratados por separado mediante un acuerdo independiente con el Titular.
 
 ---
 
@@ -96,10 +96,4 @@ Esta licencia se rige por las leyes de la **República del Perú**. Cualquier co
 
 ---
 
-## 10. Acuerdo Completo
-
-Este documento constituye el **acuerdo completo** entre las partes respecto al licenciamiento del Software, y reemplaza cualquier acuerdo previo, verbal o escrito, sobre la misma materia. Cualquier modificación deberá constar por escrito y estar firmada por ambas partes.
-
----
-
-© [AÑO] [NOMBRE DEL TITULAR]. Todos los derechos reservados.
+© [2026] Denis L. Puma T. Todos los derechos reservados.
