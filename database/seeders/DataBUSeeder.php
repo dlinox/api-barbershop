@@ -11,7 +11,7 @@ class DataBUSeeder extends Seeder
     public function run(): void
     {
         // $path = database_path('sql/bu_22_02_2026.sql');
-        $path = database_path('sql/bu_2026_05_15.sql');
+        $path = database_path('sql/bu_gruposamanez_inserts_20_05_2026.sql');
         // $path = database_path('sql/bu_inserts_14_03_26.sql');
 
         if (file_exists($path)) {
